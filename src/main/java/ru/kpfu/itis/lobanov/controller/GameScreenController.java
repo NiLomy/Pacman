@@ -9,6 +9,8 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import ru.kpfu.itis.lobanov.PacmanApplication;
+import ru.kpfu.itis.lobanov.client.PacmanClient;
 import ru.kpfu.itis.lobanov.model.environment.pickups.Bonus;
 import ru.kpfu.itis.lobanov.model.environment.Cell;
 import ru.kpfu.itis.lobanov.model.environment.Maze;
@@ -18,8 +20,10 @@ import ru.kpfu.itis.lobanov.utils.Direction;
 import ru.kpfu.itis.lobanov.utils.GameSettings;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class GameScreenController {
@@ -39,8 +43,10 @@ public class GameScreenController {
     private int scores;
     private Pacman pacman;
     private Direction currentDirection;
+    private String message;
     private List<Pellet> pellets;
     private List<Bonus> bonuses;
+    private PacmanClient client;
 
     @FXML
     private void initialize() {
@@ -51,6 +57,9 @@ public class GameScreenController {
         generateBonuses();
         generatePellets();
 
+        client = new PacmanClient(this);
+        PacmanApplication.setClient(client);
+        client.start();
         KeyFrame keyFrame = createKeyFrame();
         startGame(keyFrame);
     }
@@ -113,15 +122,19 @@ public class GameScreenController {
                     switch (event1.getCode()) {
                         case UP:
                             currentDirection = Direction.UP;
+                            message = "u";
                             break;
                         case DOWN:
                             currentDirection = Direction.DOWN;
+                            message = "d";
                             break;
                         case LEFT:
                             currentDirection = Direction.LEFT;
+                            message = "l";
                             break;
                         case RIGHT:
                             currentDirection = Direction.RIGHT;
+                            message = "r";
                             break;
                         case ENTER:
                             System.out.println("YAAA");
@@ -130,8 +143,12 @@ public class GameScreenController {
                 });
             }
 
+            if (message != null) {
+                client.sendMessage(message);
+            }
+
             blinkBonuses();
-            pacman.go(currentDirection);
+//            pacman.go(currentDirection);
             Pellet pellet = pacman.eatPellet(pellets);
             if (pellet != null) {
                 scores += pellet.getScore();
@@ -175,5 +192,24 @@ public class GameScreenController {
         };
         Timer timer = new Timer();
         timer.schedule(task, 500);
+    }
+
+    public void receiveMessage(String message) {
+        if (message.charAt(0) == '1') {
+            switch (message.substring(1)) {
+                case "u":
+                    pacman.go(Direction.UP);
+                    break;
+                case "d":
+                    pacman.go(Direction.DOWN);
+                    break;
+                case "l":
+                    pacman.go(Direction.LEFT);
+                    break;
+                case "r":
+                    pacman.go(Direction.RIGHT);
+                    break;
+            }
+        }
     }
 }
