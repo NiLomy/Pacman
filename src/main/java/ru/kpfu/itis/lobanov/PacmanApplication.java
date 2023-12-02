@@ -6,6 +6,9 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import ru.kpfu.itis.lobanov.client.PacmanClient;
+import ru.kpfu.itis.lobanov.utils.MessageType;
+
+import java.util.Arrays;
 
 public class PacmanApplication extends Application {
     private static Stage stage;

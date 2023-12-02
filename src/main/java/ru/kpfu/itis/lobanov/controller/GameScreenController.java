@@ -2,8 +2,8 @@ package ru.kpfu.itis.lobanov.controller;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -20,10 +20,8 @@ import ru.kpfu.itis.lobanov.utils.Direction;
 import ru.kpfu.itis.lobanov.utils.GameSettings;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class GameScreenController {
@@ -57,11 +55,45 @@ public class GameScreenController {
         generateBonuses();
         generatePellets();
 
-        client = new PacmanClient(this);
+        client = new PacmanClient("127.0.0.1",5555, this);
         PacmanApplication.setClient(client);
-        client.start();
+        client.connect();
         KeyFrame keyFrame = createKeyFrame();
         startGame(keyFrame);
+
+//        Scene s = StartScreenController.getScene();
+//        if (s != null) {
+//
+//        }
+        gameWindow.setOnKeyPressed(event1 -> {
+            switch (event1.getCode()) {
+                case UP:
+                    currentDirection = Direction.UP;
+                    message = "u";
+                    break;
+                case DOWN:
+                    currentDirection = Direction.DOWN;
+                    message = "d";
+                    break;
+                case LEFT:
+                    currentDirection = Direction.LEFT;
+                    message = "l";
+                    break;
+                case RIGHT:
+                    currentDirection = Direction.RIGHT;
+                    message = "r";
+                    break;
+                case ENTER:
+                    System.out.println("YAAA");
+                    break;
+            }
+            if (message != null) {
+                client.sendMessage(message + "\n");
+            }
+        });
+        Platform.runLater(() -> {
+            gameWindow.requestFocus();
+        });
     }
 
 
@@ -116,39 +148,8 @@ public class GameScreenController {
 
     private KeyFrame createKeyFrame() {
         return new KeyFrame(GameSettings.UPDATE_FREQUENCY, event -> {
-            Scene s = StartScreenController.getScene();
-            if (s != null) {
-                s.setOnKeyPressed(event1 -> {
-                    switch (event1.getCode()) {
-                        case UP:
-                            currentDirection = Direction.UP;
-                            message = "u";
-                            break;
-                        case DOWN:
-                            currentDirection = Direction.DOWN;
-                            message = "d";
-                            break;
-                        case LEFT:
-                            currentDirection = Direction.LEFT;
-                            message = "l";
-                            break;
-                        case RIGHT:
-                            currentDirection = Direction.RIGHT;
-                            message = "r";
-                            break;
-                        case ENTER:
-                            System.out.println("YAAA");
-                            break;
-                    }
-                });
-            }
-
-            if (message != null) {
-                client.sendMessage(message);
-            }
-
             blinkBonuses();
-//            pacman.go(currentDirection);
+            pacman.go();
             Pellet pellet = pacman.eatPellet(pellets);
             if (pellet != null) {
                 scores += pellet.getScore();
@@ -198,16 +199,16 @@ public class GameScreenController {
         if (message.charAt(0) == '1') {
             switch (message.substring(1)) {
                 case "u":
-                    pacman.go(Direction.UP);
+                    pacman.setCurrentDirection(Direction.UP);
                     break;
                 case "d":
-                    pacman.go(Direction.DOWN);
+                    pacman.setCurrentDirection(Direction.DOWN);
                     break;
                 case "l":
-                    pacman.go(Direction.LEFT);
+                    pacman.setCurrentDirection(Direction.LEFT);
                     break;
                 case "r":
-                    pacman.go(Direction.RIGHT);
+                    pacman.setCurrentDirection(Direction.RIGHT);
                     break;
             }
         }

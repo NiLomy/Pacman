@@ -13,7 +13,7 @@ public class GameSettings {
     public static final int BONUS_SCORES = 20;
     public static final int CALM_COUNT = 5;
     public static final int BONUS_DURATION = 5 * 1_000;
-    public static final Duration UPDATE_FREQUENCY = Duration.millis(1000);
+    public static final Duration UPDATE_FREQUENCY = Duration.millis(150);
 
     private GameSettings() {}
 }

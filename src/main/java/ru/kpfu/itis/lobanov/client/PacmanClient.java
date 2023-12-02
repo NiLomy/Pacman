@@ -1,18 +1,38 @@
 package ru.kpfu.itis.lobanov.client;
 
 import ru.kpfu.itis.lobanov.controller.GameScreenController;
+import ru.kpfu.itis.lobanov.exceptions.ClientException;
+import ru.kpfu.itis.lobanov.model.net.Message;
+import ru.kpfu.itis.lobanov.protocol.MessageProtocol;
 
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
-public class PacmanClient {
+public class PacmanClient implements Client {
+    private final String host;
+    private final int port;
     private Socket socket;
     private ClientThread thread;
-    private GameScreenController controller;
+    private final GameScreenController controller;
 
-    public PacmanClient(GameScreenController controller) {
+    public PacmanClient(String host, int port, GameScreenController controller) {
+        this.host = host;
+        this.port = port;
         this.controller = controller;
+    }
+
+    @Override
+    public void connect() {
+        try {
+            socket = new Socket(host, port);
+            BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+            BufferedWriter output = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
+            thread = new ClientThread(input, output, this);
+            new Thread(thread).start();
+        } catch (IOException e) {
+            throw new ClientException("Can't connect to the server.", e);
+        }
     }
 
     public void sendMessage(String message) {
@@ -20,33 +40,18 @@ public class PacmanClient {
             thread.getOut().write(message);
             thread.getOut().flush();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ClientException("Can't send data to the server.", e);
         }
     }
 
-    public void start() {
-        String host = "127.0.0.1";
-        int port = 5555;
-
+    @Override
+    public void sendMessage(Message message) {
         try {
-            socket = new Socket(host, port);
+//            thread.getOut().write(MessageProtocol.getBytes(message));
+            thread.getOut().flush();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ClientException("Can't send data to the server.", e);
         }
-        BufferedReader input;
-        try {
-            input = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        BufferedWriter output;
-        try {
-            output = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        thread = new ClientThread(input, output, this);
-        new Thread(thread).start();
     }
 
     public ClientThread getThread() {
@@ -57,7 +62,7 @@ public class PacmanClient {
 
         private BufferedReader in;
         private BufferedWriter out;
-        private PacmanClient pacmanClient;
+        private final PacmanClient pacmanClient;
         private boolean alive = true;
 
         public ClientThread(BufferedReader in, BufferedWriter out, PacmanClient pacmanClient) {
@@ -74,7 +79,7 @@ public class PacmanClient {
                     pacmanClient.controller.receiveMessage(message);
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new ClientException("Can't read data from server.", e);
             }
         }
 
@@ -100,7 +105,7 @@ public class PacmanClient {
                 pacmanClient.socket.close();
                 alive = false;
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new ClientException("Connection to the server is lost.", e);
             }
         }
     }

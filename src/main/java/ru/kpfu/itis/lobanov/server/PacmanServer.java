@@ -1,6 +1,6 @@
 package ru.kpfu.itis.lobanov.server;
 
-import ru.kpfu.itis.lobanov.client.PacmanClient;
+import ru.kpfu.itis.lobanov.exceptions.ServerException;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -10,12 +10,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PacmanServer {
+    private final int port;
     private ServerSocket serverSocket;
-    private List<Client> clients = new ArrayList<>();
+    private final List<Client> clients;
+
+    public PacmanServer(int port) {
+        this.port = port;
+        this.clients = new ArrayList<>();
+    }
 
     public void start() {
         try {
-            serverSocket = new ServerSocket(5555);
+            serverSocket = new ServerSocket(port);
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
@@ -28,7 +34,7 @@ public class PacmanServer {
                 new Thread(client).start();
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ServerException("Can not establish a connection.", e);
         }
     }
 
@@ -43,21 +49,16 @@ public class PacmanServer {
         }
     }
 
-    public static void main(String[] args) {
-        PacmanServer pacmanServer = new PacmanServer();
-        pacmanServer.start();
-    }
-
     static class Client implements Runnable {
         private BufferedReader input;
         private BufferedWriter output;
         private PacmanServer server;
-        private Socket clientSocket;
+        private final Socket clientSocket;
         private boolean alive = true;
-        private int id;
+        private final int id;
 
         public Client(BufferedReader input, BufferedWriter output, PacmanServer server, Socket clientSocket) {
-            this.id = server.clients.size();
+            this.id = server.clients.size() + 1;
             this.input = input;
             this.output = output;
             this.server = server;
@@ -69,7 +70,7 @@ public class PacmanServer {
             try {
                 while (alive) {
                     String message = input.readLine();
-                    server.sendMessage(message, this);
+                    server.sendMessage(message + "\n", this);
                 }
             } catch (IOException e) {
                 this.stop();
@@ -84,7 +85,7 @@ public class PacmanServer {
                 server.clients.remove(this);
                 alive = false;
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new ServerException("Connection to the client is lost.", e);
             }
         }
 

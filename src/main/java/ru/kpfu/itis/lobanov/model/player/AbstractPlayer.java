@@ -8,8 +8,9 @@ public abstract class AbstractPlayer implements Player {
     protected double spawnX;
     protected double spawnY;
     protected int hp;
+    protected Direction currentDirection;
 
-    public abstract void go(Direction currentDirection);
+    public abstract void go();
 
     public double getX() {
         return x;
@@ -53,5 +54,13 @@ public abstract class AbstractPlayer implements Player {
 
     public void setHp(int hp) {
         this.hp = hp;
+    }
+
+    public Direction getCurrentDirection() {
+        return currentDirection;
+    }
+
+    public void setCurrentDirection(Direction currentDirection) {
+        this.currentDirection = currentDirection;
     }
 }

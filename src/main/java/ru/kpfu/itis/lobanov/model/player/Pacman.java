@@ -60,7 +60,7 @@ public class Pacman extends AbstractPlayer {
     }
 
     @Override
-    public void go(Direction currentDirection) {
+    public void go() {
         Direction movingDirection;
 
         if (!checkForWall(currentDirection, x, y, walls)) {
