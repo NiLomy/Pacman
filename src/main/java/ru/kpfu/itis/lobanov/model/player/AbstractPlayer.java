@@ -1,6 +1,11 @@
 package ru.kpfu.itis.lobanov.model.player;
 
+import javafx.scene.image.ImageView;
+import javafx.scene.shape.Rectangle;
+import ru.kpfu.itis.lobanov.model.environment.Maze;
 import ru.kpfu.itis.lobanov.utils.Direction;
+
+import java.util.List;
 
 public abstract class AbstractPlayer implements Player {
     protected double x;
@@ -9,6 +14,15 @@ public abstract class AbstractPlayer implements Player {
     protected double spawnY;
     protected int hp;
     protected Direction currentDirection;
+    protected final Maze maze;
+    protected final List<Rectangle> walls;
+    protected ImageView view;
+
+    public AbstractPlayer(Maze maze) {
+        this.maze = maze;
+        this.walls = maze.getWalls();
+        this.view = new ImageView();
+    }
 
     public abstract void go();
 
@@ -62,5 +76,13 @@ public abstract class AbstractPlayer implements Player {
 
     public void setCurrentDirection(Direction currentDirection) {
         this.currentDirection = currentDirection;
+    }
+
+    public ImageView getView() {
+        return view;
+    }
+
+    public void setView(ImageView view) {
+        this.view = view;
     }
 }

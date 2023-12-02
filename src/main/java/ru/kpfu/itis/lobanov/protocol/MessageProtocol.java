@@ -43,8 +43,13 @@ public class MessageProtocol {
             in.read(buffer, 0, messageLength);
             return GameMessageProvider.createMessage(messageType, buffer);
         } catch (IOException e) {
-            throw new MessageReadException("Can't read message.", e);
+            try {
+                in.close();
+            } catch (IOException ex) {
+                throw new MessageReadException("Can't read message.", e);
+            }
         }
+        return null;
     }
 
     public static byte[] getBytes(Message message) {

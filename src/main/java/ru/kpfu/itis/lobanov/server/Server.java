@@ -7,4 +7,5 @@ public interface Server {
     void start();
     void sendMessage(int connectionId, Message message);
     void sendBroadCastMessage(Message message);
+    void sendBroadCastMessage(Message message, PacmanServer.Client client);
 }

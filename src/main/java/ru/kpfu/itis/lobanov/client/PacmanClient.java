@@ -1,20 +1,26 @@
 package ru.kpfu.itis.lobanov.client;
 
+import ru.kpfu.itis.lobanov.controller.Controller;
 import ru.kpfu.itis.lobanov.controller.GameScreenController;
 import ru.kpfu.itis.lobanov.exceptions.ClientException;
+import ru.kpfu.itis.lobanov.exceptions.MessageReadException;
 import ru.kpfu.itis.lobanov.model.net.Message;
 import ru.kpfu.itis.lobanov.protocol.MessageProtocol;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
 public class PacmanClient implements Client {
     private final String host;
     private final int port;
     private Socket socket;
     private ClientThread thread;
-    private final GameScreenController controller;
+    private Controller controller;
+
+    public PacmanClient(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
 
     public PacmanClient(String host, int port, GameScreenController controller) {
         this.host = host;
@@ -26,8 +32,8 @@ public class PacmanClient implements Client {
     public void connect() {
         try {
             socket = new Socket(host, port);
-            BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-            BufferedWriter output = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
+            InputStream input = socket.getInputStream();
+            OutputStream output = socket.getOutputStream();
             thread = new ClientThread(input, output, this);
             new Thread(thread).start();
         } catch (IOException e) {
@@ -35,19 +41,10 @@ public class PacmanClient implements Client {
         }
     }
 
-    public void sendMessage(String message) {
-        try {
-            thread.getOut().write(message);
-            thread.getOut().flush();
-        } catch (IOException e) {
-            throw new ClientException("Can't send data to the server.", e);
-        }
-    }
-
     @Override
     public void sendMessage(Message message) {
         try {
-//            thread.getOut().write(MessageProtocol.getBytes(message));
+            thread.getOut().write(MessageProtocol.getBytes(message));
             thread.getOut().flush();
         } catch (IOException e) {
             throw new ClientException("Can't send data to the server.", e);
@@ -58,14 +55,22 @@ public class PacmanClient implements Client {
         return thread;
     }
 
+    public Controller getController() {
+        return controller;
+    }
+
+    public void setController(Controller controller) {
+        this.controller = controller;
+    }
+
     public static class ClientThread implements Runnable {
 
-        private BufferedReader in;
-        private BufferedWriter out;
+        private final InputStream in;
+        private final OutputStream out;
         private final PacmanClient pacmanClient;
         private boolean alive = true;
 
-        public ClientThread(BufferedReader in, BufferedWriter out, PacmanClient pacmanClient) {
+        public ClientThread(InputStream in, OutputStream out, PacmanClient pacmanClient) {
             this.in = in;
             this.out = out;
             this.pacmanClient = pacmanClient;
@@ -75,29 +80,22 @@ public class PacmanClient implements Client {
         public void run() {
             try {
                 while (alive) {
-                    String message = in.readLine();
-                    pacmanClient.controller.receiveMessage(message);
+                    Message message = MessageProtocol.readMessage(in);
+                    if (pacmanClient.controller != null) pacmanClient.controller.receiveMessage(message);
                 }
-            } catch (IOException e) {
-                throw new ClientException("Can't read data from server.", e);
+            } catch (MessageReadException e) {
+                throw new RuntimeException(e);
             }
         }
 
-        public BufferedReader getIn() {
+        public InputStream getIn() {
             return in;
         }
 
-        public void setIn(BufferedReader in) {
-            this.in = in;
-        }
-
-        public BufferedWriter getOut() {
+        public OutputStream getOut() {
             return out;
         }
 
-        public void setOut(BufferedWriter out) {
-            this.out = out;
-        }
         public void stop() {
             try {
                 in.close();

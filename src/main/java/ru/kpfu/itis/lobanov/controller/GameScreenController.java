@@ -4,27 +4,33 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 import ru.kpfu.itis.lobanov.PacmanApplication;
 import ru.kpfu.itis.lobanov.client.PacmanClient;
 import ru.kpfu.itis.lobanov.model.environment.pickups.Bonus;
 import ru.kpfu.itis.lobanov.model.environment.Cell;
 import ru.kpfu.itis.lobanov.model.environment.Maze;
 import ru.kpfu.itis.lobanov.model.environment.pickups.Pellet;
+import ru.kpfu.itis.lobanov.model.net.Message;
+import ru.kpfu.itis.lobanov.model.player.Ghost;
 import ru.kpfu.itis.lobanov.model.player.Pacman;
-import ru.kpfu.itis.lobanov.utils.Direction;
-import ru.kpfu.itis.lobanov.utils.GameSettings;
+import ru.kpfu.itis.lobanov.utils.*;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
 
-public class GameScreenController {
+public class GameScreenController implements Controller {
     @FXML
     private Pane gameWindow;
     @FXML
@@ -40,11 +46,13 @@ public class GameScreenController {
     private final Maze maze = new Maze();
     private int scores;
     private Pacman pacman;
+    private Ghost ghost;
     private Direction currentDirection;
-    private String message;
+    private byte direction;
     private List<Pellet> pellets;
     private List<Bonus> bonuses;
     private PacmanClient client;
+    private int userId;
 
     @FXML
     private void initialize() {
@@ -52,12 +60,13 @@ public class GameScreenController {
         drawWalls();
         setUpGameInfo();
         createPacman();
+        createGhosts();
         generateBonuses();
         generatePellets();
 
-        client = new PacmanClient("127.0.0.1",5555, this);
-        PacmanApplication.setClient(client);
-        client.connect();
+        client = PacmanApplication.getClient();
+        client.setController(this);
+        client.sendMessage(GameMessageProvider.createMessage(MessageType.USER_ID_REQUEST, new byte[0]));
         KeyFrame keyFrame = createKeyFrame();
         startGame(keyFrame);
 
@@ -68,27 +77,29 @@ public class GameScreenController {
         gameWindow.setOnKeyPressed(event1 -> {
             switch (event1.getCode()) {
                 case UP:
+                case W:
                     currentDirection = Direction.UP;
-                    message = "u";
+                    direction = 1;
                     break;
                 case DOWN:
+                case S:
                     currentDirection = Direction.DOWN;
-                    message = "d";
+                    direction = 2;
                     break;
                 case LEFT:
+                case A:
                     currentDirection = Direction.LEFT;
-                    message = "l";
+                    direction = 3;
                     break;
                 case RIGHT:
+                case D:
                     currentDirection = Direction.RIGHT;
-                    message = "r";
-                    break;
-                case ENTER:
-                    System.out.println("YAAA");
+                    direction = 4;
                     break;
             }
-            if (message != null) {
-                client.sendMessage(message + "\n");
+            if (direction != 0) {
+                Message message = GameMessageProvider.createMessage(MessageType.MOVEMENT, new byte[]{direction});
+                client.sendMessage(message);
             }
         });
         Platform.runLater(() -> {
@@ -136,6 +147,11 @@ public class GameScreenController {
         gameWindow.getChildren().addAll(pacman.getView());
     }
 
+    private void createGhosts() {
+        ghost = new Ghost(maze);
+        gameWindow.getChildren().addAll(ghost.getView());
+    }
+
     private void generateBonuses() {
         bonuses = maze.generateBonuses(pacman.getX(), pacman.getY());
         gameWindow.getChildren().addAll(bonuses.stream().map(Bonus::getView).collect(Collectors.toList()));
@@ -150,6 +166,7 @@ public class GameScreenController {
         return new KeyFrame(GameSettings.UPDATE_FREQUENCY, event -> {
             blinkBonuses();
             pacman.go();
+            ghost.go();
             Pellet pellet = pacman.eatPellet(pellets);
             if (pellet != null) {
                 scores += pellet.getScore();
@@ -188,29 +205,75 @@ public class GameScreenController {
             @Override
             public void run() {
                 timeline.stop();
-                Runtime.getRuntime().exit(0);
+//                client.getThread().stop();
+                GameSettings.hostsCount.set(GameSettings.hostsCount.intValue() - 1);
+//                Runtime.getRuntime().exit(0);
             }
         };
         Timer timer = new Timer();
         timer.schedule(task, 500);
+        goToHomePage();
     }
 
-    public void receiveMessage(String message) {
-        if (message.charAt(0) == '1') {
-            switch (message.substring(1)) {
-                case "u":
-                    pacman.setCurrentDirection(Direction.UP);
+    @Override
+    public void receiveMessage(Message message) {
+        if (message != null) {
+            ByteBuffer buffer;
+            switch (message.getType()) {
+                case MessageType.MOVEMENT:
+                    buffer = ByteBuffer.wrap(message.getData());
+                    int playerId = buffer.getInt();
+                    if (playerId == 0) {
+                        switch (buffer.get()) {
+                            case 1:
+                                pacman.setCurrentDirection(Direction.UP);
+                                break;
+                            case 2:
+                                pacman.setCurrentDirection(Direction.DOWN);
+                                break;
+                            case 3:
+                                pacman.setCurrentDirection(Direction.LEFT);
+                                break;
+                            case 4:
+                                pacman.setCurrentDirection(Direction.RIGHT);
+                                break;
+                        }
+                    }
+                    if (playerId == 1) {
+                        switch (buffer.get()) {
+                            case 1:
+                                ghost.setCurrentDirection(Direction.UP);
+                                break;
+                            case 2:
+                                ghost.setCurrentDirection(Direction.DOWN);
+                                break;
+                            case 3:
+                                ghost.setCurrentDirection(Direction.LEFT);
+                                break;
+                            case 4:
+                                ghost.setCurrentDirection(Direction.RIGHT);
+                                break;
+                        }
+                    }
                     break;
-                case "d":
-                    pacman.setCurrentDirection(Direction.DOWN);
-                    break;
-                case "l":
-                    pacman.setCurrentDirection(Direction.LEFT);
-                    break;
-                case "r":
-                    pacman.setCurrentDirection(Direction.RIGHT);
+                case MessageType.USER_ID_RESPONSE:
+                    buffer = ByteBuffer.wrap(message.getData());
+                    userId = buffer.getInt();
                     break;
             }
+        }
+    }
+
+    private void goToHomePage() {
+        Stage stage = PacmanApplication.getStage();
+        FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource("/start_screen.fxml"));
+        try {
+            AnchorPane pane = loader.load();
+            Scene scene = new Scene(pane);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

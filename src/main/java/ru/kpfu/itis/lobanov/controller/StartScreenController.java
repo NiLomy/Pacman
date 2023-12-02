@@ -22,7 +22,7 @@ public class StartScreenController {
         startPlay.setOnAction(event -> {
 //            Stage stage = (Stage) startPlay.getScene().getWindow();
             Stage stage = PacmanApplication.getStage();
-            FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource("/game_screen.fxml"));
+            FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource("/rooms_screen.fxml"));
             try {
                 AnchorPane pane = loader.load();
                 Scene scene = new Scene(pane);

@@ -6,6 +6,8 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import ru.kpfu.itis.lobanov.client.PacmanClient;
+import ru.kpfu.itis.lobanov.utils.AppConfig;
+import ru.kpfu.itis.lobanov.utils.GameSettings;
 import ru.kpfu.itis.lobanov.utils.MessageType;
 
 import java.util.Arrays;
@@ -22,10 +24,14 @@ public class PacmanApplication extends Application {
         AnchorPane pane = loader.load();
         Scene scene = new Scene(pane);
 
+        client = new PacmanClient(AppConfig.CURRENT_HOST, AppConfig.CURRENT_PORT_1);
+//        PacmanApplication.setClient(client);
+        client.connect();
+
         primaryStage.setTitle("Pacman");
         primaryStage.setOnCloseRequest(e -> {
+            if (client != null && client.getThread() != null) client.getThread().stop();
             System.exit(0);
-            client.getThread().stop();
         });
         primaryStage.setScene(scene);
         primaryStage.show();

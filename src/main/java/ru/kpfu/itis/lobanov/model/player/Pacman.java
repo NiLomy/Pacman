@@ -17,32 +17,21 @@ import java.util.Random;
 import static ru.kpfu.itis.lobanov.utils.WallDetector.checkForWall;
 
 public class Pacman extends AbstractPlayer {
-    private final Maze maze;
-    private final List<Rectangle> walls;
-//    private Circle view;
-    private ImageView view;
     private int stayCount = 0;
 
     public Pacman(Maze maze) {
-        this.maze = maze;
+        super(maze);
+
         setSpawnPoint();
         setHp(GameSettings.PACMAN_HP);
-        walls = maze.getWalls();
-
-        view = new ImageView();
         view.setImage(new Image("/images/pacman-left/3.png"));
         view.setFitWidth(GameSettings.CELL_SIZE);
         view.setFitHeight(GameSettings.CELL_SIZE);
         view.setX(spawnX);
         view.setY(spawnY);
-//        view = new Circle();
-//        view.setRadius(GameSettings.CELL_SIZE - 10);
-//        view.setFill(Color.YELLOW);
-//        view.setCenterX(spawnX);
-//        view.setCenterY(spawnY);
     }
 
-    public void setSpawnPoint() {
+    private void setSpawnPoint() {
         Cell[] cellsForPlacement = maze.getCellsForPlacement(Placement.CENTER);
         Random random = new Random();
 
@@ -183,27 +172,6 @@ public class Pacman extends AbstractPlayer {
         return null;
     }
 
-//    @Override
-//    public void setX(double x) {
-//        this.x = x;
-//        this.view.setCenterX(x);
-//    }
-//
-//    @Override
-//    public void setY(double y) {
-//        this.y = y;
-//        this.view.setCenterY(y);
-//    }
-//
-//    public Circle getView() {
-//        return view;
-//    }
-//
-//    public void setView(Circle view) {
-//        this.view = view;
-//    }
-
-
     @Override
     public void setX(double x) {
         this.x = x;
@@ -214,13 +182,5 @@ public class Pacman extends AbstractPlayer {
     public void setY(double y) {
         this.y = y;
         this.view.setY(y);
-    }
-
-    public ImageView getView() {
-        return view;
-    }
-
-    public void setView(ImageView view) {
-        this.view = view;
     }
 }

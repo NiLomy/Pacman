@@ -1,5 +1,6 @@
 package ru.kpfu.itis.lobanov.utils;
 
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.util.Duration;
 
 public class GameSettings {
@@ -14,6 +15,8 @@ public class GameSettings {
     public static final int CALM_COUNT = 5;
     public static final int BONUS_DURATION = 5 * 1_000;
     public static final Duration UPDATE_FREQUENCY = Duration.millis(150);
+
+    public static SimpleIntegerProperty hostsCount = new SimpleIntegerProperty(0);
 
     private GameSettings() {}
 }
