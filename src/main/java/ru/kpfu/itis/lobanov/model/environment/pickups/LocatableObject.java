@@ -2,7 +2,9 @@ package ru.kpfu.itis.lobanov.model.environment.pickups;
 
 import javafx.scene.Node;
 
-public abstract class LocatableObject {
+import java.io.Serializable;
+
+public abstract class LocatableObject implements Serializable {
     protected double x;
     protected double y;
 

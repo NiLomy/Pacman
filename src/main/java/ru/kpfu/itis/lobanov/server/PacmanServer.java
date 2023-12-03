@@ -4,9 +4,13 @@ import ru.kpfu.itis.lobanov.exceptions.EventListenerException;
 import ru.kpfu.itis.lobanov.exceptions.MessageReadException;
 import ru.kpfu.itis.lobanov.exceptions.ServerException;
 import ru.kpfu.itis.lobanov.listener.EventListener;
-import ru.kpfu.itis.lobanov.listener.MoveEventListener;
-import ru.kpfu.itis.lobanov.listener.SendClientsCountEventListener;
+import ru.kpfu.itis.lobanov.model.environment.Cell;
+import ru.kpfu.itis.lobanov.model.environment.Maze;
+import ru.kpfu.itis.lobanov.model.environment.pickups.Bonus;
+import ru.kpfu.itis.lobanov.model.environment.pickups.Pellet;
 import ru.kpfu.itis.lobanov.model.net.Message;
+import ru.kpfu.itis.lobanov.model.player.Ghost;
+import ru.kpfu.itis.lobanov.model.player.Pacman;
 import ru.kpfu.itis.lobanov.protocol.MessageProtocol;
 import ru.kpfu.itis.lobanov.utils.AppConfig;
 
@@ -24,6 +28,12 @@ public class PacmanServer implements Server {
     private ServerSocket serverSocket;
     private final List<Client> clients;
     private final List<EventListener> listeners;
+    private final Maze maze = new Maze();
+    private Pacman pacman;
+    private Ghost ghost;
+    private List<Pellet> pellets;
+    private List<Bonus> bonuses;
+    private ByteBuffer wallsBuffer;
 
     public PacmanServer(int port) {
         this.port = port;
@@ -32,15 +42,20 @@ public class PacmanServer implements Server {
     }
 
     @Override
+    public void registerListener(EventListener listener) throws EventListenerException {
+        listener.init(this);
+        listeners.add(listener);
+    }
+
+    @Override
     public void start() {
         try {
             serverSocket = new ServerSocket(port);
-            SendClientsCountEventListener listener = new SendClientsCountEventListener();
-            MoveEventListener listener1 = new MoveEventListener();
-            listener.init(this);
-            listener1.init(this);
-            listeners.add(listener);
-            listeners.add(listener1);
+            generateWalls();
+            createPacman();
+            createGhosts();
+            generateBonuses();
+            generatePellets();
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
@@ -60,7 +75,7 @@ public class PacmanServer implements Server {
 
     @Override
     public void sendMessage(int connectionId, Message message) {
-        Client client = clients.get(connectionId - 1);
+        Client client = clients.get(connectionId);
         try {
             client.getOutput().write(MessageProtocol.getBytes(message));
             client.getOutput().flush();
@@ -98,8 +113,79 @@ public class PacmanServer implements Server {
         }
     }
 
+    public void generateWalls() {
+//        Cell[][] cells = maze.getData();
+//        for (int i = 0; i < cells.length; i++) {
+//            HBox line = new HBox();
+//            line.setAlignment(Pos.CENTER);
+//            for (int j = 0; j < cells.length; j++) {
+//                if (cells[i][j].isWall()) {
+//                    Rectangle rectangle = new Rectangle(i * CELL_SIZE, j * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+//                    line.getChildren().addAll(rectangle);
+//                    walls.add(rectangle);
+//                } else {
+//                    Rectangle rectangle = new Rectangle(i * CELL_SIZE, j * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+//                    rectangle.setFill(Color.WHITE);
+//                    line.getChildren().addAll(rectangle);
+//                }
+//            }
+//            gameField.getChildren().addAll(line);
+//        }
+        byte[] b = new byte[maze.getWalls().size() * 2 * 4];
+        wallsBuffer = ByteBuffer.wrap(b);
+        Cell[][] cells = maze.getData();
+        for (int i = 0; i < cells.length; i++) {
+            for (int j = 0; j < cells.length; j++) {
+                if (cells[i][j].isWall()) {
+                    wallsBuffer.putInt(i);
+                    wallsBuffer.putInt(j);
+                }
+            }
+        }
+    }
+
+    public void createPacman() {
+        pacman = new Pacman(maze);
+    }
+
+    public void createGhosts() {
+        ghost = new Ghost(maze);
+    }
+
+    public void generateBonuses() {
+        bonuses = maze.generateBonuses(pacman.getX(), pacman.getY());
+    }
+
+    public void generatePellets() {
+        pellets = maze.generatePellets(pacman.getX(), pacman.getY(), bonuses);
+    }
+
     public ServerSocket getServerSocket() {
         return serverSocket;
+    }
+
+    public Maze getMaze() {
+        return maze;
+    }
+
+    public ByteBuffer getWallsBuffer() {
+        return wallsBuffer;
+    }
+
+    public Pacman getPacman() {
+        return pacman;
+    }
+
+    public Ghost getGhost() {
+        return ghost;
+    }
+
+    public List<Pellet> getPellets() {
+        return pellets;
+    }
+
+    public List<Bonus> getBonuses() {
+        return bonuses;
     }
 
     static class Client implements Runnable {
@@ -127,6 +213,7 @@ public class PacmanServer implements Server {
                         for (EventListener listener : server.listeners) {
                             if (message.getType() == listener.getType()) {
                                 listener.handle(message, id, server.clients.size());
+                                break;
                             }
                         }
                     }

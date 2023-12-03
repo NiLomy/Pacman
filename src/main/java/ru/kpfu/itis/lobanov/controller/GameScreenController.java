@@ -12,11 +12,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import org.apache.commons.lang.SerializationUtils;
 import ru.kpfu.itis.lobanov.PacmanApplication;
 import ru.kpfu.itis.lobanov.client.PacmanClient;
-import ru.kpfu.itis.lobanov.model.environment.pickups.Bonus;
-import ru.kpfu.itis.lobanov.model.environment.Cell;
 import ru.kpfu.itis.lobanov.model.environment.Maze;
+import ru.kpfu.itis.lobanov.model.environment.pickups.Bonus;
 import ru.kpfu.itis.lobanov.model.environment.pickups.Pellet;
 import ru.kpfu.itis.lobanov.model.net.Message;
 import ru.kpfu.itis.lobanov.model.player.Ghost;
@@ -25,9 +25,7 @@ import ru.kpfu.itis.lobanov.utils.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GameScreenController implements Controller {
@@ -43,7 +41,7 @@ public class GameScreenController implements Controller {
     private Label scoreInfo;
 
     private Timeline timeline;
-    private final Maze maze = new Maze();
+//    private final Maze maze = new Maze();
     private int scores;
     private Pacman pacman;
     private Ghost ghost;
@@ -57,23 +55,21 @@ public class GameScreenController implements Controller {
     @FXML
     private void initialize() {
         gameWindow.setStyle("-fx-background-color: lightgrey");
-        drawWalls();
-        setUpGameInfo();
-        createPacman();
-        createGhosts();
-        generateBonuses();
-        generatePellets();
 
         client = PacmanApplication.getClient();
         client.setController(this);
         client.sendMessage(GameMessageProvider.createMessage(MessageType.USER_ID_REQUEST, new byte[0]));
+        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_WALLS_REQUEST, new byte[0]));
+        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_PACMAN_REQUEST, new byte[0]));
+        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_GHOST_REQUEST, new byte[0]));
+        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_BONUSES_REQUEST, new byte[0]));
+        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_PELLETS_REQUEST, new byte[0]));
+
+        setUpGameInfo();
+
         KeyFrame keyFrame = createKeyFrame();
         startGame(keyFrame);
 
-//        Scene s = StartScreenController.getScene();
-//        if (s != null) {
-//
-//        }
         gameWindow.setOnKeyPressed(event1 -> {
             switch (event1.getCode()) {
                 case UP:
@@ -108,78 +104,63 @@ public class GameScreenController implements Controller {
     }
 
 
-    private void drawWalls() {
+//    private void drawWalls() {
+////        Cell[][] cells = maze.getData();
+////        for (int i = 0; i < cells.length; i++) {
+////            HBox line = new HBox();
+////            line.setAlignment(Pos.CENTER);
+////            for (int j = 0; j < cells.length; j++) {
+////                if (cells[i][j].isWall()) {
+////                    Rectangle rectangle = new Rectangle(i * CELL_SIZE, j * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+////                    line.getChildren().addAll(rectangle);
+////                    walls.add(rectangle);
+////                } else {
+////                    Rectangle rectangle = new Rectangle(i * CELL_SIZE, j * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+////                    rectangle.setFill(Color.WHITE);
+////                    line.getChildren().addAll(rectangle);
+////                }
+////            }
+////            gameField.getChildren().addAll(line);
+////        }
+//
 //        Cell[][] cells = maze.getData();
 //        for (int i = 0; i < cells.length; i++) {
-//            HBox line = new HBox();
-//            line.setAlignment(Pos.CENTER);
 //            for (int j = 0; j < cells.length; j++) {
 //                if (cells[i][j].isWall()) {
-//                    Rectangle rectangle = new Rectangle(i * CELL_SIZE, j * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-//                    line.getChildren().addAll(rectangle);
-//                    walls.add(rectangle);
-//                } else {
-//                    Rectangle rectangle = new Rectangle(i * CELL_SIZE, j * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-//                    rectangle.setFill(Color.WHITE);
-//                    line.getChildren().addAll(rectangle);
+//                    Rectangle rectangle = new Rectangle(i * GameSettings.CELL_SIZE, j * GameSettings.CELL_SIZE, GameSettings.CELL_SIZE, GameSettings.CELL_SIZE);
+//                    gameWindow.getChildren().addAll(rectangle);
 //                }
 //            }
-//            gameField.getChildren().addAll(line);
 //        }
-
-        Cell[][] cells = maze.getData();
-        for (int i = 0; i < cells.length; i++) {
-            for (int j = 0; j < cells.length; j++) {
-                if (cells[i][j].isWall()) {
-                    Rectangle rectangle = new Rectangle(i * GameSettings.CELL_SIZE, j * GameSettings.CELL_SIZE, GameSettings.CELL_SIZE, GameSettings.CELL_SIZE);
-                    gameWindow.getChildren().addAll(rectangle);
-                }
-            }
-        }
-    }
+//    }
 
     private void setUpGameInfo() {
         scoreInfo.setText("Scores: " + scores);
     }
 
-    private void createPacman() {
-        pacman = new Pacman(maze);
-        gameWindow.getChildren().addAll(pacman.getView());
-    }
 
-    private void createGhosts() {
-        ghost = new Ghost(maze);
-        gameWindow.getChildren().addAll(ghost.getView());
-    }
-
-    private void generateBonuses() {
-        bonuses = maze.generateBonuses(pacman.getX(), pacman.getY());
-        gameWindow.getChildren().addAll(bonuses.stream().map(Bonus::getView).collect(Collectors.toList()));
-    }
-
-    private void generatePellets() {
-        pellets = maze.generatePellets(pacman.getX(), pacman.getY(), bonuses);
-        gameWindow.getChildren().addAll(pellets.stream().map(Pellet::getView).collect(Collectors.toList()));
-    }
 
     private KeyFrame createKeyFrame() {
         return new KeyFrame(GameSettings.UPDATE_FREQUENCY, event -> {
-            blinkBonuses();
-            pacman.go();
-            ghost.go();
-            Pellet pellet = pacman.eatPellet(pellets);
-            if (pellet != null) {
-                scores += pellet.getScore();
-                gameWindow.getChildren().remove(pellet.getView());
-            }
-            Bonus bonus = pacman.eatBonus(bonuses);
-            if (bonus != null) {
-                scores += bonus.getScore();
-                gameWindow.getChildren().remove(bonus.getView());
-            }
-            setUpGameInfo();
+            if (bonuses != null) blinkBonuses();
+            if (pacman != null) pacman.go();
+            if (pacman != null && ghost != null && bonuses != null && pellets != null) {
+                pacman.go();
+                ghost.go();
+                Pellet pellet = pacman.eatPellet(pellets);
+                if (pellet != null) {
+                    scores += pellet.getScore();
+                    gameWindow.getChildren().remove(pellet.getView());
+                }
+                Bonus bonus = pacman.eatBonus(bonuses);
+                if (bonus != null) {
+                    scores += bonus.getScore();
+                    gameWindow.getChildren().remove(bonus.getView());
+                }
+                setUpGameInfo();
 
-            if (pellets.isEmpty() && bonuses.isEmpty()) endGame();
+                if (pellets.isEmpty() && bonuses.isEmpty()) endGame();
+            }
         });
     }
 
@@ -259,6 +240,61 @@ public class GameScreenController implements Controller {
                 case MessageType.USER_ID_RESPONSE:
                     buffer = ByteBuffer.wrap(message.getData());
                     userId = buffer.getInt();
+                    break;
+                case MessageType.CREATE_WALLS_RESPONSE:
+                    buffer = ByteBuffer.wrap(message.getData());
+                    List<Rectangle> rectangles = new ArrayList<>();
+                    while (buffer.hasRemaining()) {
+                        Rectangle rectangle = new Rectangle(buffer.getInt() * GameSettings.CELL_SIZE, buffer.getInt() * GameSettings.CELL_SIZE, GameSettings.CELL_SIZE, GameSettings.CELL_SIZE);
+                        rectangles.add(rectangle);
+                    }
+                    Platform.runLater(() -> {
+                        gameWindow.getChildren().addAll(rectangles);
+                    });
+                    break;
+                case MessageType.CREATE_PACMAN_RESPONSE:
+                    buffer = ByteBuffer.wrap(message.getData());
+                    double x = buffer.getDouble();
+                    double y = buffer.getDouble();
+                    Maze m = (Maze) SerializationUtils.deserialize(Arrays.copyOfRange(buffer.array(), 8 * 2, buffer.array().length));
+                    pacman = new Pacman(m);
+                    pacman.setX(x);
+                    pacman.setSpawnX(x);
+                    pacman.setY(y);
+                    pacman.setSpawnY(y);
+                    pacman.show();
+                    Platform.runLater(() -> {
+                        gameWindow.getChildren().addAll(pacman.getView());
+                    });
+                    break;
+                case MessageType.CREATE_GHOST_RESPONSE:
+                    buffer = ByteBuffer.wrap(message.getData());
+                    double x2 = buffer.getDouble();
+                    double y2 = buffer.getDouble();
+                    Maze m2 = (Maze) SerializationUtils.deserialize(Arrays.copyOfRange(buffer.array(), 8 * 2, buffer.array().length));
+                    ghost = new Ghost(m2);
+                    ghost.setX(x2);
+                    ghost.setSpawnX(x2);
+                    ghost.setY(y2);
+                    ghost.setSpawnY(y2);
+                    ghost.show();
+                    Platform.runLater(() -> {
+                        gameWindow.getChildren().addAll(ghost.getView());
+                    });
+                    break;
+                case MessageType.CREATE_BONUSES_RESPONSE:
+                    bonuses = (List<Bonus>) SerializationUtils.deserialize(message.getData());
+                    bonuses.stream().forEach(Bonus::show);
+                    Platform.runLater(() -> {
+                        gameWindow.getChildren().addAll(bonuses.stream().map(Bonus::getView).collect(Collectors.toList()));
+                    });
+                    break;
+                case MessageType.CREATE_PELLETS_RESPONSE:
+                    pellets = (List<Pellet>) SerializationUtils.deserialize(message.getData());
+                    pellets.stream().forEach(Pellet::show);
+                    Platform.runLater(() -> {
+                        gameWindow.getChildren().addAll(pellets.stream().map(Pellet::getView).collect(Collectors.toList()));
+                    });
                     break;
             }
         }

@@ -6,11 +6,12 @@ import ru.kpfu.itis.lobanov.model.environment.pickups.Pellet;
 import ru.kpfu.itis.lobanov.utils.GameSettings;
 import ru.kpfu.itis.lobanov.utils.Placement;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Maze {
+public class Maze implements Serializable {
     private final Cell[][] data = new Cell[GameSettings.SIZE][GameSettings.SIZE];
     private final Random random = new Random();
     private final List<Cell> exits = new ArrayList<>();

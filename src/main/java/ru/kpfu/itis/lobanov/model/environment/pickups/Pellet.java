@@ -15,16 +15,19 @@ public class Pellet extends LocatableObject {
         this.y = y;
         this.score = score;
 //        view = new Circle();
+//        view.setRadius(GameSettings.CELL_SIZE / 5);
+//        view.setFill(Color.GREEN);
+//        view.setCenterX(x);
+//        view.setCenterY(y);
+    }
+
+    public void show() {
         view = new ImageView();
         view.setImage(new Image("/images/dot.png"));
         view.setFitHeight(GameSettings.CELL_SIZE);
         view.setFitWidth(GameSettings.CELL_SIZE);
         view.setX(x);
         view.setY(y);
-//        view.setRadius(GameSettings.CELL_SIZE / 5);
-//        view.setFill(Color.GREEN);
-//        view.setCenterX(x);
-//        view.setCenterY(y);
     }
 
     public int getScore() {

@@ -5,6 +5,7 @@ import javafx.scene.shape.Rectangle;
 import ru.kpfu.itis.lobanov.model.environment.Maze;
 import ru.kpfu.itis.lobanov.utils.Direction;
 
+import java.io.Serializable;
 import java.util.List;
 
 public abstract class AbstractPlayer implements Player {

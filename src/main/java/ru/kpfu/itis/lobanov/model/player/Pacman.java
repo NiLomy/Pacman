@@ -3,6 +3,7 @@ package ru.kpfu.itis.lobanov.model.player;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.Rectangle;
+import org.apache.commons.lang.SerializationUtils;
 import ru.kpfu.itis.lobanov.model.environment.pickups.Bonus;
 import ru.kpfu.itis.lobanov.model.environment.Cell;
 import ru.kpfu.itis.lobanov.model.environment.Maze;
@@ -11,6 +12,7 @@ import ru.kpfu.itis.lobanov.utils.Direction;
 import ru.kpfu.itis.lobanov.utils.GameSettings;
 import ru.kpfu.itis.lobanov.utils.Placement;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Random;
 
@@ -24,11 +26,6 @@ public class Pacman extends AbstractPlayer {
 
         setSpawnPoint();
         setHp(GameSettings.PACMAN_HP);
-        view.setImage(new Image("/images/pacman-left/3.png"));
-        view.setFitWidth(GameSettings.CELL_SIZE);
-        view.setFitHeight(GameSettings.CELL_SIZE);
-        view.setX(spawnX);
-        view.setY(spawnY);
     }
 
     private void setSpawnPoint() {
@@ -150,6 +147,14 @@ public class Pacman extends AbstractPlayer {
             }
             stayCount = 0;
         }
+    }
+
+    public void show() {
+        view.setImage(new Image("/images/pacman-left/3.png"));
+        view.setFitWidth(GameSettings.CELL_SIZE);
+        view.setFitHeight(GameSettings.CELL_SIZE);
+        view.setX(spawnX);
+        view.setY(spawnY);
     }
 
     public Pellet eatPellet(List<Pellet> pellets) {

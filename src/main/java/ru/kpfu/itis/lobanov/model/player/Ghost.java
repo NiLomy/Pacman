@@ -20,11 +20,6 @@ public class Ghost extends AbstractPlayer {
 
         setSpawnPoint();
         setHp(GameSettings.GHOST_HP);
-        view.setImage(new Image("/images/pacman-left/3.png"));
-        view.setFitWidth(GameSettings.CELL_SIZE);
-        view.setFitHeight(GameSettings.CELL_SIZE);
-        view.setX(spawnX);
-        view.setY(spawnY);
     }
 
     private void setSpawnPoint() {
@@ -42,8 +37,8 @@ public class Ghost extends AbstractPlayer {
 //                break;
 //            }
 //        }
-        x = spawnX = 1;
-        y = spawnY = 1;
+        x = spawnX = GameSettings.CELL_SIZE;
+        y = spawnY = GameSettings.CELL_SIZE;
     }
 
     @Override
@@ -95,6 +90,14 @@ public class Ghost extends AbstractPlayer {
                     }
             }
         }
+    }
+
+    public void show() {
+        view.setImage(new Image("/images/pacman-left/3.png"));
+        view.setFitWidth(GameSettings.CELL_SIZE);
+        view.setFitHeight(GameSettings.CELL_SIZE);
+        view.setX(spawnX);
+        view.setY(spawnY);
     }
 
     @Override

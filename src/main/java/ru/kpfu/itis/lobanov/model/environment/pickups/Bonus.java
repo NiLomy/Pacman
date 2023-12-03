@@ -12,6 +12,9 @@ public class Bonus extends LocatableObject {
         this.x = x;
         this.y = y;
         this.score = score;
+    }
+
+    public void show() {
         view = new Circle();
         view.setRadius(GameSettings.CELL_SIZE / 4);
         view.setFill(Color.BLUE);
