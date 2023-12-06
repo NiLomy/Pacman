@@ -3,6 +3,7 @@ package ru.kpfu.itis.lobanov.listener;
 import org.apache.commons.lang.SerializationUtils;
 import ru.kpfu.itis.lobanov.exceptions.EventListenerException;
 import ru.kpfu.itis.lobanov.model.net.Message;
+import ru.kpfu.itis.lobanov.model.player.Ghost;
 import ru.kpfu.itis.lobanov.utils.GameMessageProvider;
 import ru.kpfu.itis.lobanov.utils.MessageType;
 
@@ -14,12 +15,15 @@ public class CreateGhostEventListener extends AbstractEventListener {
         if (!isInit) throw new EventListenerException("Listener hasn't been initialized yet.");
 
         byte[] maze = SerializationUtils.serialize(server.getMaze());
-        ByteBuffer buffer = ByteBuffer.allocate(maze.length + 8 * 2);
-        buffer.putDouble(server.getGhost().getSpawnX());
-        buffer.putDouble(server.getGhost().getSpawnY());
-        buffer.put(maze);
-        Message response = GameMessageProvider.createMessage(MessageType.CREATE_GHOST_RESPONSE, buffer.array());
-        server.sendMessage(connectionId, response);
+        for (int i = 0; i < server.getGhosts().size(); i++) {
+            Ghost ghost = server.getGhosts().get(i);
+            ByteBuffer buffer = ByteBuffer.allocate(maze.length + 8 * 2);
+            buffer.putDouble(ghost.getSpawnX());
+            buffer.putDouble(ghost.getSpawnY());
+            buffer.put(maze);
+            Message response = GameMessageProvider.createMessage(MessageType.CREATE_GHOST_RESPONSE, buffer.array());
+            server.sendMessage(connectionId, response);
+        }
     }
 
     @Override

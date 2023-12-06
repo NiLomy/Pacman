@@ -38,8 +38,8 @@ public class Pacman extends AbstractPlayer {
             if (!cell.isWall()) {
 //                x = spawnX = cell.getX() * GameSettings.CELL_SIZE + GameSettings.CELL_SIZE / 2;
 //                y = spawnY = cell.getY() * GameSettings.CELL_SIZE + GameSettings.CELL_SIZE / 2;
-                x = spawnX = cell.getX() * GameSettings.CELL_SIZE;
-                y = spawnY = cell.getY() * GameSettings.CELL_SIZE;
+                x = spawnX = cell.getX() * GameSettings.CELL_SIZE + 3;
+                y = spawnY = cell.getY() * GameSettings.CELL_SIZE + 3;
                 break;
             }
         }
@@ -48,13 +48,12 @@ public class Pacman extends AbstractPlayer {
     @Override
     public void go() {
         Direction movingDirection;
-
-        if (!checkForWall(currentDirection, x, y, walls)) {
+        if (!checkForWall(currentDirection, walls, view)) {
             movingDirection = currentDirection;
         } else {
             movingDirection = null;
             stayCount++;
-            switch (currentDirection) {
+            if (currentDirection != null) switch (currentDirection) {
                 case UP:
                     if (stayCount < GameSettings.CALM_COUNT) {
                         view.setImage(new Image("/images/pacman-up/2.png"));
@@ -89,7 +88,7 @@ public class Pacman extends AbstractPlayer {
         if (movingDirection != null) {
             switch (movingDirection) {
                 case UP:
-                    if (!checkForWall(movingDirection, x, y, walls)) {
+                    if (!checkForWall(movingDirection, walls, view)) {
                         setY(y - GameSettings.PACMAN_SPEED);
                     }
                     if (y + GameSettings.CELL_SIZE / 2 <= 0) {
@@ -103,7 +102,7 @@ public class Pacman extends AbstractPlayer {
                     }
                     break;
                 case DOWN:
-                    if (!checkForWall(movingDirection, x, y, walls)) {
+                    if (!checkForWall(movingDirection, walls, view)) {
                         setY(y + GameSettings.PACMAN_SPEED);
                     }
                     if (y >= maze.labyrinthLength() * GameSettings.CELL_SIZE - GameSettings.CELL_SIZE / 2) {
@@ -117,7 +116,7 @@ public class Pacman extends AbstractPlayer {
                     }
                     break;
                 case LEFT:
-                    if (!checkForWall(movingDirection, x, y, walls)) {
+                    if (!checkForWall(movingDirection, walls, view)) {
                         setX(x - GameSettings.PACMAN_SPEED);
                     }
                     if (x + GameSettings.CELL_SIZE / 2 <= 0) {
@@ -131,7 +130,7 @@ public class Pacman extends AbstractPlayer {
                     }
                     break;
                 case RIGHT:
-                    if (!checkForWall(movingDirection, x, y, walls)) {
+                    if (!checkForWall(movingDirection, walls, view)) {
                         setX(x + GameSettings.PACMAN_SPEED);
                     }
                     if (x >= maze.labyrinthLength() * GameSettings.CELL_SIZE - GameSettings.CELL_SIZE / 2) {
@@ -151,8 +150,8 @@ public class Pacman extends AbstractPlayer {
 
     public void show() {
         view.setImage(new Image("/images/pacman-left/3.png"));
-        view.setFitWidth(GameSettings.CELL_SIZE);
-        view.setFitHeight(GameSettings.CELL_SIZE);
+        view.setFitWidth(GameSettings.CELL_SIZE - 4);
+        view.setFitHeight(GameSettings.CELL_SIZE - 4);
         view.setX(spawnX);
         view.setY(spawnY);
     }

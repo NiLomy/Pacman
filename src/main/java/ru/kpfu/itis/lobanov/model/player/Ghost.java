@@ -22,7 +22,7 @@ public class Ghost extends AbstractPlayer {
         setHp(GameSettings.GHOST_HP);
     }
 
-    private void setSpawnPoint() {
+    public void setSpawnPoint() {
 //        Cell[] cellsForPlacement = maze.getCellsForPlacement(Placement.CENTER);
 //        Random random = new Random();
 //
@@ -37,15 +37,15 @@ public class Ghost extends AbstractPlayer {
 //                break;
 //            }
 //        }
-        x = spawnX = GameSettings.CELL_SIZE;
-        y = spawnY = GameSettings.CELL_SIZE;
+        x = spawnX = GameSettings.CELL_SIZE + 3;
+        y = spawnY = GameSettings.CELL_SIZE + 3;
     }
 
     @Override
     public void go() {
         Direction movingDirection;
 
-        if (!checkForWall(currentDirection, x, y, walls)) {
+        if (!checkForWall(currentDirection, walls, view)) {
             movingDirection = currentDirection;
         } else {
             movingDirection = null;
@@ -54,8 +54,8 @@ public class Ghost extends AbstractPlayer {
         if (movingDirection != null) {
             switch (movingDirection) {
                 case UP:
-                    if (!checkForWall(movingDirection, x, y, walls)) {
-                        setY(y - GameSettings.PACMAN_SPEED);
+                    if (!checkForWall(movingDirection, walls, view)) {
+                        setY(y - GameSettings.GHOST_SPEED);
                     }
                     if (y + GameSettings.CELL_SIZE / 2 <= 0) {
                         setY(maze.getLowerExit().getY() * GameSettings.CELL_SIZE);
@@ -63,8 +63,8 @@ public class Ghost extends AbstractPlayer {
                     }
                     break;
                 case DOWN:
-                    if (!checkForWall(movingDirection, x, y, walls)) {
-                        setY(y + GameSettings.PACMAN_SPEED);
+                    if (!checkForWall(movingDirection, walls, view)) {
+                        setY(y + GameSettings.GHOST_SPEED);
                     }
                     if (y >= maze.labyrinthLength() * GameSettings.CELL_SIZE - GameSettings.CELL_SIZE / 2) {
                         setY(GameSettings.CELL_SIZE / 2);
@@ -72,8 +72,8 @@ public class Ghost extends AbstractPlayer {
                     }
                     break;
                 case LEFT:
-                    if (!checkForWall(movingDirection, x, y, walls)) {
-                        setX(x - GameSettings.PACMAN_SPEED);
+                    if (!checkForWall(movingDirection, walls, view)) {
+                        setX(x - GameSettings.GHOST_SPEED);
                     }
                     if (x + GameSettings.CELL_SIZE / 2 <= 0) {
                         setX(maze.getRightExit().getX() * GameSettings.CELL_SIZE);
@@ -81,8 +81,8 @@ public class Ghost extends AbstractPlayer {
                     }
                     break;
                 case RIGHT:
-                    if (!checkForWall(movingDirection, x, y, walls)) {
-                        setX(x + GameSettings.PACMAN_SPEED);
+                    if (!checkForWall(movingDirection, walls, view)) {
+                        setX(x + GameSettings.GHOST_SPEED);
                     }
                     if (x >= maze.labyrinthLength() * GameSettings.CELL_SIZE - GameSettings.CELL_SIZE / 2) {
                         setX(GameSettings.CELL_SIZE / 2);
@@ -93,9 +93,9 @@ public class Ghost extends AbstractPlayer {
     }
 
     public void show() {
-        view.setImage(new Image("/images/pacman-left/3.png"));
-        view.setFitWidth(GameSettings.CELL_SIZE);
-        view.setFitHeight(GameSettings.CELL_SIZE);
+        view.setImage(new Image("/images/blinky.png"));
+        view.setFitWidth(GameSettings.CELL_SIZE - 4);
+        view.setFitHeight(GameSettings.CELL_SIZE - 4);
         view.setX(spawnX);
         view.setY(spawnY);
     }

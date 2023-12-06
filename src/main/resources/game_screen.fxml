@@ -24,4 +24,9 @@
 
 <!--    </VBox>-->
 
+    <VBox fx:id="gameEndWindow" alignment="CENTER" visible="false" AnchorPane.leftAnchor="10" AnchorPane.bottomAnchor="10" AnchorPane.rightAnchor="10" AnchorPane.topAnchor="10">
+        <Label fx:id="gameEndLabel"/>
+        <Button fx:id="gameEndButton" text="Go to home page"/>
+    </VBox>
+
 </AnchorPane>

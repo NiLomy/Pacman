@@ -13,6 +13,9 @@ import ru.kpfu.itis.lobanov.model.player.Ghost;
 import ru.kpfu.itis.lobanov.model.player.Pacman;
 import ru.kpfu.itis.lobanov.protocol.MessageProtocol;
 import ru.kpfu.itis.lobanov.utils.AppConfig;
+import ru.kpfu.itis.lobanov.utils.GameMessageProvider;
+import ru.kpfu.itis.lobanov.utils.GameSettings;
+import ru.kpfu.itis.lobanov.utils.MessageType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,16 +32,20 @@ public class PacmanServer implements Server {
     private final List<Client> clients;
     private final List<EventListener> listeners;
     private final Maze maze = new Maze();
+    private boolean isGameStarted;
     private Pacman pacman;
-    private Ghost ghost;
+    private List<Ghost> ghosts;
     private List<Pellet> pellets;
     private List<Bonus> bonuses;
     private ByteBuffer wallsBuffer;
+    private int scores;
 
     public PacmanServer(int port) {
         this.port = port;
         this.clients = new ArrayList<>();
+        this.ghosts = new ArrayList<>();
         this.listeners = new ArrayList<>();
+        this.isGameStarted = false;
     }
 
     @Override
@@ -47,31 +54,31 @@ public class PacmanServer implements Server {
         listeners.add(listener);
     }
 
-    @Override
-    public void start() {
-        try {
-            serverSocket = new ServerSocket(port);
-            generateWalls();
-            createPacman();
-            createGhosts();
-            generateBonuses();
-            generatePellets();
-
-            while (true) {
-                Socket clientSocket = serverSocket.accept();
-                InputStream input = clientSocket.getInputStream();
-                OutputStream output = clientSocket.getOutputStream();
-
-                Client client = new Client(input, output, this, clientSocket);
-                clients.add(client);
-                AppConfig.usersCount.set(clients.size());
-
-                new Thread(client).start();
-            }
-        } catch (IOException e) {
-            throw new ServerException("Can not establish a connection.", e);
-        }
-    }
+//    @Override
+//    public void start() {
+//        try {
+//            serverSocket = new ServerSocket(port);
+//            generateWalls();
+//            createPacman();
+//            createGhosts();
+//            generateBonuses();
+//            generatePellets();
+//
+//            while (true) {
+//                Socket clientSocket = serverSocket.accept();
+//                InputStream input = clientSocket.getInputStream();
+//                OutputStream output = clientSocket.getOutputStream();
+//
+//                Client client = new Client(input, output, this, clientSocket);
+//                clients.add(client);
+//                AppConfig.usersCount.set(clients.size());
+//
+//                new Thread(client).start();
+//            }
+//        } catch (IOException e) {
+//            throw new ServerException("Can not establish a connection.", e);
+//        }
+//    }
 
     @Override
     public void sendMessage(int connectionId, Message message) {
@@ -149,7 +156,11 @@ public class PacmanServer implements Server {
     }
 
     public void createGhosts() {
-        ghost = new Ghost(maze);
+        for (int i = 0; i < clients.size() - 1; i++) {
+            Ghost ghost = new Ghost(maze);
+            ghost.setSpawnPoint();
+            ghosts.add(ghost);
+        }
     }
 
     public void generateBonuses() {
@@ -176,8 +187,8 @@ public class PacmanServer implements Server {
         return pacman;
     }
 
-    public Ghost getGhost() {
-        return ghost;
+    public List<Ghost> getGhosts() {
+        return ghosts;
     }
 
     public List<Pellet> getPellets() {
@@ -188,10 +199,75 @@ public class PacmanServer implements Server {
         return bonuses;
     }
 
+    @Override
+    public void run() {
+        try {
+            serverSocket = new ServerSocket(port);
+            generateWalls();
+
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                InputStream input = clientSocket.getInputStream();
+                OutputStream output = clientSocket.getOutputStream();
+
+                Client client = new Client(input, output, this, clientSocket);
+                clients.add(client);
+                AppConfig.usersCount.set(clients.size());
+
+                new Thread(client).start();
+
+                if (!isGameStarted && clients.size() == GameSettings.PLAYERS_COUNT) {
+                    createPacman();
+                    createGhosts();
+                    generateBonuses();
+                    generatePellets();
+                    startGame();
+                    isGameStarted = true;
+                }
+            }
+        } catch (IOException e) {
+            throw new ServerException("Can not establish a connection.", e);
+        }
+    }
+
+    private void startGame() {
+        GameScreenUpdater gameScreenUpdater = new GameScreenUpdater(this);
+        new Thread(gameScreenUpdater).start();
+    }
+
+    static class GameScreenUpdater implements Runnable {
+        private final Server server;
+
+        public GameScreenUpdater(Server server) {
+            this.server = server;
+        }
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(7500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            while (true) {
+                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.BLINK_BONUSES_RESPONSE, new byte[0]));
+                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.PLAYERS_MOVE_RESPONSE, new byte[0]));
+                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.PACMAN_EAT_PELLET_RESPONSE, new byte[0]));
+                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.PACMAN_EAT_BONUS_RESPONSE, new byte[0]));
+                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.CHANGE_SCORES_RESPONSE, new byte[0]));
+                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.GAME_WIN_RESPONSE, new byte[0]));
+                try {
+                    Thread.sleep(GameSettings.UPDATE_FREQUENCY);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+
     static class Client implements Runnable {
-        private InputStream input;
-        private OutputStream output;
-        private PacmanServer server;
+        private final InputStream input;
+        private final OutputStream output;
+        private final PacmanServer server;
         private final Socket clientSocket;
         private boolean alive = true;
         private final int id;
@@ -217,7 +293,6 @@ public class PacmanServer implements Server {
                             }
                         }
                     }
-//                    server.sendBroadCastMessage(message, this);
                 }
             } catch (MessageReadException e) {
                 throw new RuntimeException(e);

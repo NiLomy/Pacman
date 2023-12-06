@@ -12,16 +12,15 @@ import ru.kpfu.itis.lobanov.model.player.Pacman;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-public interface Server {
+public interface Server extends Runnable {
     void registerListener(EventListener listener) throws EventListenerException;
-    void start();
     void sendMessage(int connectionId, Message message);
     void sendBroadCastMessage(Message message);
     void sendBroadCastMessage(Message message, PacmanServer.Client client);
     Maze getMaze();
     ByteBuffer getWallsBuffer();
     Pacman getPacman();
-    Ghost getGhost();
+    List<Ghost> getGhosts();
     List<Bonus> getBonuses();
     List<Pellet> getPellets();
 }

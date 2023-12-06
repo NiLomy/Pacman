@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Maze implements Serializable {
-    private final Cell[][] data = new Cell[GameSettings.SIZE][GameSettings.SIZE];
+    private final Cell[][] data = new Cell[GameSettings.MAZE_SIZE][GameSettings.MAZE_SIZE];
     private final Random random = new Random();
     private final List<Cell> exits = new ArrayList<>();
 
@@ -30,7 +30,7 @@ public class Maze implements Serializable {
         currentCell.setChecked(true);
 
         Cell[] currentCellNeighbours;
-        Cell[] path = new Cell[GameSettings.SIZE * GameSettings.SIZE];
+        Cell[] path = new Cell[GameSettings.MAZE_SIZE * GameSettings.MAZE_SIZE];
         int indexOfPath = 0;
 
         do {
@@ -69,8 +69,8 @@ public class Maze implements Serializable {
     }
 
     private void generateCells() {
-        for (int i = 0; i < GameSettings.SIZE; i++) {
-            for (int j = 0; j < GameSettings.SIZE; j++) {
+        for (int i = 0; i < GameSettings.MAZE_SIZE; i++) {
+            for (int j = 0; j < GameSettings.MAZE_SIZE; j++) {
                 data[i][j] = new Cell(i, j, true);
             }
         }
@@ -80,8 +80,8 @@ public class Maze implements Serializable {
         final int BEGIN_INDEX = 1;
         final int DISTANCE = 2;
 
-        for (int i = BEGIN_INDEX; i < GameSettings.SIZE; i += DISTANCE) {
-            for (int j = BEGIN_INDEX; j < GameSettings.SIZE; j += DISTANCE) {
+        for (int i = BEGIN_INDEX; i < GameSettings.MAZE_SIZE; i += DISTANCE) {
+            for (int j = BEGIN_INDEX; j < GameSettings.MAZE_SIZE; j += DISTANCE) {
                 data[i][j].setWall(false);
             }
         }
@@ -92,7 +92,7 @@ public class Maze implements Serializable {
     }
 
     public int labyrinthLength() {
-        return GameSettings.SIZE;
+        return GameSettings.MAZE_SIZE;
     }
 
     private void go(Cell randomEmptyNeighbour, Cell wallNeighbour) {
@@ -138,24 +138,24 @@ public class Maze implements Serializable {
     }
 
     private Cell[][] getVerticalSideWalls() {
-        Cell[] rightWall = new Cell[GameSettings.SIZE];
-        Cell[] leftWall = new Cell[GameSettings.SIZE];
+        Cell[] rightWall = new Cell[GameSettings.MAZE_SIZE];
+        Cell[] leftWall = new Cell[GameSettings.MAZE_SIZE];
 
-        for (int i = 0; i < GameSettings.SIZE; i++) {
+        for (int i = 0; i < GameSettings.MAZE_SIZE; i++) {
             leftWall[i] = data[i][0];
             data[i][0].setSideWall(true);
-            rightWall[i] = data[i][GameSettings.SIZE - 1];
-            data[i][GameSettings.SIZE - 1].setSideWall(true);
+            rightWall[i] = data[i][GameSettings.MAZE_SIZE - 1];
+            data[i][GameSettings.MAZE_SIZE - 1].setSideWall(true);
         }
         return new Cell[][]{leftWall, rightWall};
     }
 
     private Cell[][] getHorizontalSideWalls() {
         Cell[] upperWall = data[0];
-        Cell[] lowerWall = data[GameSettings.SIZE - 1];
-        for (int i = 0; i < GameSettings.SIZE; i++) {
+        Cell[] lowerWall = data[GameSettings.MAZE_SIZE - 1];
+        for (int i = 0; i < GameSettings.MAZE_SIZE; i++) {
             data[0][i].setSideWall(true);
-            data[GameSettings.SIZE - 1][i].setSideWall(true);
+            data[GameSettings.MAZE_SIZE - 1][i].setSideWall(true);
         }
         return new Cell[][]{upperWall, lowerWall};
     }
@@ -165,7 +165,7 @@ public class Maze implements Serializable {
             int index;
             do {
                 index = random.nextInt(cells.length);
-            } while (index == 0 || index == GameSettings.SIZE - 1);
+            } while (index == 0 || index == GameSettings.MAZE_SIZE - 1);
             Cell cell = cells[index];
             Cell[] neighbours = cell.getEmptyNeighbours(this);
             if (sizeOfArray(neighbours) > 0) {
@@ -183,34 +183,34 @@ public class Maze implements Serializable {
         int yEndIndex;
         switch (placement) {
             case CENTER:
-                xStartIndex = GameSettings.SIZE * 3 / 8; // SIZE / 2 - SIZE / 8
-                xEndIndex = GameSettings.SIZE * 5 / 8; // SIZE / 2 + SIZE / 8
-                yStartIndex = GameSettings.SIZE * 3 / 8;
-                yEndIndex = GameSettings.SIZE * 5 / 8;
+                xStartIndex = GameSettings.MAZE_SIZE * 3 / 8; // SIZE / 2 - SIZE / 8
+                xEndIndex = GameSettings.MAZE_SIZE * 5 / 8; // SIZE / 2 + SIZE / 8
+                yStartIndex = GameSettings.MAZE_SIZE * 3 / 8;
+                yEndIndex = GameSettings.MAZE_SIZE * 5 / 8;
                 return getCellsInRange(xStartIndex, xEndIndex, yStartIndex, yEndIndex);
             case UPPER_LEFT_CORNER:
                 xStartIndex = 1;
-                xEndIndex = 1 + GameSettings.SIZE / 8;
+                xEndIndex = 1 + GameSettings.MAZE_SIZE / 8;
                 yStartIndex = 1;
-                yEndIndex = 1 + GameSettings.SIZE / 8;
+                yEndIndex = 1 + GameSettings.MAZE_SIZE / 8;
                 return getCellsInRange(xStartIndex, xEndIndex, yStartIndex, yEndIndex);
             case UPPER_RIGHT_CORNER:
-                xStartIndex = GameSettings.SIZE * 7 / 8 - 2; // SIZE - 2 - SIZE / 8
-                xEndIndex = GameSettings.SIZE - 2;
+                xStartIndex = GameSettings.MAZE_SIZE * 7 / 8 - 2; // SIZE - 2 - SIZE / 8
+                xEndIndex = GameSettings.MAZE_SIZE - 2;
                 yStartIndex = 1;
-                yEndIndex = 1 + GameSettings.SIZE / 8;
+                yEndIndex = 1 + GameSettings.MAZE_SIZE / 8;
                 return getCellsInRange(xStartIndex, xEndIndex, yStartIndex, yEndIndex);
             case LOWER_LEFT_CORNER:
                 xStartIndex = 1;
-                xEndIndex = 1 + GameSettings.SIZE / 8;
-                yStartIndex = GameSettings.SIZE * 7 / 8 - 2; // SIZE - 2 - SIZE / 8
-                yEndIndex = GameSettings.SIZE - 2;
+                xEndIndex = 1 + GameSettings.MAZE_SIZE / 8;
+                yStartIndex = GameSettings.MAZE_SIZE * 7 / 8 - 2; // SIZE - 2 - SIZE / 8
+                yEndIndex = GameSettings.MAZE_SIZE - 2;
                 return getCellsInRange(xStartIndex, xEndIndex, yStartIndex, yEndIndex);
             case LOWER_RIGHT_CORNER:
-                xStartIndex = GameSettings.SIZE * 7 / 8 - 2; // SIZE - 2 - SIZE / 8
-                xEndIndex = GameSettings.SIZE - 2;
-                yStartIndex = GameSettings.SIZE * 7 / 8 - 2;
-                yEndIndex = GameSettings.SIZE - 2;
+                xStartIndex = GameSettings.MAZE_SIZE * 7 / 8 - 2; // SIZE - 2 - SIZE / 8
+                xEndIndex = GameSettings.MAZE_SIZE - 2;
+                yStartIndex = GameSettings.MAZE_SIZE * 7 / 8 - 2;
+                yEndIndex = GameSettings.MAZE_SIZE - 2;
                 return getCellsInRange(xStartIndex, xEndIndex, yStartIndex, yEndIndex);
         }
         return null;
@@ -260,8 +260,8 @@ public class Maze implements Serializable {
         List<Pellet> pellets = new ArrayList<>();
         int beginIndex = 1;
 
-        for (int x = beginIndex; x < GameSettings.SIZE - 1; x++) {
-            for (int y = beginIndex; y < GameSettings.SIZE - 1; y++) {
+        for (int x = beginIndex; x < GameSettings.MAZE_SIZE - 1; x++) {
+            for (int y = beginIndex; y < GameSettings.MAZE_SIZE - 1; y++) {
                 double cellX = x * GameSettings.CELL_SIZE + GameSettings.CELL_SIZE / 2;
                 double cellY = y * GameSettings.CELL_SIZE + GameSettings.CELL_SIZE / 2;
                 Bonus tempBonus = new Bonus(cellX, cellY, GameSettings.BONUS_SCORES);
@@ -275,8 +275,8 @@ public class Maze implements Serializable {
 
     public List<Rectangle> getWalls() {
         List<Rectangle> walls = new ArrayList<>();
-        for (int x = 0; x < GameSettings.SIZE; x++) {
-            for (int y = 0; y < GameSettings.SIZE; y++) {
+        for (int x = 0; x < GameSettings.MAZE_SIZE; x++) {
+            for (int y = 0; y < GameSettings.MAZE_SIZE; y++) {
                 if (data[x][y].isWall()) {
                     Rectangle rectangle = new Rectangle(x * GameSettings.CELL_SIZE, y * GameSettings.CELL_SIZE, GameSettings.CELL_SIZE, GameSettings.CELL_SIZE);
                     walls.add(rectangle);
@@ -297,7 +297,7 @@ public class Maze implements Serializable {
 
     public Cell getLowerExit() {
         for (Cell cell : exits) {
-            if (cell.getY() == GameSettings.SIZE - 1) {
+            if (cell.getY() == GameSettings.MAZE_SIZE - 1) {
                 return cell;
             }
         }
@@ -315,7 +315,7 @@ public class Maze implements Serializable {
 
     public Cell getRightExit() {
         for (Cell cell : exits) {
-            if (cell.getX() == GameSettings.SIZE - 1) {
+            if (cell.getX() == GameSettings.MAZE_SIZE - 1) {
                 return cell;
             }
         }

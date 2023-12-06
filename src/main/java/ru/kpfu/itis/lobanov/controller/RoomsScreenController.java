@@ -8,6 +8,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import ru.kpfu.itis.lobanov.PacmanApplication;
+import ru.kpfu.itis.lobanov.client.PacmanClient;
 import ru.kpfu.itis.lobanov.utils.AppConfig;
 
 import java.io.IOException;
@@ -20,6 +21,8 @@ public class RoomsScreenController {
     @FXML
     private Button room2;
     private static Scene scene;
+    private static PacmanClient client;
+
     @FXML
     private void initialize() {
         room1.setOnAction(event -> {
@@ -28,6 +31,9 @@ public class RoomsScreenController {
             Stage stage = PacmanApplication.getStage();
             FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource("/waiting_room.fxml"));
             try {
+                client = new PacmanClient(AppConfig.CURRENT_HOST, AppConfig.CURRENT_PORT_1);
+                PacmanApplication.setClient(client);
+                client.connect();
                 AnchorPane pane = loader.load();
                 Scene scene = new Scene(pane);
                 RoomsScreenController.scene = scene;
@@ -38,24 +44,23 @@ public class RoomsScreenController {
             }
         });
 
-//        GameSettings.hostsCount.addListener((observable, oldValue, newValue) -> {
-//            int newHostCount = newValue.intValue();
-//            int oldHostCount = oldValue.intValue();
-//
-//            if (newHostCount > oldHostCount) {
-//                Button button = new Button("Start game");
-//                button.setId(AppConfig.CURRENT_HOST + " " + AppConfig.CURRENT_PORT_1);
-//                button.setOnAction(event -> {
-//
-//                });
-//                button.minWidth(100);
-//                panel.getChildren().addAll(button);
-//            } else {
-//                Button b = (Button) panel.lookup("#" + AppConfig.CURRENT_HOST + " " + AppConfig.CURRENT_PORT_1);
-//                panel.getChildren().remove(b);
-//            }
-//        });
-
-//        GameSettings.hostsCount.set(GameSettings.hostsCount.intValue() + 1);
+        room2.setOnAction(event -> {
+            AppConfig.setHost(AppConfig.CURRENT_HOST);
+            AppConfig.setPort(AppConfig.CURRENT_PORT_2);
+            Stage stage = PacmanApplication.getStage();
+            FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource("/waiting_room.fxml"));
+            try {
+                client = new PacmanClient(AppConfig.CURRENT_HOST, AppConfig.CURRENT_PORT_2);
+                PacmanApplication.setClient(client);
+                client.connect();
+                AnchorPane pane = loader.load();
+                Scene scene = new Scene(pane);
+                RoomsScreenController.scene = scene;
+                stage.setScene(scene);
+                stage.show();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 }

@@ -7,20 +7,20 @@ import ru.kpfu.itis.lobanov.utils.MessageType;
 
 import java.nio.ByteBuffer;
 
-public class MoveEventListener extends AbstractEventListener {
+public class EatPlayerEventListener extends AbstractEventListener {
     @Override
     public void handle(Message message, int connectionId, int info) throws EventListenerException {
         if (!isInit) throw new EventListenerException("Listener hasn't been initialized yet.");
 
-        byte[] currentData = message.getData();
-        ByteBuffer buffer = ByteBuffer.allocate(currentData.length + 4);
-        buffer.putInt(connectionId);
-        buffer.put(currentData);
-        server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.MOVEMENT_RESPONSE, buffer.array()));
+//        byte[] currentData = message.getData();
+//        ByteBuffer buffer = ByteBuffer.allocate(currentData.length + 4);
+//        buffer.putInt(connectionId);
+//        buffer.put(currentData);
+        server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.EAT_PLAYER_RESPONSE, message.getData()));
     }
 
     @Override
     public int getType() {
-        return MessageType.MOVEMENT_REQUEST;
+        return MessageType.EAT_PLAYER_REQUEST;
     }
 }
