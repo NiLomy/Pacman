@@ -39,6 +39,8 @@ public class MessageType {
     public static final int GAME_LOOSE_RESPONSE = 32;
     public static final int PLAYERS_MOVE_REQUEST = 33;
     public static final int PLAYERS_MOVE_RESPONSE = 34;
+    public static final int RUSH_MODE_REQUEST = 35;
+    public static final int RUSH_MODE_RESPONSE = 36;
 
 
     public static List<Integer> getAllTypes() {

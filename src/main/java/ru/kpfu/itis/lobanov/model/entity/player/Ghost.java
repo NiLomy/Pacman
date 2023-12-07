@@ -51,8 +51,8 @@ public class Ghost extends AbstractPlayer {
                         setY(y - GameSettings.GHOST_SPEED);
                     }
                     if (y + GameSettings.CELL_SIZE / 2 <= 0) {
-                        setY(maze.getLowerExit().getY() * GameSettings.CELL_SIZE);
-                        setX(maze.getLowerExit().getX() * GameSettings.CELL_SIZE);
+                        setY(maze.getLowerExit().getY() * GameSettings.CELL_SIZE + 3);
+                        setX(maze.getLowerExit().getX() * GameSettings.CELL_SIZE + 3);
                     }
                     break;
                 case DOWN:
@@ -60,8 +60,8 @@ public class Ghost extends AbstractPlayer {
                         setY(y + GameSettings.GHOST_SPEED);
                     }
                     if (y >= maze.labyrinthLength() * GameSettings.CELL_SIZE - GameSettings.CELL_SIZE / 2) {
-                        setY(GameSettings.CELL_SIZE / 2);
-                        setX(maze.getUpperExit().getX() * GameSettings.CELL_SIZE);
+                        setY(GameSettings.CELL_SIZE / 2 + 3);
+                        setX(maze.getUpperExit().getX() * GameSettings.CELL_SIZE + 3);
                     }
                     break;
                 case LEFT:
@@ -69,8 +69,8 @@ public class Ghost extends AbstractPlayer {
                         setX(x - GameSettings.GHOST_SPEED);
                     }
                     if (x + GameSettings.CELL_SIZE / 2 <= 0) {
-                        setX(maze.getRightExit().getX() * GameSettings.CELL_SIZE);
-                        setY(maze.getRightExit().getY() * GameSettings.CELL_SIZE);
+                        setX(maze.getRightExit().getX() * GameSettings.CELL_SIZE + 3);
+                        setY(maze.getRightExit().getY() * GameSettings.CELL_SIZE + 3);
                     }
                     break;
                 case RIGHT:
@@ -78,8 +78,8 @@ public class Ghost extends AbstractPlayer {
                         setX(x + GameSettings.GHOST_SPEED);
                     }
                     if (x >= maze.labyrinthLength() * GameSettings.CELL_SIZE - GameSettings.CELL_SIZE / 2) {
-                        setX(GameSettings.CELL_SIZE / 2);
-                        setY(maze.getLeftExit().getY() * GameSettings.CELL_SIZE);
+                        setX(GameSettings.CELL_SIZE / 2 + 3);
+                        setY(maze.getLeftExit().getY() * GameSettings.CELL_SIZE + 3);
                     }
             }
         }

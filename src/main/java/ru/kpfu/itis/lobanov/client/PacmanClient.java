@@ -4,6 +4,7 @@ import ru.kpfu.itis.lobanov.controller.Controller;
 import ru.kpfu.itis.lobanov.controller.GameScreenController;
 import ru.kpfu.itis.lobanov.exceptions.ClientException;
 import ru.kpfu.itis.lobanov.exceptions.MessageReadException;
+import ru.kpfu.itis.lobanov.exceptions.MessageWriteException;
 import ru.kpfu.itis.lobanov.model.entity.net.Message;
 import ru.kpfu.itis.lobanov.protocol.MessageProtocol;
 
@@ -44,9 +45,8 @@ public class PacmanClient implements Client {
     @Override
     public void sendMessage(Message message) {
         try {
-            thread.getOut().write(MessageProtocol.getBytes(message));
-            thread.getOut().flush();
-        } catch (IOException e) {
+            MessageProtocol.writeMessage(thread.getOut(), message);
+        } catch (MessageWriteException e) {
             throw new ClientException("Can't send data to the server.", e);
         }
     }

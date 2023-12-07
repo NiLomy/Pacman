@@ -1,9 +1,6 @@
 package ru.kpfu.itis.lobanov.protocol;
 
-import ru.kpfu.itis.lobanov.exceptions.InvalidMessageLengthException;
-import ru.kpfu.itis.lobanov.exceptions.InvalidMessageTypeException;
-import ru.kpfu.itis.lobanov.exceptions.InvalidProtocolVersionException;
-import ru.kpfu.itis.lobanov.exceptions.MessageReadException;
+import ru.kpfu.itis.lobanov.exceptions.*;
 import ru.kpfu.itis.lobanov.model.entity.net.Message;
 import ru.kpfu.itis.lobanov.utils.GameMessageProvider;
 import ru.kpfu.itis.lobanov.utils.MessageType;
@@ -57,6 +54,15 @@ public class MessageProtocol {
         return null;
     }
 
+    public static void writeMessage(OutputStream out, Message message) throws MessageWriteException {
+        try {
+            out.write(MessageProtocol.getBytes(message));
+            out.flush();
+        } catch (IOException e) {
+            throw new MessageWriteException("Can't write message.", e);
+        }
+    }
+
     public static byte[] getBytes(Message message) {
         byte[] bytes = new byte[VERSION_BYTES.length + INTEGER_BYTES * 2 + message.getData().length];
         int index = 0;
@@ -76,9 +82,5 @@ public class MessageProtocol {
             bytes[index++] = dataByte;
         }
         return bytes;
-    }
-
-    public static void writeMessage(OutputStream out, Message message) {
-
     }
 }

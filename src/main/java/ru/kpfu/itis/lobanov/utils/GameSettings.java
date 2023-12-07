@@ -14,7 +14,7 @@ public class GameSettings {
     public static final int BONUS_SCORES = 20;
     public static final int CALM_COUNT = 5;
     public static final int BONUS_DURATION = 5 * 1_000;
-    public static final int PLAYERS_COUNT = 2;
+    public static final int PLAYERS_COUNT = 3;
     public static final int UPDATE_FREQUENCY = 60;
 
     public static SimpleIntegerProperty hostsCount = new SimpleIntegerProperty(0);

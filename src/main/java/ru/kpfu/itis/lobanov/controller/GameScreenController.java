@@ -8,7 +8,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -22,7 +25,10 @@ import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Pellet;
 import ru.kpfu.itis.lobanov.model.entity.net.Message;
 import ru.kpfu.itis.lobanov.model.entity.player.Ghost;
 import ru.kpfu.itis.lobanov.model.entity.player.Pacman;
-import ru.kpfu.itis.lobanov.utils.*;
+import ru.kpfu.itis.lobanov.utils.Direction;
+import ru.kpfu.itis.lobanov.utils.GameMessageProvider;
+import ru.kpfu.itis.lobanov.utils.GameSettings;
+import ru.kpfu.itis.lobanov.utils.MessageType;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -48,7 +54,7 @@ public class GameScreenController implements Controller {
     private Label gameEndLabel;
 
     private Timeline timeline;
-//    private final Maze maze = new Maze();
+    //    private final Maze maze = new Maze();
     private int scores;
     private Pacman pacman;
     private List<Ghost> ghosts;
@@ -57,6 +63,7 @@ public class GameScreenController implements Controller {
     private List<Bonus> bonuses;
     private PacmanClient client;
     private int userId;
+    private boolean isRushMode = false;
 
     @FXML
     private void initialize() {
@@ -183,7 +190,7 @@ public class GameScreenController implements Controller {
                     gameEndButton.setOnAction(event -> {
                         goToHomePage();
                     });
-                    gameEndLabel.setText("You lost the game\"");
+                    gameEndLabel.setText("You lost the game");
                 });
             }
         };
@@ -305,6 +312,21 @@ public class GameScreenController implements Controller {
                     int victimId = buffer.getInt();
                     switch (eaterId) {
                         case 0:
+                            Ghost gho = ghosts.get(victimId);
+                            gho.getView().setVisible(false);
+                            gho.setX(0);
+                            gho.setY(0);
+                            TimerTask task = new TimerTask() {
+                                @Override
+                                public void run() {
+                                    gho.setX(gho.getSpawnX());
+                                    gho.setY(gho.getSpawnY());
+                                    gho.getView().setVisible(true);
+                                }
+                            };
+                            Timer timer = new Timer();
+                            timer.schedule(task, 3 * 1_000);
+                            scores += 500;
                             break;
                         default:
                             pacman.setX(pacman.getSpawnX());
@@ -333,6 +355,7 @@ public class GameScreenController implements Controller {
                 case MessageType.PACMAN_EAT_BONUS_RESPONSE:
                     Bonus bonus = pacman.eatBonus(bonuses);
                     if (bonus != null) {
+                        client.sendMessage(GameMessageProvider.createMessage(MessageType.RUSH_MODE_REQUEST, new byte[] {1}));
                         scores += bonus.getScore();
                         Platform.runLater(() -> gameWindow.getChildren().remove(bonus.getView()));
                     }
@@ -348,8 +371,27 @@ public class GameScreenController implements Controller {
                     break;
                 case MessageType.PLAYERS_MOVE_RESPONSE:
                     pacman.go();
-                    for (Ghost ghos : ghosts) {
+                    for (int i = 0; i < ghosts.size(); i++) {
+                        Ghost ghos = ghosts.get(i);
                         ghos.go();
+                        if (pacman.getView().getBoundsInParent().intersects(ghos.getView().getBoundsInParent())) {
+                            buffer = ByteBuffer.allocate(8 * 2 + 4 * 2);
+                            if (userId != 0) {
+                                if (isRushMode) {
+                                    buffer.putInt(0);
+                                    buffer.putInt(i);
+                                } else {
+                                    buffer.putInt(i);
+                                    buffer.putInt(0);
+                                }
+                                buffer.putDouble(pacman.getX());
+                                buffer.putDouble(pacman.getY());
+                                client.sendMessage(GameMessageProvider.createMessage(MessageType.EAT_PLAYER_REQUEST, buffer.array()));
+                            }
+                        }
+                    }
+//                    for (Ghost ghos : ghosts) {
+//                        ghos.go();
 //                        if (pacman.getX() == ghos.getX() && pacman.getY() == ghos.getY()) {
 //                            buffer = ByteBuffer.allocate(8 * 2 + 4 * 2);
 //                            buffer.putInt(1);
@@ -358,15 +400,11 @@ public class GameScreenController implements Controller {
 //                            buffer.putDouble(pacman.getY());
 //                            client.sendMessage(GameMessageProvider.createMessage(MessageType.EAT_PLAYER_REQUEST, buffer.array()));
 //                        }
-                        if (pacman.getView().getBoundsInParent().intersects(ghos.getView().getBoundsInParent())) {
-                            buffer = ByteBuffer.allocate(8 * 2 + 4 * 2);
-                            buffer.putInt(1);
-                            buffer.putInt(0);
-                            buffer.putDouble(pacman.getX());
-                            buffer.putDouble(pacman.getY());
-                            client.sendMessage(GameMessageProvider.createMessage(MessageType.EAT_PLAYER_REQUEST, buffer.array()));
-                        }
-                    }
+//                    }
+                    break;
+                case MessageType.RUSH_MODE_RESPONSE:
+                    byte[] data = message.getData();
+                    isRushMode = data[0] == 1;
                     break;
             }
         }

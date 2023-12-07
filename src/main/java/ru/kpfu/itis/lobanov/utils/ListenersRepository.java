@@ -44,7 +44,8 @@ public class ListenersRepository {
                 new CreateWallsEventListener(),
                 new CreateGhostEventListener(),
                 new EatPlayerEventListener(),
-                new GameLooseEndEventListener()
+                new GameLooseEndEventListener(),
+                new RushModeEventListener()
         };
     }
 

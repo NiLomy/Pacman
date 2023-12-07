@@ -2,6 +2,7 @@ package ru.kpfu.itis.lobanov.server;
 
 import ru.kpfu.itis.lobanov.exceptions.EventListenerException;
 import ru.kpfu.itis.lobanov.exceptions.MessageReadException;
+import ru.kpfu.itis.lobanov.exceptions.MessageWriteException;
 import ru.kpfu.itis.lobanov.exceptions.ServerException;
 import ru.kpfu.itis.lobanov.listener.EventListener;
 import ru.kpfu.itis.lobanov.model.dao.ServerDao;
@@ -37,7 +38,7 @@ public class PacmanServer implements Server {
     private final Maze maze = new Maze();
     private boolean isGameStarted;
     private Pacman pacman;
-    private List<Ghost> ghosts;
+    private final List<Ghost> ghosts;
     private List<Pellet> pellets;
     private List<Bonus> bonuses;
     private ByteBuffer wallsBuffer;
@@ -90,9 +91,8 @@ public class PacmanServer implements Server {
     public void sendMessage(int connectionId, Message message) {
         Client client = clients.get(connectionId);
         try {
-            client.getOutput().write(MessageProtocol.getBytes(message));
-            client.getOutput().flush();
-        } catch (IOException e) {
+            MessageProtocol.writeMessage(client.getOutput(), message);
+        } catch (MessageWriteException e) {
             client.stop();
         }
     }
@@ -101,9 +101,8 @@ public class PacmanServer implements Server {
     public void sendBroadCastMessage(Message message) {
         for (Client c : clients) {
             try {
-                c.getOutput().write(MessageProtocol.getBytes(message));
-                c.getOutput().flush();
-            } catch (IOException e) {
+                MessageProtocol.writeMessage(c.getOutput(), message);
+            } catch (MessageWriteException e) {
                 c.stop();
             }
         }
@@ -118,9 +117,8 @@ public class PacmanServer implements Server {
                 buffer.putInt(client.id);
                 buffer.put(currentData);
                 message.setData(buffer.array());
-                c.getOutput().write(MessageProtocol.getBytes(message));
-                c.getOutput().flush();
-            } catch (IOException e) {
+                MessageProtocol.writeMessage(c.getOutput(), message);
+            } catch (MessageWriteException e) {
                 c.stop();
             }
         }
@@ -205,6 +203,7 @@ public class PacmanServer implements Server {
     public void closeServer() {
         serverDao.remove(AppConfig.CURRENT_HOST, port);
     }
+
 
     public List<Bonus> getBonuses() {
         return bonuses;

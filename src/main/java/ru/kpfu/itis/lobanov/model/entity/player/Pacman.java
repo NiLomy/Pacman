@@ -21,7 +21,7 @@ public class Pacman extends AbstractPlayer {
         super(maze);
 
         setSpawnPoint();
-        setHp(GameSettings.PACMAN_HP * GameSettings.PLAYERS_COUNT);
+        setHp(GameSettings.PACMAN_HP);
     }
 
     private void setSpawnPoint() {
@@ -88,8 +88,8 @@ public class Pacman extends AbstractPlayer {
                         setY(y - GameSettings.PACMAN_SPEED);
                     }
                     if (y + GameSettings.CELL_SIZE / 2 <= 0) {
-                        setY(maze.getLowerExit().getY() * GameSettings.CELL_SIZE);
-                        setX(maze.getLowerExit().getX() * GameSettings.CELL_SIZE);
+                        setY(maze.getLowerExit().getY() * GameSettings.CELL_SIZE + 3);
+                        setX(maze.getLowerExit().getX() * GameSettings.CELL_SIZE + 3);
                     }
                     if (stayCount == 0) {
                         view.setImage(new Image("/images/pacman-up/1.png"));
@@ -102,8 +102,8 @@ public class Pacman extends AbstractPlayer {
                         setY(y + GameSettings.PACMAN_SPEED);
                     }
                     if (y >= maze.labyrinthLength() * GameSettings.CELL_SIZE - GameSettings.CELL_SIZE / 2) {
-                        setY(GameSettings.CELL_SIZE / 2);
-                        setX(maze.getUpperExit().getX() * GameSettings.CELL_SIZE);
+                        setY(GameSettings.CELL_SIZE / 2 + 3);
+                        setX(maze.getUpperExit().getX() * GameSettings.CELL_SIZE + 3);
                     }
                     if (stayCount == 0) {
                         view.setImage(new Image("/images/pacman-down/1.png"));
@@ -116,8 +116,8 @@ public class Pacman extends AbstractPlayer {
                         setX(x - GameSettings.PACMAN_SPEED);
                     }
                     if (x + GameSettings.CELL_SIZE / 2 <= 0) {
-                        setX(maze.getRightExit().getX() * GameSettings.CELL_SIZE);
-                        setY(maze.getRightExit().getY() * GameSettings.CELL_SIZE);
+                        setX(maze.getRightExit().getX() * GameSettings.CELL_SIZE + 3);
+                        setY(maze.getRightExit().getY() * GameSettings.CELL_SIZE + 3);
                     }
                     if (stayCount == 0) {
                         view.setImage(new Image("/images/pacman-left/1.png"));
@@ -130,8 +130,8 @@ public class Pacman extends AbstractPlayer {
                         setX(x + GameSettings.PACMAN_SPEED);
                     }
                     if (x >= maze.labyrinthLength() * GameSettings.CELL_SIZE - GameSettings.CELL_SIZE / 2) {
-                        setX(GameSettings.CELL_SIZE / 2);
-                        setY(maze.getLeftExit().getY() * GameSettings.CELL_SIZE);
+                        setX(GameSettings.CELL_SIZE / 2 + 3);
+                        setY(maze.getLeftExit().getY() * GameSettings.CELL_SIZE + 3);
                     }
                     if (stayCount == 0) {
                         view.setImage(new Image("/images/pacman-right/1.png"));
