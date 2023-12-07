@@ -1,9 +1,9 @@
 package ru.kpfu.itis.lobanov.listener;
 
 import ru.kpfu.itis.lobanov.exceptions.EventListenerException;
-import ru.kpfu.itis.lobanov.model.environment.Cell;
-import ru.kpfu.itis.lobanov.model.environment.Maze;
-import ru.kpfu.itis.lobanov.model.net.Message;
+import ru.kpfu.itis.lobanov.model.entity.environment.Cell;
+import ru.kpfu.itis.lobanov.model.entity.environment.Maze;
+import ru.kpfu.itis.lobanov.model.entity.net.Message;
 import ru.kpfu.itis.lobanov.server.Server;
 import ru.kpfu.itis.lobanov.utils.GameMessageProvider;
 import ru.kpfu.itis.lobanov.utils.MessageType;

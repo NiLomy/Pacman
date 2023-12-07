@@ -4,7 +4,7 @@ import ru.kpfu.itis.lobanov.exceptions.InvalidMessageLengthException;
 import ru.kpfu.itis.lobanov.exceptions.InvalidMessageTypeException;
 import ru.kpfu.itis.lobanov.exceptions.InvalidProtocolVersionException;
 import ru.kpfu.itis.lobanov.exceptions.MessageReadException;
-import ru.kpfu.itis.lobanov.model.net.Message;
+import ru.kpfu.itis.lobanov.model.entity.net.Message;
 import ru.kpfu.itis.lobanov.utils.GameMessageProvider;
 import ru.kpfu.itis.lobanov.utils.MessageType;
 
@@ -23,6 +23,11 @@ public class MessageProtocol {
         byte[] buffer = new byte[VERSION_BYTES.length + INTEGER_BYTES * 2];
         try {
             in.read(buffer, 0, VERSION_BYTES.length);
+            int counter = 0;
+            for (int i = 0; i < VERSION_BYTES.length; i++) {
+                if (buffer[i] == 0) counter++;
+            }
+            if (counter == VERSION_BYTES.length) return null;
             if (!Arrays.equals(Arrays.copyOfRange(buffer, 0, VERSION_BYTES.length), VERSION_BYTES)) {
                 throw new InvalidProtocolVersionException("Versions of the protocols don't match. Message first bytes must be: " + Arrays.toString(VERSION_BYTES));
             }

@@ -1,18 +1,14 @@
-package ru.kpfu.itis.lobanov.model.player;
+package ru.kpfu.itis.lobanov.model.entity.player;
 
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.shape.Rectangle;
-import org.apache.commons.lang.SerializationUtils;
-import ru.kpfu.itis.lobanov.model.environment.pickups.Bonus;
-import ru.kpfu.itis.lobanov.model.environment.Cell;
-import ru.kpfu.itis.lobanov.model.environment.Maze;
-import ru.kpfu.itis.lobanov.model.environment.pickups.Pellet;
+import ru.kpfu.itis.lobanov.model.entity.environment.Maze;
+import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Bonus;
+import ru.kpfu.itis.lobanov.model.entity.environment.Cell;
+import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Pellet;
 import ru.kpfu.itis.lobanov.utils.Direction;
 import ru.kpfu.itis.lobanov.utils.GameSettings;
 import ru.kpfu.itis.lobanov.utils.Placement;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Random;
 
@@ -25,7 +21,7 @@ public class Pacman extends AbstractPlayer {
         super(maze);
 
         setSpawnPoint();
-        setHp(GameSettings.PACMAN_HP);
+        setHp(GameSettings.PACMAN_HP * GameSettings.PLAYERS_COUNT);
     }
 
     private void setSpawnPoint() {

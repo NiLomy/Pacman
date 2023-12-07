@@ -1,8 +1,8 @@
-package ru.kpfu.itis.lobanov.model.environment;
+package ru.kpfu.itis.lobanov.model.entity.environment;
 
 import javafx.scene.shape.Rectangle;
-import ru.kpfu.itis.lobanov.model.environment.pickups.Bonus;
-import ru.kpfu.itis.lobanov.model.environment.pickups.Pellet;
+import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Bonus;
+import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Pellet;
 import ru.kpfu.itis.lobanov.utils.GameSettings;
 import ru.kpfu.itis.lobanov.utils.Placement;
 

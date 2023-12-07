@@ -2,8 +2,8 @@ package ru.kpfu.itis.lobanov.listener;
 
 import org.apache.commons.lang.SerializationUtils;
 import ru.kpfu.itis.lobanov.exceptions.EventListenerException;
-import ru.kpfu.itis.lobanov.model.environment.pickups.Bonus;
-import ru.kpfu.itis.lobanov.model.net.Message;
+import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Bonus;
+import ru.kpfu.itis.lobanov.model.entity.net.Message;
 import ru.kpfu.itis.lobanov.utils.GameMessageProvider;
 import ru.kpfu.itis.lobanov.utils.MessageType;
 

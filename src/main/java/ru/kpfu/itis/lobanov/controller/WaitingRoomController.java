@@ -9,7 +9,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import ru.kpfu.itis.lobanov.PacmanApplication;
 import ru.kpfu.itis.lobanov.client.PacmanClient;
-import ru.kpfu.itis.lobanov.model.net.Message;
+import ru.kpfu.itis.lobanov.model.entity.net.Message;
 import ru.kpfu.itis.lobanov.utils.AppConfig;
 import ru.kpfu.itis.lobanov.utils.GameMessageProvider;
 import ru.kpfu.itis.lobanov.utils.GameSettings;

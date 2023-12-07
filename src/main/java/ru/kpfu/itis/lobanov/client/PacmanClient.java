@@ -4,7 +4,7 @@ import ru.kpfu.itis.lobanov.controller.Controller;
 import ru.kpfu.itis.lobanov.controller.GameScreenController;
 import ru.kpfu.itis.lobanov.exceptions.ClientException;
 import ru.kpfu.itis.lobanov.exceptions.MessageReadException;
-import ru.kpfu.itis.lobanov.model.net.Message;
+import ru.kpfu.itis.lobanov.model.entity.net.Message;
 import ru.kpfu.itis.lobanov.protocol.MessageProtocol;
 
 import java.io.*;
@@ -81,7 +81,7 @@ public class PacmanClient implements Client {
             try {
                 while (alive) {
                     Message message = MessageProtocol.readMessage(in);
-                    if (pacmanClient.controller != null) pacmanClient.controller.receiveMessage(message);
+                    if (message != null && pacmanClient.controller != null) pacmanClient.controller.receiveMessage(message);
                 }
             } catch (MessageReadException e) {
                 throw new RuntimeException(e);

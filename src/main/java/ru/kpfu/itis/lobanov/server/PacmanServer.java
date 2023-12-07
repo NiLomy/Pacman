@@ -4,13 +4,16 @@ import ru.kpfu.itis.lobanov.exceptions.EventListenerException;
 import ru.kpfu.itis.lobanov.exceptions.MessageReadException;
 import ru.kpfu.itis.lobanov.exceptions.ServerException;
 import ru.kpfu.itis.lobanov.listener.EventListener;
-import ru.kpfu.itis.lobanov.model.environment.Cell;
-import ru.kpfu.itis.lobanov.model.environment.Maze;
-import ru.kpfu.itis.lobanov.model.environment.pickups.Bonus;
-import ru.kpfu.itis.lobanov.model.environment.pickups.Pellet;
-import ru.kpfu.itis.lobanov.model.net.Message;
-import ru.kpfu.itis.lobanov.model.player.Ghost;
-import ru.kpfu.itis.lobanov.model.player.Pacman;
+import ru.kpfu.itis.lobanov.model.dao.ServerDao;
+import ru.kpfu.itis.lobanov.model.dao.impl.ServerDaoImpl;
+import ru.kpfu.itis.lobanov.model.entity.db.ServerModel;
+import ru.kpfu.itis.lobanov.model.entity.environment.Cell;
+import ru.kpfu.itis.lobanov.model.entity.environment.Maze;
+import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Bonus;
+import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Pellet;
+import ru.kpfu.itis.lobanov.model.entity.net.Message;
+import ru.kpfu.itis.lobanov.model.entity.player.Ghost;
+import ru.kpfu.itis.lobanov.model.entity.player.Pacman;
 import ru.kpfu.itis.lobanov.protocol.MessageProtocol;
 import ru.kpfu.itis.lobanov.utils.AppConfig;
 import ru.kpfu.itis.lobanov.utils.GameMessageProvider;
@@ -39,6 +42,7 @@ public class PacmanServer implements Server {
     private List<Bonus> bonuses;
     private ByteBuffer wallsBuffer;
     private int scores;
+    private final ServerDao serverDao;
 
     public PacmanServer(int port) {
         this.port = port;
@@ -46,6 +50,8 @@ public class PacmanServer implements Server {
         this.ghosts = new ArrayList<>();
         this.listeners = new ArrayList<>();
         this.isGameStarted = false;
+        this.serverDao = new ServerDaoImpl();
+        Runtime.getRuntime().addShutdownHook(new Thread(this::closeServer));
     }
 
     @Override
@@ -195,6 +201,11 @@ public class PacmanServer implements Server {
         return pellets;
     }
 
+    @Override
+    public void closeServer() {
+        serverDao.remove(AppConfig.CURRENT_HOST, port);
+    }
+
     public List<Bonus> getBonuses() {
         return bonuses;
     }
@@ -202,6 +213,7 @@ public class PacmanServer implements Server {
     @Override
     public void run() {
         try {
+            serverDao.save(new ServerModel(AppConfig.CURRENT_HOST, port));
             serverSocket = new ServerSocket(port);
             generateWalls();
 

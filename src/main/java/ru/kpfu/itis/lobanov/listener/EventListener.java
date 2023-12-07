@@ -1,7 +1,7 @@
 package ru.kpfu.itis.lobanov.listener;
 
 import ru.kpfu.itis.lobanov.exceptions.EventListenerException;
-import ru.kpfu.itis.lobanov.model.net.Message;
+import ru.kpfu.itis.lobanov.model.entity.net.Message;
 import ru.kpfu.itis.lobanov.server.Server;
 
 public interface EventListener {

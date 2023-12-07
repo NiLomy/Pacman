@@ -1,4 +1,4 @@
-package ru.kpfu.itis.lobanov.model.environment.pickups;
+package ru.kpfu.itis.lobanov.model.entity.environment.pickups;
 
 import javafx.scene.Node;
 

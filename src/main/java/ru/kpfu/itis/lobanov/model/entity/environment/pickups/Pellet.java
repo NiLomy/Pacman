@@ -1,9 +1,7 @@
-package ru.kpfu.itis.lobanov.model.environment.pickups;
+package ru.kpfu.itis.lobanov.model.entity.environment.pickups;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import ru.kpfu.itis.lobanov.utils.GameSettings;
 
 public class Pellet extends LocatableObject {

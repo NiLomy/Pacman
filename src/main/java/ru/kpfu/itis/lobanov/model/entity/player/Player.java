@@ -1,4 +1,4 @@
-package ru.kpfu.itis.lobanov.model.player;
+package ru.kpfu.itis.lobanov.model.entity.player;
 
 import ru.kpfu.itis.lobanov.utils.Direction;
 

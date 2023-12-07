@@ -43,7 +43,8 @@ public class ListenersRepository {
                 new SendIdEventListener(),
                 new CreateWallsEventListener(),
                 new CreateGhostEventListener(),
-                new EatPlayerEventListener()
+                new EatPlayerEventListener(),
+                new GameLooseEndEventListener()
         };
     }
 

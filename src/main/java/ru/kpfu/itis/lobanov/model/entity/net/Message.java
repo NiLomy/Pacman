@@ -1,4 +1,4 @@
-package ru.kpfu.itis.lobanov.model.net;
+package ru.kpfu.itis.lobanov.model.entity.net;
 
 public class Message {
     protected int type;

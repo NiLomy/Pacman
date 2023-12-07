@@ -1,4 +1,4 @@
-package ru.kpfu.itis.lobanov.model.environment;
+package ru.kpfu.itis.lobanov.model.entity.environment;
 
 import java.io.Serializable;
 

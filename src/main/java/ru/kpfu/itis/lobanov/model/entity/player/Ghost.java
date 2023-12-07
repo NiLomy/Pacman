@@ -1,16 +1,9 @@
-package ru.kpfu.itis.lobanov.model.player;
+package ru.kpfu.itis.lobanov.model.entity.player;
 
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.shape.Rectangle;
-import ru.kpfu.itis.lobanov.model.environment.Cell;
-import ru.kpfu.itis.lobanov.model.environment.Maze;
+import ru.kpfu.itis.lobanov.model.entity.environment.Maze;
 import ru.kpfu.itis.lobanov.utils.Direction;
 import ru.kpfu.itis.lobanov.utils.GameSettings;
-import ru.kpfu.itis.lobanov.utils.Placement;
-
-import java.util.List;
-import java.util.Random;
 
 import static ru.kpfu.itis.lobanov.utils.WallDetector.checkForWall;
 

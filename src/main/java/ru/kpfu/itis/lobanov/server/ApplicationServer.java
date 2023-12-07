@@ -11,6 +11,7 @@ public class ApplicationServer {
     public static void main(String[] args) {
         try {
 //            ListenersRepository.init();
+            //TODO make a window before launching server to write host and port
             startServer(AppConfig.CURRENT_PORT_1);
             startServer(AppConfig.CURRENT_PORT_2);
         } catch (EventListenerException | InstantiationException | IllegalAccessException | InvocationTargetException |
