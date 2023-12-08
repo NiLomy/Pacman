@@ -13,7 +13,7 @@ import java.util.Arrays;
 
 public class MessageProtocol {
     public static final byte[] VERSION_BYTES = {0x0, 0x1};
-    public static final int MAX_MESSAGE_LENGTH = 5 * 1024;
+    public static final int MAX_MESSAGE_LENGTH = 100 * 1024;
     private static final int INTEGER_BYTES = 4;
 
     public static Message readMessage(InputStream in) throws MessageReadException {

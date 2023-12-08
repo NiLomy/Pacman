@@ -6,6 +6,6 @@ import ru.kpfu.itis.lobanov.server.Server;
 
 public interface EventListener {
     void init(Server server);
-    void handle(Message message, int connectionId, int info) throws EventListenerException;
+    void handle(Message message, int connectionId, int clientsCount) throws EventListenerException;
     int getType();
 }

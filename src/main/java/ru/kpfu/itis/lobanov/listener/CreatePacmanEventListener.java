@@ -10,7 +10,7 @@ import java.nio.ByteBuffer;
 
 public class CreatePacmanEventListener extends AbstractEventListener {
     @Override
-    public void handle(Message message, int connectionId, int info) throws EventListenerException {
+    public void handle(Message message, int connectionId, int clientsCount) throws EventListenerException {
         if (!isInit) throw new EventListenerException("Listener hasn't been initialized yet.");
 
         byte[] maze = SerializationUtils.serialize(server.getMaze());

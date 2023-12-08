@@ -77,8 +77,6 @@ public class RoomsScreenController {
     private void createRoom(String host, int port) {
         Button room = new Button("Start Game");
         room.setOnAction(event -> {
-            AppConfig.setHost(host);
-            AppConfig.setPort(port);
             Stage stage = PacmanApplication.getStage();
             FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource("/waiting_room.fxml"));
             try {

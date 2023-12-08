@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 
 public class SendIdEventListener extends AbstractEventListener {
     @Override
-    public void handle(Message message, int connectionId, int info) throws EventListenerException {
+    public void handle(Message message, int connectionId, int clientsCount) throws EventListenerException {
         if (!isInit) throw new EventListenerException("Listener hasn't been initialized yet.");
 
         ByteBuffer buffer = ByteBuffer.allocate(4).putInt(connectionId);

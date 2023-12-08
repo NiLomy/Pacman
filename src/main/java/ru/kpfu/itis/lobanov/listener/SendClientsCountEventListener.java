@@ -9,10 +9,10 @@ import java.nio.ByteBuffer;
 
 public class SendClientsCountEventListener extends AbstractEventListener {
     @Override
-    public void handle(Message message, int connectionId, int info) throws EventListenerException {
+    public void handle(Message message, int connectionId, int clientsCount) throws EventListenerException {
         if (!isInit) throw new EventListenerException("Listener hasn't been initialized yet.");
 
-        ByteBuffer buffer = ByteBuffer.allocate(4).putInt(info);
+        ByteBuffer buffer = ByteBuffer.allocate(4).putInt(clientsCount);
         Message response = GameMessageProvider.createMessage(MessageType.USER_COUNT_INFO_RESPONSE, buffer.array());
         server.sendBroadCastMessage(response);
     }

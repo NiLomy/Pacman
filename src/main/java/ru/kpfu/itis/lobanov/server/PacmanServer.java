@@ -61,32 +61,6 @@ public class PacmanServer implements Server {
         listeners.add(listener);
     }
 
-//    @Override
-//    public void start() {
-//        try {
-//            serverSocket = new ServerSocket(port);
-//            generateWalls();
-//            createPacman();
-//            createGhosts();
-//            generateBonuses();
-//            generatePellets();
-//
-//            while (true) {
-//                Socket clientSocket = serverSocket.accept();
-//                InputStream input = clientSocket.getInputStream();
-//                OutputStream output = clientSocket.getOutputStream();
-//
-//                Client client = new Client(input, output, this, clientSocket);
-//                clients.add(client);
-//                AppConfig.usersCount.set(clients.size());
-//
-//                new Thread(client).start();
-//            }
-//        } catch (IOException e) {
-//            throw new ServerException("Can not establish a connection.", e);
-//        }
-//    }
-
     @Override
     public void sendMessage(int connectionId, Message message) {
         Client client = clients.get(connectionId);
@@ -223,7 +197,6 @@ public class PacmanServer implements Server {
 
                 Client client = new Client(input, output, this, clientSocket);
                 clients.add(client);
-                AppConfig.usersCount.set(clients.size());
 
                 new Thread(client).start();
 
@@ -255,7 +228,7 @@ public class PacmanServer implements Server {
         @Override
         public void run() {
             try {
-                Thread.sleep(7500);
+                Thread.sleep(3500);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -318,7 +291,6 @@ public class PacmanServer implements Server {
                 output.close();
                 clientSocket.close();
                 server.clients.remove(this);
-                AppConfig.usersCount.set(server.clients.size());
                 alive = false;
             } catch (IOException e) {
                 throw new ServerException("Connection to the client is lost.", e);

@@ -7,7 +7,7 @@ import ru.kpfu.itis.lobanov.utils.MessageType;
 
 public class EatPlayerEventListener extends AbstractEventListener {
     @Override
-    public void handle(Message message, int connectionId, int info) throws EventListenerException {
+    public void handle(Message message, int connectionId, int clientsCount) throws EventListenerException {
         if (!isInit) throw new EventListenerException("Listener hasn't been initialized yet.");
 
 //        byte[] currentData = message.getData();

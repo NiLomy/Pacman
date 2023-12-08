@@ -3,16 +3,9 @@ package ru.kpfu.itis.lobanov;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import ru.kpfu.itis.lobanov.client.PacmanClient;
-import ru.kpfu.itis.lobanov.utils.AppConfig;
-import ru.kpfu.itis.lobanov.utils.GameMessageProvider;
-import ru.kpfu.itis.lobanov.utils.GameSettings;
-import ru.kpfu.itis.lobanov.utils.MessageType;
-
-import java.util.Arrays;
 
 public class PacmanApplication extends Application {
     private static Stage stage;

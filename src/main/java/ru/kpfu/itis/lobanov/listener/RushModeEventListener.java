@@ -11,7 +11,7 @@ import java.util.TimerTask;
 
 public class RushModeEventListener extends AbstractEventListener {
     @Override
-    public void handle(Message message, int connectionId, int info) throws EventListenerException {
+    public void handle(Message message, int connectionId, int clientsCount) throws EventListenerException {
         if (!isInit) throw new EventListenerException("Listener hasn't been initialized yet.");
 
         server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.RUSH_MODE_RESPONSE, message.getData()));

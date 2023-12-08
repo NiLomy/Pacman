@@ -1,6 +1,8 @@
 package ru.kpfu.itis.lobanov.model.entity.environment;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Cell implements Serializable {
     private int x;
@@ -78,6 +80,36 @@ public class Cell implements Serializable {
             }
         }
 
+        return result;
+    }
+
+    public List<Cell> getWallNeighbours(Maze maze) {
+        List<Cell> result = new ArrayList<>();
+        Cell neighbour;
+        if (x + 1 < maze.labyrinthLength()) {
+            neighbour = maze.getCell(x + 1, y);
+            if (neighbour.isWall()) {
+                result.add(neighbour);
+            }
+        }
+        if (y + 1 < maze.labyrinthLength()) {
+            neighbour = maze.getCell(x, y + 1);
+            if (neighbour.isWall()) {
+                result.add(neighbour);
+            }
+        }
+        if (x - 1 >= 0) {
+            neighbour = maze.getCell(x - 1, y);
+            if (neighbour.isWall()) {
+                result.add(neighbour);
+            }
+        }
+        if (y - 1 >= 0) {
+            neighbour = maze.getCell(x, y - 1);
+            if (neighbour.isWall()) {
+                result.add(neighbour);
+            }
+        }
         return result;
     }
 

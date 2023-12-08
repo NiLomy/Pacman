@@ -8,6 +8,7 @@ import ru.kpfu.itis.lobanov.utils.Placement;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -66,6 +67,8 @@ public class Maze implements Serializable {
         setExit(rightWall);
         setExit(upperWall);
         setExit(lowerWall);
+
+        addRandomPassages();
     }
 
     private void generateCells() {
@@ -174,6 +177,31 @@ public class Maze implements Serializable {
                 break;
             }
         }
+    }
+
+    private void addRandomPassages() {
+        List<Cell> wallsWithNeighbours = getWallsWithTwoNeighbours();
+        for (int i = 0; i < Math.min(GameSettings.RANDOM_PASSAGES_COUNT, wallsWithNeighbours.size()); i++) {
+            int index = random.nextInt(wallsWithNeighbours.size());
+            Cell cell = wallsWithNeighbours.get(index);
+            cell.setWall(false);
+            wallsWithNeighbours.remove(index);
+        }
+    }
+
+    private List<Cell> getWallsWithTwoNeighbours() {
+        List<Cell> wallsWithNeighbours = new ArrayList<>();
+        for (int i = 1; i < GameSettings.MAZE_SIZE - 1; i++) {
+            for (int j = 1; j < GameSettings.MAZE_SIZE - 1; j++) {
+                Cell cell = data[i][j];
+                if (cell.isWall()) {
+                    List<Cell> cells = cell.getWallNeighbours(this);
+                    if (cells.size() == 2 && (Math.abs(cell.getX() - cells.get(0).getX()) == 1 && Math.abs(cell.getX() - cells.get(1).getX()) == 1 && Math.abs(cell.getY() - cells.get(0).getY()) == 0 && Math.abs(cell.getY() - cells.get(1).getY()) == 0 || Math.abs(cell.getY() - cells.get(0).getY()) == 1 && Math.abs(cell.getY() - cells.get(1).getY()) == 1 && Math.abs(cell.getX() - cells.get(0).getX()) == 0 && Math.abs(cell.getX() - cells.get(1).getX()) == 0))
+                        wallsWithNeighbours.add(cell);
+                }
+            }
+        }
+        return wallsWithNeighbours;
     }
 
     public Cell[] getCellsForPlacement(Placement placement) {

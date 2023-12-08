@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class CreateBonusesEventListener extends AbstractEventListener {
     @Override
-    public void handle(Message message, int connectionId, int info) throws EventListenerException {
+    public void handle(Message message, int connectionId, int clientsCount) throws EventListenerException {
         if (!isInit) throw new EventListenerException("Listener hasn't been initialized yet.");
 
         Message response = GameMessageProvider.createMessage(MessageType.CREATE_BONUSES_RESPONSE, SerializationUtils.serialize((ArrayList<Bonus>) server.getBonuses()));

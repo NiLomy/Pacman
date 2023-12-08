@@ -31,8 +31,6 @@ public class WaitingRoomController implements Controller {
         client.sendMessage(GameMessageProvider.createMessage(MessageType.USER_COUNT_INFO_REQUEST, new byte[0]));
 
         start.setOnAction(event -> {
-            AppConfig.setHost(AppConfig.CURRENT_HOST);
-            AppConfig.setPort(AppConfig.CURRENT_PORT_1);
             Stage stage = PacmanApplication.getStage();
             FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource("/game_screen.fxml"));
             try {

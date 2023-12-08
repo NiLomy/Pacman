@@ -1,7 +1,5 @@
 package ru.kpfu.itis.lobanov.controller;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -53,8 +51,6 @@ public class GameScreenController implements Controller {
     @FXML
     private Label gameEndLabel;
 
-    private Timeline timeline;
-    //    private final Maze maze = new Maze();
     private int scores;
     private Pacman pacman;
     private List<Ghost> ghosts;
@@ -80,9 +76,6 @@ public class GameScreenController implements Controller {
         client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_PELLETS_REQUEST, new byte[0]));
 
         setUpGameInfo();
-
-//        KeyFrame keyFrame = createKeyFrame();
-//        startGame(keyFrame);
 
         gameWindow.setOnKeyPressed(event1 -> {
             switch (event1.getCode()) {
@@ -115,53 +108,17 @@ public class GameScreenController implements Controller {
         Platform.runLater(() -> scoreInfo.setText("Scores: " + scores));
     }
 
-//    private KeyFrame createKeyFrame() {
-//        return new KeyFrame(GameSettings.UPDATE_FREQUENCY, event -> {
-//            if (bonuses != null) blinkBonuses();
-//            if (pacman != null && ghost != null && bonuses != null && pellets != null) {
-//                pacman.go();
-//                ghost.go();
-//                Pellet pellet = pacman.eatPellet(pellets);
-//                if (pellet != null) {
-//                    scores += pellet.getScore();
-//                    gameWindow.getChildren().remove(pellet.getView());
-//                }
-//                Bonus bonus = pacman.eatBonus(bonuses);
-//                if (bonus != null) {
-//                    scores += bonus.getScore();
-//                    gameWindow.getChildren().remove(bonus.getView());
-//                }
-//                if (pacman.getX() == ghost.getX() && pacman.getY() == ghost.getY()) {
-//                    ByteBuffer buffer = ByteBuffer.allocate(8 * 2 + 4 * 2);
-//                    buffer.putInt(1);
-//                    buffer.putInt(0);
-//                    buffer.putDouble(pacman.getX());
-//                    buffer.putDouble(pacman.getY());
-//                    client.sendMessage(GameMessageProvider.createMessage(MessageType.EAT_PLAYER_REQUEST, buffer.array()));
-//                }
-//
-//                setUpGameInfo();
-//
-//                if (pellets.isEmpty() && bonuses.isEmpty()) endGameWin();
-//            }
-//        });
-//    }
-
     private void blinkBonuses() {
         for (Bonus bonus : bonuses) {
-            Circle bonusView = bonus.getView();
-            if (bonusView.getFill() == Color.BLUE) {
-                bonusView.setFill(Color.CYAN);
-            } else {
-                bonusView.setFill(Color.BLUE);
-            }
+            Platform.runLater(() -> {
+                Circle bonusView = bonus.getView();
+                if (bonusView.getFill() == Color.BLUE) {
+                    bonusView.setFill(Color.CYAN);
+                } else {
+                    bonusView.setFill(Color.BLUE);
+                }
+            });
         }
-    }
-
-    private void startGame(KeyFrame keyFrame) {
-        timeline = new Timeline(keyFrame);
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
     }
 
     private void endGameWin() {
@@ -237,22 +194,6 @@ public class GameScreenController implements Controller {
                                 break;
                         }
                     }
-//                    if (playerId == 1) {
-//                        switch (buffer.get()) {
-//                            case 1:
-//                                ghost.setCurrentDirection(Direction.UP);
-//                                break;
-//                            case 2:
-//                                ghost.setCurrentDirection(Direction.DOWN);
-//                                break;
-//                            case 3:
-//                                ghost.setCurrentDirection(Direction.LEFT);
-//                                break;
-//                            case 4:
-//                                ghost.setCurrentDirection(Direction.RIGHT);
-//                                break;
-//                        }
-//                    }
                     break;
                 case MessageType.USER_ID_RESPONSE:
                     buffer = ByteBuffer.wrap(message.getData());
@@ -313,15 +254,19 @@ public class GameScreenController implements Controller {
                     switch (eaterId) {
                         case 0:
                             Ghost gho = ghosts.get(victimId);
-                            gho.getView().setVisible(false);
-                            gho.setX(0);
-                            gho.setY(0);
+                            Platform.runLater(() -> {
+                                gho.getView().setVisible(false);
+                                gho.setX(0);
+                                gho.setY(0);
+                            });
                             TimerTask task = new TimerTask() {
                                 @Override
                                 public void run() {
-                                    gho.setX(gho.getSpawnX());
-                                    gho.setY(gho.getSpawnY());
-                                    gho.getView().setVisible(true);
+                                    Platform.runLater(() -> {
+                                        gho.setX(gho.getSpawnX());
+                                        gho.setY(gho.getSpawnY());
+                                        gho.getView().setVisible(true);
+                                    });
                                 }
                             };
                             Timer timer = new Timer();
@@ -329,12 +274,14 @@ public class GameScreenController implements Controller {
                             scores += 500;
                             break;
                         default:
-                            pacman.setX(pacman.getSpawnX());
-                            pacman.setY(pacman.getSpawnY());
-                            for (Ghost gh : ghosts) {
-                                gh.setX(gh.getSpawnX());
-                                gh.setY(gh.getSpawnY());
-                            }
+                            Platform.runLater(() -> {
+                                pacman.setX(pacman.getSpawnX());
+                                pacman.setY(pacman.getSpawnY());
+                                for (Ghost gh : ghosts) {
+                                    gh.setX(gh.getSpawnX());
+                                    gh.setY(gh.getSpawnY());
+                                }
+                            });
                             pacman.setHp(pacman.getHp() - 1);
                             if (pacman.getHp() == 0) {
                                 client.sendMessage(GameMessageProvider.createMessage(MessageType.GAME_LOOSE_REQUEST, new byte[0]));
@@ -355,7 +302,7 @@ public class GameScreenController implements Controller {
                 case MessageType.PACMAN_EAT_BONUS_RESPONSE:
                     Bonus bonus = pacman.eatBonus(bonuses);
                     if (bonus != null) {
-                        client.sendMessage(GameMessageProvider.createMessage(MessageType.RUSH_MODE_REQUEST, new byte[] {1}));
+                        client.sendMessage(GameMessageProvider.createMessage(MessageType.RUSH_MODE_REQUEST, new byte[]{1}));
                         scores += bonus.getScore();
                         Platform.runLater(() -> gameWindow.getChildren().remove(bonus.getView()));
                     }
@@ -370,10 +317,10 @@ public class GameScreenController implements Controller {
                     Platform.runLater(this::endGameLoose);
                     break;
                 case MessageType.PLAYERS_MOVE_RESPONSE:
-                    pacman.go();
+                    Platform.runLater(pacman::go);
                     for (int i = 0; i < ghosts.size(); i++) {
                         Ghost ghos = ghosts.get(i);
-                        ghos.go();
+                        Platform.runLater(ghos::go);
                         if (pacman.getView().getBoundsInParent().intersects(ghos.getView().getBoundsInParent())) {
                             buffer = ByteBuffer.allocate(8 * 2 + 4 * 2);
                             if (userId != 0) {
@@ -390,17 +337,6 @@ public class GameScreenController implements Controller {
                             }
                         }
                     }
-//                    for (Ghost ghos : ghosts) {
-//                        ghos.go();
-//                        if (pacman.getX() == ghos.getX() && pacman.getY() == ghos.getY()) {
-//                            buffer = ByteBuffer.allocate(8 * 2 + 4 * 2);
-//                            buffer.putInt(1);
-//                            buffer.putInt(0);
-//                            buffer.putDouble(pacman.getX());
-//                            buffer.putDouble(pacman.getY());
-//                            client.sendMessage(GameMessageProvider.createMessage(MessageType.EAT_PLAYER_REQUEST, buffer.array()));
-//                        }
-//                    }
                     break;
                 case MessageType.RUSH_MODE_RESPONSE:
                     byte[] data = message.getData();
