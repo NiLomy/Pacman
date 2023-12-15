@@ -2,7 +2,7 @@ package ru.kpfu.itis.lobanov.server;
 
 import ru.kpfu.itis.lobanov.exceptions.EventListenerException;
 import ru.kpfu.itis.lobanov.listener.*;
-import ru.kpfu.itis.lobanov.utils.AppConfig;
+import ru.kpfu.itis.lobanov.utils.constants.AppConfig;
 import ru.kpfu.itis.lobanov.utils.ListenersRepository;
 
 import java.lang.reflect.InvocationTargetException;

@@ -3,7 +3,7 @@ package ru.kpfu.itis.lobanov.protocol;
 import ru.kpfu.itis.lobanov.exceptions.*;
 import ru.kpfu.itis.lobanov.model.entity.net.Message;
 import ru.kpfu.itis.lobanov.utils.GameMessageProvider;
-import ru.kpfu.itis.lobanov.utils.MessageType;
+import ru.kpfu.itis.lobanov.utils.constants.MessageType;
 
 import java.io.IOException;
 import java.io.InputStream;

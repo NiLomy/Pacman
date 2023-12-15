@@ -44,8 +44,9 @@ public class ListenersRepository {
                 new CreateWallsEventListener(),
                 new CreateGhostEventListener(),
                 new EatPlayerEventListener(),
-                new GameLooseEndEventListener(),
-                new RushModeEventListener()
+                new RushModeEventListener(),
+                new GameEndEventListener(),
+                new PacmanDeathEventListener()
         };
     }
 

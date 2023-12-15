@@ -4,16 +4,26 @@ public class ServerModel {
     private long id;
     private String host;
     private int port;
+    private boolean isGameHeld;
 
     public ServerModel(String host, int port) {
         this.host = host;
         this.port = port;
+        this.isGameHeld = false;
     }
 
     public ServerModel(long id, String host, int port) {
         this.id = id;
         this.host = host;
         this.port = port;
+        this.isGameHeld = false;
+    }
+
+    public ServerModel(long id, String host, int port, boolean isGameHeld) {
+        this.id = id;
+        this.host = host;
+        this.port = port;
+        this.isGameHeld = isGameHeld;
     }
 
     @Override
@@ -58,5 +68,13 @@ public class ServerModel {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public boolean isGameHeld() {
+        return isGameHeld;
+    }
+
+    public void setGameHeld(boolean gameHeld) {
+        isGameHeld = gameHeld;
     }
 }

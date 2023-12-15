@@ -18,15 +18,7 @@
 
     <HBox fx:id="gameInfo" AnchorPane.leftAnchor="5" AnchorPane.rightAnchor="5">
         <Label fx:id="scoreInfo" prefWidth="130"/>
+        <Label fx:id="timeLabel" prefWidth="150"/>
     </HBox>
-
-<!--    <VBox fx:id="gameField" alignment="CENTER" AnchorPane.topAnchor="15" AnchorPane.rightAnchor="10" AnchorPane.leftAnchor="10">-->
-
-<!--    </VBox>-->
-
-    <VBox fx:id="gameEndWindow" alignment="CENTER" visible="false" AnchorPane.leftAnchor="10" AnchorPane.bottomAnchor="10" AnchorPane.rightAnchor="10" AnchorPane.topAnchor="10">
-        <Label fx:id="gameEndLabel"/>
-        <Button fx:id="gameEndButton" text="Go to home page"/>
-    </VBox>
 
 </AnchorPane>

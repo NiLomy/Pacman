@@ -2,20 +2,22 @@ package ru.kpfu.itis.lobanov.model.entity.player;
 
 import javafx.scene.image.Image;
 import ru.kpfu.itis.lobanov.model.entity.environment.Maze;
-import ru.kpfu.itis.lobanov.utils.Direction;
-import ru.kpfu.itis.lobanov.utils.GameSettings;
+import ru.kpfu.itis.lobanov.utils.constants.Direction;
+import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
 
 import static ru.kpfu.itis.lobanov.utils.WallDetector.checkForWall;
 
 public class Ghost extends AbstractPlayer {
+    private String ghostPackageSprite;
+
     public Ghost(Maze maze) {
         super(maze);
 
-        setSpawnPoint();
+        setSpawnPoint(GameSettings.CELL_SIZE + 3, GameSettings.CELL_SIZE + 3);
         setHp(GameSettings.GHOST_HP);
     }
 
-    public void setSpawnPoint() {
+    public void setSpawnPoint(double x, double y) {
 //        Cell[] cellsForPlacement = maze.getCellsForPlacement(Placement.CENTER);
 //        Random random = new Random();
 //
@@ -30,8 +32,8 @@ public class Ghost extends AbstractPlayer {
 //                break;
 //            }
 //        }
-        x = spawnX = GameSettings.CELL_SIZE + 3;
-        y = spawnY = GameSettings.CELL_SIZE + 3;
+        this.x = spawnX = x;
+        this.y = spawnY = y;
     }
 
     @Override
@@ -42,11 +44,26 @@ public class Ghost extends AbstractPlayer {
             movingDirection = currentDirection;
         } else {
             movingDirection = null;
+            if (currentDirection != null) switch (currentDirection) {
+                case UP:
+                    view.setImage(new Image("/images/ghosts" + ghostPackageSprite + "/up.png"));
+                    break;
+                case DOWN:
+                    view.setImage(new Image("/images/ghosts" + ghostPackageSprite + "/down.png"));
+                    break;
+                case LEFT:
+                    view.setImage(new Image("/images/ghosts" + ghostPackageSprite + "/left.png"));
+                    break;
+                case RIGHT:
+                    view.setImage(new Image("/images/ghosts" + ghostPackageSprite + "/right.png"));
+                    break;
+            }
         }
 
         if (movingDirection != null) {
             switch (movingDirection) {
                 case UP:
+                    view.setImage(new Image("/images/ghosts" + ghostPackageSprite + "/up.png"));
                     if (!checkForWall(movingDirection, walls, view)) {
                         setY(y - GameSettings.GHOST_SPEED);
                     }
@@ -56,6 +73,7 @@ public class Ghost extends AbstractPlayer {
                     }
                     break;
                 case DOWN:
+                    view.setImage(new Image("/images/ghosts" + ghostPackageSprite + "/down.png"));
                     if (!checkForWall(movingDirection, walls, view)) {
                         setY(y + GameSettings.GHOST_SPEED);
                     }
@@ -65,6 +83,7 @@ public class Ghost extends AbstractPlayer {
                     }
                     break;
                 case LEFT:
+                    view.setImage(new Image("/images/ghosts" + ghostPackageSprite + "/left.png"));
                     if (!checkForWall(movingDirection, walls, view)) {
                         setX(x - GameSettings.GHOST_SPEED);
                     }
@@ -74,6 +93,7 @@ public class Ghost extends AbstractPlayer {
                     }
                     break;
                 case RIGHT:
+                    view.setImage(new Image("/images/ghosts" + ghostPackageSprite + "/right.png"));
                     if (!checkForWall(movingDirection, walls, view)) {
                         setX(x + GameSettings.GHOST_SPEED);
                     }
@@ -86,7 +106,7 @@ public class Ghost extends AbstractPlayer {
     }
 
     public void show() {
-        view.setImage(new Image("/images/blinky.png"));
+        view.setImage(new Image("/images/ghosts" + ghostPackageSprite + "/right.png"));
         view.setFitWidth(GameSettings.CELL_SIZE - 4);
         view.setFitHeight(GameSettings.CELL_SIZE - 4);
         view.setX(spawnX);
@@ -103,5 +123,13 @@ public class Ghost extends AbstractPlayer {
     public void setY(double y) {
         this.y = y;
         this.view.setY(y);
+    }
+
+    public String getGhostPackageSprite() {
+        return ghostPackageSprite;
+    }
+
+    public void setGhostPackageSprite(String ghostPackageSprite) {
+        this.ghostPackageSprite = ghostPackageSprite;
     }
 }

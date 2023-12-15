@@ -2,7 +2,7 @@ package ru.kpfu.itis.lobanov.model.entity.environment.pickups;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import ru.kpfu.itis.lobanov.utils.GameSettings;
+import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
 
 public class Pellet extends LocatableObject {
     private int score;
@@ -12,18 +12,14 @@ public class Pellet extends LocatableObject {
         this.x = x;
         this.y = y;
         this.score = score;
-//        view = new Circle();
-//        view.setRadius(GameSettings.CELL_SIZE / 5);
-//        view.setFill(Color.GREEN);
-//        view.setCenterX(x);
-//        view.setCenterY(y);
     }
 
     public void show() {
         view = new ImageView();
-        view.setImage(new Image("/images/dot.png"));
-        view.setFitHeight(GameSettings.CELL_SIZE);
-        view.setFitWidth(GameSettings.CELL_SIZE);
+        view.toBack();
+        view.setImage(new Image("/images/pellet2.png"));
+        view.setFitHeight(GameSettings.CELL_SIZE / 5);
+        view.setFitWidth(GameSettings.CELL_SIZE / 5);
         view.setX(x);
         view.setY(y);
     }
@@ -35,15 +31,6 @@ public class Pellet extends LocatableObject {
     public void setScore(int score) {
         this.score = score;
     }
-
-//    public Circle getView() {
-//        return view;
-//    }
-//
-//    public void setView(Circle view) {
-//        this.view = view;
-//    }
-
 
     public ImageView getView() {
         return view;

@@ -1,4 +1,4 @@
-package ru.kpfu.itis.lobanov.utils;
+package ru.kpfu.itis.lobanov.utils.constants;
 
 public enum Direction {
     UP((byte) 1), DOWN((byte) 2), LEFT((byte) 3), RIGHT((byte) 4);

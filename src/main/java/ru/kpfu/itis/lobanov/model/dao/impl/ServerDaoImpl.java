@@ -25,7 +25,8 @@ public class ServerDaoImpl implements ServerDao {
                     return new ServerModel(
                             resultSet.getLong("id"),
                             resultSet.getString("host"),
-                            resultSet.getInt("port")
+                            resultSet.getInt("port"),
+                            resultSet.getBoolean("is_game_held")
                     );
                 }
             }
@@ -41,20 +42,8 @@ public class ServerDaoImpl implements ServerDao {
             Statement statement = connection.createStatement();
             String sql = "SELECT * from servers";
             ResultSet resultSet = statement.executeQuery(sql);
-            List<ServerModel> servers = new ArrayList<>();
 
-            if (resultSet != null) {
-                while (resultSet.next()) {
-                    servers.add(
-                            new ServerModel(
-                                    resultSet.getLong("id"),
-                                    resultSet.getString("host"),
-                                    resultSet.getInt("port")
-                            )
-                    );
-                }
-            }
-            return servers;
+            return getAllFromServerByResultSet(resultSet);
         } catch (SQLException e) {
             throw new DbException("Can't get server list from DB.", e);
         }
@@ -77,12 +66,13 @@ public class ServerDaoImpl implements ServerDao {
 
     @Override
     public void update(ServerModel serverModel, int id) {
-        String sql = "update servers set host=?, port=? where id=?;";
+        String sql = "update servers set host=?, port=?, is_game_held=? where id=?;";
         try {
             int position = 1;
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(position++, serverModel.getHost());
             preparedStatement.setInt(position++, serverModel.getPort());
+            preparedStatement.setBoolean(position++, serverModel.isGameHeld());
             preparedStatement.setInt(position++, id);
 
             preparedStatement.executeUpdate();
@@ -102,6 +92,80 @@ public class ServerDaoImpl implements ServerDao {
         } catch (SQLException e) {
             throw new DbException("Can't delete server from DB.", e);
         }
+    }
+
+    @Override
+    public ServerModel get(String host, int port) {
+        try {
+            String sql = "SELECT * from servers where host=? AND port=?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            int position = 1;
+            preparedStatement.setString(position++, host);
+            preparedStatement.setInt(position++, port);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet != null) {
+                if (resultSet.next()) {
+                    return new ServerModel(
+                            resultSet.getLong("id"),
+                            resultSet.getString("host"),
+                            resultSet.getInt("port"),
+                            resultSet.getBoolean("is_game_held")
+                    );
+                }
+            }
+            return null;
+        } catch (SQLException e) {
+            throw new DbException("Can't get server from DB.", e);
+        }
+    }
+
+    @Override
+    public List<ServerModel> getAllFromServer(String host) {
+        try {
+            String sql = "SELECT * from servers WHERE host=?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, host);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            return getAllFromServerByResultSet(resultSet);
+        } catch (SQLException e) {
+            throw new DbException("Can't get server list from DB.", e);
+        }
+    }
+
+    @Override
+    public void updateGameStatus(String host, int port, boolean isGameHeld) {
+        String sql = "update servers set is_game_held=? where host=? AND port=?;";
+        try {
+            int position = 1;
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setBoolean(position++, isGameHeld);
+            preparedStatement.setString(position++, host);
+            preparedStatement.setInt(position++, port);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DbException("Can't update server into DB.", e);
+        }
+    }
+
+    private List<ServerModel> getAllFromServerByResultSet(ResultSet resultSet) throws SQLException {
+        List<ServerModel> servers = new ArrayList<>();
+
+        if (resultSet != null) {
+            while (resultSet.next()) {
+                servers.add(
+                        new ServerModel(
+                                resultSet.getLong("id"),
+                                resultSet.getString("host"),
+                                resultSet.getInt("port"),
+                                resultSet.getBoolean("is_game_held")
+                        )
+                );
+            }
+        }
+        return servers;
     }
 
     @Override

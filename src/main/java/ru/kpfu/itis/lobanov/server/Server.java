@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 public interface Server extends Runnable {
-    void registerListener(EventListener listener) throws EventListenerException;
+    void registerListener(EventListener listener);
     void sendMessage(int connectionId, Message message);
     void sendBroadCastMessage(Message message);
     void sendBroadCastMessage(Message message, PacmanServer.Client client);
@@ -24,4 +24,5 @@ public interface Server extends Runnable {
     List<Bonus> getBonuses();
     List<Pellet> getPellets();
     void closeServer();
+    void endGame();
 }

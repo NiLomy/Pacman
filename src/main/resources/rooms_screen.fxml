@@ -14,9 +14,12 @@
             prefHeight="400.0" prefWidth="600.0">
 
     <children>
-        <VBox fx:id="panel" alignment="CENTER" spacing="10" AnchorPane.topAnchor="10" AnchorPane.rightAnchor="10" AnchorPane.leftAnchor="10">
-<!--            <Button fx:id="room1" prefWidth="0" text="Start Game" VBox.vgrow="ALWAYS" minWidth="100.0"/>-->
-<!--            <Button fx:id="room2" prefWidth="0" text="Start Game" VBox.vgrow="ALWAYS" minWidth="100.0"/>-->
+        <VBox AnchorPane.topAnchor="15.0" AnchorPane.leftAnchor="20">
+            <Button fx:id="backBtn" text="%go_back"/>
+        </VBox>
+        <VBox fx:id="panel" alignment="CENTER" spacing="10" AnchorPane.topAnchor="35" AnchorPane.rightAnchor="10" AnchorPane.leftAnchor="10">
+            <Button fx:id="refreshBtn" text="%refresh"/>
+            <!--            <Button fx:id="room1" prefWidth="0" text="Start Game" VBox.vgrow="ALWAYS" minWidth="100.0"/>-->
         </VBox>
     </children>
 </AnchorPane>

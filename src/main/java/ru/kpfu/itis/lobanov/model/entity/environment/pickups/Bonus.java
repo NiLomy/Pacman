@@ -2,7 +2,7 @@ package ru.kpfu.itis.lobanov.model.entity.environment.pickups;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import ru.kpfu.itis.lobanov.utils.GameSettings;
+import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
 
 public class Bonus extends LocatableObject {
     private int score;

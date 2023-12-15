@@ -1,4 +1,4 @@
-package ru.kpfu.itis.lobanov.utils;
+package ru.kpfu.itis.lobanov.utils.constants;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,12 +35,18 @@ public class MessageType {
     public static final int CHANGE_SCORES_RESPONSE = 28;
     public static final int GAME_WIN_REQUEST = 29;
     public static final int GAME_WIN_RESPONSE = 30;
-    public static final int GAME_LOOSE_REQUEST = 31;
-    public static final int GAME_LOOSE_RESPONSE = 32;
+    public static final int GAME_LOSE_REQUEST = 31;
+    public static final int GAME_LOSE_RESPONSE = 32;
     public static final int PLAYERS_MOVE_REQUEST = 33;
     public static final int PLAYERS_MOVE_RESPONSE = 34;
     public static final int RUSH_MODE_REQUEST = 35;
     public static final int RUSH_MODE_RESPONSE = 36;
+    public static final int GHOST_SCORES_REQUEST = 37;
+    public static final int GHOST_SCORES_RESPONSE = 38;
+    public static final int GAME_END_REQUEST = 39;
+    public static final int GAME_END_RESPONSE = 40;
+    public static final int TIME_REQUEST = 41;
+    public static final int TIME_RESPONSE = 42;
 
 
     public static List<Integer> getAllTypes() {

@@ -16,10 +16,10 @@ import ru.kpfu.itis.lobanov.model.entity.net.Message;
 import ru.kpfu.itis.lobanov.model.entity.player.Ghost;
 import ru.kpfu.itis.lobanov.model.entity.player.Pacman;
 import ru.kpfu.itis.lobanov.protocol.MessageProtocol;
-import ru.kpfu.itis.lobanov.utils.AppConfig;
-import ru.kpfu.itis.lobanov.utils.GameMessageProvider;
-import ru.kpfu.itis.lobanov.utils.GameSettings;
-import ru.kpfu.itis.lobanov.utils.MessageType;
+import ru.kpfu.itis.lobanov.updater.ScreenUpdater;
+import ru.kpfu.itis.lobanov.utils.*;
+import ru.kpfu.itis.lobanov.utils.constants.AppConfig;
+import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +42,6 @@ public class PacmanServer implements Server {
     private List<Pellet> pellets;
     private List<Bonus> bonuses;
     private ByteBuffer wallsBuffer;
-    private int scores;
     private final ServerDao serverDao;
 
     public PacmanServer(int port) {
@@ -56,7 +55,7 @@ public class PacmanServer implements Server {
     }
 
     @Override
-    public void registerListener(EventListener listener) throws EventListenerException {
+    public void registerListener(EventListener listener) {
         listener.init(this);
         listeners.add(listener);
     }
@@ -87,7 +86,7 @@ public class PacmanServer implements Server {
         for (Client c : clients) {
             try {
                 byte[] currentData = message.getData();
-                ByteBuffer buffer = ByteBuffer.allocate(currentData.length + 4);
+                ByteBuffer buffer = ByteBuffer.allocate(currentData.length + GameSettings.INTEGER_BYTES);
                 buffer.putInt(client.id);
                 buffer.put(currentData);
                 message.setData(buffer.array());
@@ -99,24 +98,7 @@ public class PacmanServer implements Server {
     }
 
     public void generateWalls() {
-//        Cell[][] cells = maze.getData();
-//        for (int i = 0; i < cells.length; i++) {
-//            HBox line = new HBox();
-//            line.setAlignment(Pos.CENTER);
-//            for (int j = 0; j < cells.length; j++) {
-//                if (cells[i][j].isWall()) {
-//                    Rectangle rectangle = new Rectangle(i * CELL_SIZE, j * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-//                    line.getChildren().addAll(rectangle);
-//                    walls.add(rectangle);
-//                } else {
-//                    Rectangle rectangle = new Rectangle(i * CELL_SIZE, j * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-//                    rectangle.setFill(Color.WHITE);
-//                    line.getChildren().addAll(rectangle);
-//                }
-//            }
-//            gameField.getChildren().addAll(line);
-//        }
-        byte[] b = new byte[maze.getWalls().size() * 2 * 4];
+        byte[] b = new byte[maze.getWalls().size() * 2 * GameSettings.INTEGER_BYTES];
         wallsBuffer = ByteBuffer.wrap(b);
         Cell[][] cells = maze.getData();
         for (int i = 0; i < cells.length; i++) {
@@ -136,7 +118,9 @@ public class PacmanServer implements Server {
     public void createGhosts() {
         for (int i = 0; i < clients.size() - 1; i++) {
             Ghost ghost = new Ghost(maze);
-            ghost.setSpawnPoint();
+            double x = GameSettings.CELL_SIZE + GameSettings.CELL_SIZE * ((GameSettings.MAZE_SIZE - 3) * (i % 2)) + 3;
+            double y = GameSettings.CELL_SIZE + GameSettings.CELL_SIZE * ((GameSettings.MAZE_SIZE - 3) * (i / 2)) + 3;
+            ghost.setSpawnPoint(x, y);
             ghosts.add(ghost);
         }
     }
@@ -176,8 +160,11 @@ public class PacmanServer implements Server {
     @Override
     public void closeServer() {
         serverDao.remove(AppConfig.CURRENT_HOST, port);
+        List<ServerModel> servers = serverDao.getAllFromServer(AppConfig.CURRENT_HOST);
+        if (servers.isEmpty()) {
+            System.exit(0);
+        }
     }
-
 
     public List<Bonus> getBonuses() {
         return bonuses;
@@ -215,36 +202,15 @@ public class PacmanServer implements Server {
     }
 
     private void startGame() {
-        GameScreenUpdater gameScreenUpdater = new GameScreenUpdater(this);
-        new Thread(gameScreenUpdater).start();
+        for (ScreenUpdater updater : UpdatersRepository.getScreenUpdaters()) {
+            updater.init(this);
+            new Thread(updater).start();
+        }
     }
 
-    static class GameScreenUpdater implements Runnable {
-        private final Server server;
-
-        public GameScreenUpdater(Server server) {
-            this.server = server;
-        }
-        @Override
-        public void run() {
-            try {
-                Thread.sleep(3500);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            while (true) {
-                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.BLINK_BONUSES_RESPONSE, new byte[0]));
-                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.PLAYERS_MOVE_RESPONSE, new byte[0]));
-                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.PACMAN_EAT_PELLET_RESPONSE, new byte[0]));
-                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.PACMAN_EAT_BONUS_RESPONSE, new byte[0]));
-                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.CHANGE_SCORES_RESPONSE, new byte[0]));
-                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.GAME_WIN_RESPONSE, new byte[0]));
-                try {
-                    Thread.sleep(GameSettings.UPDATE_FREQUENCY);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+    public void endGame() {
+        for (ScreenUpdater updater : UpdatersRepository.getScreenUpdaters()) {
+            updater.setGameAlive(false);
         }
     }
 
@@ -279,9 +245,9 @@ public class PacmanServer implements Server {
                     }
                 }
             } catch (MessageReadException e) {
-                throw new RuntimeException(e);
+                throw new ServerException("Server can't read a message.", e);
             } catch (EventListenerException e) {
-                throw new RuntimeException(e);
+                throw new ServerException("Server has a not initialized listener.", e);
             }
         }
 

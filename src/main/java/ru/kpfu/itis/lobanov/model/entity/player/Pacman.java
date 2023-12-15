@@ -5,9 +5,9 @@ import ru.kpfu.itis.lobanov.model.entity.environment.Maze;
 import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Bonus;
 import ru.kpfu.itis.lobanov.model.entity.environment.Cell;
 import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Pellet;
-import ru.kpfu.itis.lobanov.utils.Direction;
-import ru.kpfu.itis.lobanov.utils.GameSettings;
-import ru.kpfu.itis.lobanov.utils.Placement;
+import ru.kpfu.itis.lobanov.utils.constants.Direction;
+import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
+import ru.kpfu.itis.lobanov.utils.constants.Placement;
 
 import java.util.List;
 import java.util.Random;
@@ -15,13 +15,16 @@ import java.util.Random;
 import static ru.kpfu.itis.lobanov.utils.WallDetector.checkForWall;
 
 public class Pacman extends AbstractPlayer {
-    private int stayCount = 0;
+    private int stayCount;
+    private Direction lastDirection;
+    private int moveCount;
 
     public Pacman(Maze maze) {
         super(maze);
-
+        this.stayCount = 0;
         setSpawnPoint();
         setHp(GameSettings.PACMAN_HP);
+//        animation = new SpriteAnimation(new ImageView(new Image("/images/spritesheet.png")), Duration.seconds(2), 11, 11,351, 2, 38, 38);
     }
 
     private void setSpawnPoint() {
@@ -52,30 +55,30 @@ public class Pacman extends AbstractPlayer {
             if (currentDirection != null) switch (currentDirection) {
                 case UP:
                     if (stayCount < GameSettings.CALM_COUNT) {
-                        view.setImage(new Image("/images/pacman-up/2.png"));
+                        view.setImage(new Image("/images/pacman/up/2.png"));
                     } else {
-                        view.setImage(new Image("/images/pacman-up/3.png"));
+                        view.setImage(new Image("/images/pacman/calm/pacman.png"));
                     }
                     break;
                 case DOWN:
                     if (stayCount < GameSettings.CALM_COUNT) {
-                        view.setImage(new Image("/images/pacman-down/2.png"));
+                        view.setImage(new Image("/images/pacman/down/2.png"));
                     } else {
-                        view.setImage(new Image("/images/pacman-down/3.png"));
+                        view.setImage(new Image("/images/pacman/calm/pacman.png"));
                     }
                     break;
                 case LEFT:
                     if (stayCount < GameSettings.CALM_COUNT) {
-                        view.setImage(new Image("/images/pacman-left/2.png"));
+                        view.setImage(new Image("/images/pacman/left/2.png"));
                     } else {
-                        view.setImage(new Image("/images/pacman-left/3.png"));
+                        view.setImage(new Image("/images/pacman/calm/pacman.png"));
                     }
                     break;
                 case RIGHT:
                     if (stayCount < GameSettings.CALM_COUNT) {
-                        view.setImage(new Image("/images/pacman-right/2.png"));
+                        view.setImage(new Image("/images/pacman/right/2.png"));
                     } else {
-                        view.setImage(new Image("/images/pacman-right/3.png"));
+                        view.setImage(new Image("/images/pacman/calm/pacman.png"));
                     }
                     break;
             }
@@ -92,9 +95,20 @@ public class Pacman extends AbstractPlayer {
                         setX(maze.getLowerExit().getX() * GameSettings.CELL_SIZE + 3);
                     }
                     if (stayCount == 0) {
-                        view.setImage(new Image("/images/pacman-up/1.png"));
+                        if (lastDirection == Direction.UP) {
+                            moveCount++;
+                        } else {
+                            moveCount = 0;
+                        }
+                        if (moveCount < GameSettings.MOVING_COUNT) {
+                            view.setImage(new Image("/images/pacman/up/1.png"));
+                        } else {
+                            view.setImage(new Image("/images/pacman/up/2.png"));
+                            if (moveCount == GameSettings.MOVING_COUNT * 2) moveCount = 0;
+                        }
+                        lastDirection = Direction.UP;
                     } else {
-                        view.setImage(new Image("/images/pacman-up/2.png"));
+                        view.setImage(new Image("/images/pacman/calm/pacman.png"));
                     }
                     break;
                 case DOWN:
@@ -106,9 +120,20 @@ public class Pacman extends AbstractPlayer {
                         setX(maze.getUpperExit().getX() * GameSettings.CELL_SIZE + 3);
                     }
                     if (stayCount == 0) {
-                        view.setImage(new Image("/images/pacman-down/1.png"));
+                        if (lastDirection == Direction.DOWN) {
+                            moveCount++;
+                        } else {
+                            moveCount = 0;
+                        }
+                        if (moveCount < GameSettings.MOVING_COUNT) {
+                            view.setImage(new Image("/images/pacman/down/1.png"));
+                        } else {
+                            view.setImage(new Image("/images/pacman/down/2.png"));
+                            if (moveCount == GameSettings.MOVING_COUNT * 2) moveCount = 0;
+                        }
+                        lastDirection = Direction.DOWN;
                     } else {
-                        view.setImage(new Image("/images/pacman-down/2.png"));
+                        view.setImage(new Image("/images/pacman/calm/pacman.png"));
                     }
                     break;
                 case LEFT:
@@ -120,9 +145,20 @@ public class Pacman extends AbstractPlayer {
                         setY(maze.getRightExit().getY() * GameSettings.CELL_SIZE + 3);
                     }
                     if (stayCount == 0) {
-                        view.setImage(new Image("/images/pacman-left/1.png"));
+                        if (lastDirection == Direction.LEFT) {
+                            moveCount++;
+                        } else {
+                            moveCount = 0;
+                        }
+                        if (moveCount < GameSettings.MOVING_COUNT) {
+                            view.setImage(new Image("/images/pacman/left/1.png"));
+                        } else {
+                            view.setImage(new Image("/images/pacman/left/2.png"));
+                            if (moveCount == GameSettings.MOVING_COUNT * 2) moveCount = 0;
+                        }
+                        lastDirection = Direction.LEFT;
                     } else {
-                        view.setImage(new Image("/images/pacman-left/2.png"));
+                        view.setImage(new Image("/images/pacman/calm/pacman.png"));
                     }
                     break;
                 case RIGHT:
@@ -134,9 +170,20 @@ public class Pacman extends AbstractPlayer {
                         setY(maze.getLeftExit().getY() * GameSettings.CELL_SIZE + 3);
                     }
                     if (stayCount == 0) {
-                        view.setImage(new Image("/images/pacman-right/1.png"));
+                        if (lastDirection == Direction.RIGHT) {
+                            moveCount++;
+                        } else {
+                            moveCount = 0;
+                        }
+                        if (moveCount < GameSettings.MOVING_COUNT) {
+                            view.setImage(new Image("/images/pacman/right/1.png"));
+                        } else {
+                            view.setImage(new Image("/images/pacman/right/2.png"));
+                            if (moveCount == GameSettings.MOVING_COUNT * 2) moveCount = 0;
+                        }
+                        lastDirection = Direction.RIGHT;
                     } else {
-                        view.setImage(new Image("/images/pacman-right/2.png"));
+                        view.setImage(new Image("/images/pacman/calm/pacman.png"));
                     }
                     break;
             }
@@ -145,7 +192,7 @@ public class Pacman extends AbstractPlayer {
     }
 
     public void show() {
-        view.setImage(new Image("/images/pacman-left/3.png"));
+        view.setImage(new Image("/images/pacman/calm/pacman.png"));
         view.setFitWidth(GameSettings.CELL_SIZE - 4);
         view.setFitHeight(GameSettings.CELL_SIZE - 4);
         view.setX(spawnX);
@@ -155,9 +202,12 @@ public class Pacman extends AbstractPlayer {
     public Pellet eatPellet(List<Pellet> pellets) {
         for (int i = 0; i < pellets.size(); i++) {
             Pellet pellet = pellets.get(i);
-            if (Math.abs(pellet.getX() - x) <= GameSettings.CELL_SIZE / 4 && Math.abs(pellet.getY() - y) <= GameSettings.CELL_SIZE / 4) {
+            if (view.getBoundsInParent().intersects(pellet.getView().getBoundsInParent())) {
                 return pellets.remove(i);
             }
+//            if (Math.abs(pellet.getX() - x) <= GameSettings.CELL_SIZE / 4 && Math.abs(pellet.getY() - y) <= GameSettings.CELL_SIZE / 4) {
+//                return pellets.remove(i);
+//            }
         }
         return null;
     }

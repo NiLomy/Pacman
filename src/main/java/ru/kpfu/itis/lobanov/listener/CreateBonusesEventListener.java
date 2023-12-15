@@ -5,7 +5,7 @@ import ru.kpfu.itis.lobanov.exceptions.EventListenerException;
 import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Bonus;
 import ru.kpfu.itis.lobanov.model.entity.net.Message;
 import ru.kpfu.itis.lobanov.utils.GameMessageProvider;
-import ru.kpfu.itis.lobanov.utils.MessageType;
+import ru.kpfu.itis.lobanov.utils.constants.MessageType;
 
 import java.util.ArrayList;
 

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.collections.FXCollections?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="ru.kpfu.itis.lobanov.controller.SettingsScreenController"
+            prefHeight="400.0" prefWidth="600.0">
+
+    <Button fx:id="back" text="%go_back" AnchorPane.topAnchor="15" AnchorPane.leftAnchor="20"/>
+
+    <VBox spacing="20" AnchorPane.topAnchor="35" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" alignment="CENTER">
+        <ComboBox fx:id="sizeCombo" prefWidth="100.0">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="Small"/>
+                    <String fx:value="Medium"/>
+                    <String fx:value="Large"/>
+                </FXCollections>
+            </items>
+        </ComboBox>
+
+        <ComboBox fx:id="languageCombo" prefWidth="100.0">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="English"/>
+                    <String fx:value="Russian"/>
+                </FXCollections>
+            </items>
+        </ComboBox>
+
+        <Button fx:id="apply" text="%settings.apply"/>
+    </VBox>
+
+</AnchorPane>

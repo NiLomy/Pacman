@@ -3,7 +3,7 @@ package ru.kpfu.itis.lobanov.model.entity.player;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.Rectangle;
 import ru.kpfu.itis.lobanov.model.entity.environment.Maze;
-import ru.kpfu.itis.lobanov.utils.Direction;
+import ru.kpfu.itis.lobanov.utils.constants.Direction;
 
 import java.util.List;
 

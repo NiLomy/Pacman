@@ -2,6 +2,7 @@ package ru.kpfu.itis.lobanov.client;
 
 import ru.kpfu.itis.lobanov.controller.Controller;
 import ru.kpfu.itis.lobanov.controller.GameScreenController;
+import ru.kpfu.itis.lobanov.controller.MessageReceiverController;
 import ru.kpfu.itis.lobanov.exceptions.ClientException;
 import ru.kpfu.itis.lobanov.exceptions.MessageReadException;
 import ru.kpfu.itis.lobanov.exceptions.MessageWriteException;
@@ -16,21 +17,15 @@ public class PacmanClient implements Client {
     private final int port;
     private Socket socket;
     private ClientThread thread;
-    private Controller controller;
+    private MessageReceiverController controller;
 
     public PacmanClient(String host, int port) {
         this.host = host;
         this.port = port;
     }
 
-    public PacmanClient(String host, int port, GameScreenController controller) {
-        this.host = host;
-        this.port = port;
-        this.controller = controller;
-    }
-
     @Override
-    public void connect() {
+    public void connect() throws ClientException {
         try {
             socket = new Socket(host, port);
             InputStream input = socket.getInputStream();
@@ -55,11 +50,11 @@ public class PacmanClient implements Client {
         return thread;
     }
 
-    public Controller getController() {
+    public MessageReceiverController getController() {
         return controller;
     }
 
-    public void setController(Controller controller) {
+    public void setController(MessageReceiverController controller) {
         this.controller = controller;
     }
 
@@ -84,7 +79,7 @@ public class PacmanClient implements Client {
                     if (message != null && pacmanClient.controller != null) pacmanClient.controller.receiveMessage(message);
                 }
             } catch (MessageReadException e) {
-                throw new RuntimeException(e);
+                throw new ClientException("Client can't read a message.", e);
             }
         }
 

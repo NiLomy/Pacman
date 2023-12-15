@@ -3,8 +3,8 @@ package ru.kpfu.itis.lobanov.listener;
 import ru.kpfu.itis.lobanov.exceptions.EventListenerException;
 import ru.kpfu.itis.lobanov.model.entity.net.Message;
 import ru.kpfu.itis.lobanov.utils.GameMessageProvider;
-import ru.kpfu.itis.lobanov.utils.GameSettings;
-import ru.kpfu.itis.lobanov.utils.MessageType;
+import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
+import ru.kpfu.itis.lobanov.utils.constants.MessageType;
 
 import java.util.Timer;
 import java.util.TimerTask;

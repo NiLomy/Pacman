@@ -1,7 +1,5 @@
 package ru.kpfu.itis.lobanov.controller;
 
-import ru.kpfu.itis.lobanov.model.entity.net.Message;
+import javafx.fxml.Initializable;
 
-public interface Controller {
-    void receiveMessage(Message message);
-}
+public interface Controller extends Initializable {}

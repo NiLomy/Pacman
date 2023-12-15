@@ -3,12 +3,11 @@ package ru.kpfu.itis.lobanov.model.entity.environment;
 import javafx.scene.shape.Rectangle;
 import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Bonus;
 import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Pellet;
-import ru.kpfu.itis.lobanov.utils.GameSettings;
-import ru.kpfu.itis.lobanov.utils.Placement;
+import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
+import ru.kpfu.itis.lobanov.utils.constants.Placement;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -290,11 +289,11 @@ public class Maze implements Serializable {
 
         for (int x = beginIndex; x < GameSettings.MAZE_SIZE - 1; x++) {
             for (int y = beginIndex; y < GameSettings.MAZE_SIZE - 1; y++) {
-                double cellX = x * GameSettings.CELL_SIZE + GameSettings.CELL_SIZE / 2;
-                double cellY = y * GameSettings.CELL_SIZE + GameSettings.CELL_SIZE / 2;
+                double cellX = x * GameSettings.CELL_SIZE + GameSettings.CELL_SIZE / 2 - 2;
+                double cellY = y * GameSettings.CELL_SIZE + GameSettings.CELL_SIZE / 2 - 2;
                 Bonus tempBonus = new Bonus(cellX, cellY, GameSettings.BONUS_SCORES);
                 if (!data[x][y].isWall() && !bonuses.contains(tempBonus) && (cellX != pacmanX || cellY != pacmanY)) {
-                    pellets.add(new Pellet(cellX - GameSettings.CELL_SIZE / 2, cellY - GameSettings.CELL_SIZE / 2, GameSettings.PELLET_SCORES));
+                    pellets.add(new Pellet(cellX, cellY, GameSettings.PELLET_SCORES));
                 }
             }
         }
