@@ -1,5 +1,8 @@
 package ru.kpfu.itis.lobanov.model.entity.net;
 
+/**
+ * Instances of this class should only be created by special classes - MessageProviders, for a proper use in net
+ */
 public class Message {
     protected int type;
     protected byte[] data;

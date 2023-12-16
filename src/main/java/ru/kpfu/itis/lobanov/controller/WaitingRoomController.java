@@ -1,11 +1,10 @@
 package ru.kpfu.itis.lobanov.controller;
 
 import javafx.application.Platform;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import ru.kpfu.itis.lobanov.PacmanApplication;
 import ru.kpfu.itis.lobanov.client.PacmanClient;
@@ -42,13 +41,14 @@ public class WaitingRoomController implements MessageReceiverController {
                 ServerDao serverDao = new ServerDaoImpl();
                 serverDao.updateGameStatus(AppConfig.host, AppConfig.port, true);
                 Stage stage = PacmanApplication.getStage();
-                FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource("/game_screen.fxml"));
-                loader.setResources(ResourceBundle.getBundle("game_strings", GameSettings.LOCALE));
+                FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource("/view/game_screen.fxml"));
+                loader.setResources(ResourceBundle.getBundle("property/game_strings", GameSettings.LOCALE));
                 Platform.runLater(() -> {
                     try {
                         AnchorPane pane = loader.load();
-                        Scene scene = new Scene(pane);
+                        Scene scene = new Scene(pane, Screen.getPrimary().getVisualBounds().getWidth(), Screen.getPrimary().getVisualBounds().getHeight());
                         stage.setScene(scene);
+                        stage.setMaximized(true);
                         stage.show();
                     } catch (IOException e) {
                         throw new RuntimeException(e);

@@ -26,7 +26,8 @@ public class ServerDaoImpl implements ServerDao {
                             resultSet.getLong("id"),
                             resultSet.getString("host"),
                             resultSet.getInt("port"),
-                            resultSet.getBoolean("is_game_held")
+                            resultSet.getBoolean("is_game_held"),
+                            resultSet.getString("game_map")
                     );
                 }
             }
@@ -110,7 +111,8 @@ public class ServerDaoImpl implements ServerDao {
                             resultSet.getLong("id"),
                             resultSet.getString("host"),
                             resultSet.getInt("port"),
-                            resultSet.getBoolean("is_game_held")
+                            resultSet.getBoolean("is_game_held"),
+                            resultSet.getString("game_map")
                     );
                 }
             }
@@ -150,6 +152,22 @@ public class ServerDaoImpl implements ServerDao {
         }
     }
 
+    @Override
+    public void updateGameMap(String host, int port, String gameMap) {
+        String sql = "update servers set game_map=? where host=? AND port=?;";
+        try {
+            int position = 1;
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(position++, gameMap);
+            preparedStatement.setString(position++, host);
+            preparedStatement.setInt(position++, port);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DbException("Can't update server into DB.", e);
+        }
+    }
+
     private List<ServerModel> getAllFromServerByResultSet(ResultSet resultSet) throws SQLException {
         List<ServerModel> servers = new ArrayList<>();
 
@@ -160,7 +178,8 @@ public class ServerDaoImpl implements ServerDao {
                                 resultSet.getLong("id"),
                                 resultSet.getString("host"),
                                 resultSet.getInt("port"),
-                                resultSet.getBoolean("is_game_held")
+                                resultSet.getBoolean("is_game_held"),
+                                resultSet.getString("game_map")
                         )
                 );
             }

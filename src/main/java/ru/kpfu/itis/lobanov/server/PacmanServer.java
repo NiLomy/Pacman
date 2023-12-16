@@ -24,6 +24,7 @@ import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -35,7 +36,7 @@ public class PacmanServer implements Server {
     private ServerSocket serverSocket;
     private final List<Client> clients;
     private final List<EventListener> listeners;
-    private final Maze maze = new Maze();
+    private Maze maze = new Maze();
     private boolean isGameStarted;
     private Pacman pacman;
     private final List<Ghost> ghosts;
@@ -97,7 +98,8 @@ public class PacmanServer implements Server {
         }
     }
 
-    public void generateWalls() {
+    public String generateWalls() {
+        StringBuilder sb = new StringBuilder();
         byte[] b = new byte[maze.getWalls().size() * 2 * GameSettings.INTEGER_BYTES];
         wallsBuffer = ByteBuffer.wrap(b);
         Cell[][] cells = maze.getData();
@@ -106,9 +108,12 @@ public class PacmanServer implements Server {
                 if (cells[i][j].isWall()) {
                     wallsBuffer.putInt(i);
                     wallsBuffer.putInt(j);
-                }
+                    sb.append(1);
+                } else sb.append(0);
             }
         }
+        serverDao.updateGameMap(AppConfig.CURRENT_HOST, port, sb.toString());
+        return sb.toString();
     }
 
     public void createPacman() {
@@ -125,6 +130,10 @@ public class PacmanServer implements Server {
         }
     }
 
+    public int getPort() {
+        return port;
+    }
+
     public void generateBonuses() {
         bonuses = maze.generateBonuses(pacman.getX(), pacman.getY());
     }
@@ -139,6 +148,11 @@ public class PacmanServer implements Server {
 
     public Maze getMaze() {
         return maze;
+    }
+
+    @Override
+    public void setMaze(Maze maze) {
+        this.maze = maze;
     }
 
     public ByteBuffer getWallsBuffer() {
@@ -173,8 +187,8 @@ public class PacmanServer implements Server {
     @Override
     public void run() {
         try {
-            serverDao.save(new ServerModel(AppConfig.CURRENT_HOST, port));
             serverSocket = new ServerSocket(port);
+            serverDao.save(new ServerModel(AppConfig.CURRENT_HOST, port));
             generateWalls();
 
             while (true) {

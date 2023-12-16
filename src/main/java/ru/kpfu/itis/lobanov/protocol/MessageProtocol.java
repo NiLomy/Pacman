@@ -16,6 +16,7 @@ public class MessageProtocol {
     public static final int MAX_MESSAGE_LENGTH = 100 * 1024;
     private static final int INTEGER_BYTES = 4;
 
+    // replace all byte[] into buffers
     public static Message readMessage(InputStream in) throws MessageReadException {
         byte[] buffer = new byte[VERSION_BYTES.length + INTEGER_BYTES * 2];
         try {
@@ -69,11 +70,19 @@ public class MessageProtocol {
         for (byte versionByte : VERSION_BYTES) {
             bytes[index++] = versionByte;
         }
-        byte[] messageType = ByteBuffer.allocate(INTEGER_BYTES).putInt(message.getType()).array();
+        int type = message.getType();
+        if (!MessageType.getAllTypes().contains(type)) {
+            throw new InvalidMessageTypeException("Wrong message type: " + type + ".");
+        }
+        byte[] messageType = ByteBuffer.allocate(INTEGER_BYTES).putInt(type).array();
         for (byte typeByte : messageType) {
             bytes[index++] = typeByte;
         }
-        byte[] messageLength = ByteBuffer.allocate(INTEGER_BYTES).putInt(message.getData().length).array();
+        int length = message.getData().length;
+        if (length > MAX_MESSAGE_LENGTH) {
+            throw new InvalidMessageLengthException("Protocol doesn't support this message length: " + length + ". Message length can't be greater than " + MAX_MESSAGE_LENGTH + " bytes length.");
+        }
+        byte[] messageLength = ByteBuffer.allocate(INTEGER_BYTES).putInt(length).array();
         for (byte lengthByte : messageLength) {
             bytes[index++] = lengthByte;
         }

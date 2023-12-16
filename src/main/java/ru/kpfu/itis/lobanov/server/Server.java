@@ -18,6 +18,7 @@ public interface Server extends Runnable {
     void sendBroadCastMessage(Message message);
     void sendBroadCastMessage(Message message, PacmanServer.Client client);
     Maze getMaze();
+    void setMaze(Maze maze);
     ByteBuffer getWallsBuffer();
     Pacman getPacman();
     List<Ghost> getGhosts();

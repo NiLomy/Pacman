@@ -25,11 +25,11 @@ public class DatabaseConfigProvider {
     }
 
     public static String getDbData(String data) throws DbConfigException {
-        try (InputStream input = DatabaseConfigProvider.class.getClassLoader().getResourceAsStream("config.properties")) {
+        try (InputStream input = DatabaseConfigProvider.class.getClassLoader().getResourceAsStream("property/config.properties")) {
             Properties prop = new Properties();
 
             if (input == null) {
-                throw new DbConfigException("Unable to find: " + "config.properties" + ".");
+                throw new DbConfigException("Unable to find: " + "property/config.properties" + ".");
             }
 
             prop.load(input);

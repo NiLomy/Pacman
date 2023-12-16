@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import ru.kpfu.itis.lobanov.PacmanApplication;
 import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
@@ -62,11 +63,11 @@ public class SettingsScreenController implements Controller {
         });
         back.setOnAction(event -> {
             Stage stage = PacmanApplication.getStage();
-            FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource("/start_screen.fxml"));
-            loader.setResources(ResourceBundle.getBundle("game_strings", GameSettings.LOCALE));
+            FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource("/view/start_screen.fxml"));
+            loader.setResources(ResourceBundle.getBundle("property/game_strings", GameSettings.LOCALE));
             try {
                 AnchorPane pane = loader.load();
-                Scene scene = new Scene(pane);
+                Scene scene = new Scene(pane, Screen.getPrimary().getVisualBounds().getWidth(), Screen.getPrimary().getVisualBounds().getHeight());
                 stage.setScene(scene);
                 stage.show();
             } catch (IOException e) {
@@ -81,11 +82,11 @@ public class SettingsScreenController implements Controller {
                 GameSettings.LOCALE = selectedLocal;
             }
             Stage stage = PacmanApplication.getStage();
-            FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource("/settings_screen.fxml"));
-            loader.setResources(ResourceBundle.getBundle("game_strings", GameSettings.LOCALE));
+            FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource("/view/settings_screen.fxml"));
+            loader.setResources(ResourceBundle.getBundle("property/game_strings", GameSettings.LOCALE));
             try {
                 AnchorPane pane = loader.load();
-                Scene scene = new Scene(pane);
+                Scene scene = new Scene(pane, Screen.getPrimary().getVisualBounds().getWidth(), Screen.getPrimary().getVisualBounds().getHeight());
                 stage.setScene(scene);
                 stage.show();
             } catch (IOException e) {

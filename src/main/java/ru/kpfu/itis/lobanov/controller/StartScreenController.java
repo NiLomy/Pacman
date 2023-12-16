@@ -6,7 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.web.WebView;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import ru.kpfu.itis.lobanov.PacmanApplication;
 import ru.kpfu.itis.lobanov.utils.animation.GifAnimator;
@@ -35,22 +35,24 @@ public class StartScreenController implements Controller {
         animator.getView().setFitHeight(250);
         imageBox.getChildren().addAll(animator.getView());
         startPlay.setOnAction(event -> {
-            showScreen("/rooms_screen.fxml");
+            showScreen("/view/rooms_screen.fxml");
         });
         settings.setOnAction(event -> {
-            showScreen("/settings_screen.fxml");
+            showScreen("/view/settings_screen.fxml");
         });
     }
 
     private void showScreen(String fxmlName) {
         Stage stage = PacmanApplication.getStage();
         FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource(fxmlName));
-        loader.setResources(ResourceBundle.getBundle("game_strings", GameSettings.LOCALE));
+        loader.setResources(ResourceBundle.getBundle("property/game_strings", GameSettings.LOCALE));
         try {
             AnchorPane pane = loader.load();
-            Scene scene = new Scene(pane);
+            Scene scene = new Scene(pane, Screen.getPrimary().getVisualBounds().getWidth(), Screen.getPrimary().getVisualBounds().getHeight());
             stage.setScene(scene);
+            stage.setMaximized(true);
             stage.show();
+            stage.setMaximized(true);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

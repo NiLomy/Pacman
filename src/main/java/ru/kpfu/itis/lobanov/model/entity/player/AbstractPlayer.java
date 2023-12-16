@@ -17,11 +17,15 @@ public abstract class AbstractPlayer implements Player {
     protected final Maze maze;
     protected final List<Rectangle> walls;
     protected ImageView view;
+    protected double offsetX;
+    protected double offsetY;
 
     public AbstractPlayer(Maze maze) {
         this.maze = maze;
         this.walls = maze.getWalls();
         this.view = new ImageView();
+        this.offsetX = 0;
+        this.offsetY = 0;
     }
 
     public abstract void go();
@@ -58,9 +62,6 @@ public abstract class AbstractPlayer implements Player {
         this.spawnY = spawnY;
     }
 
-    public void setSpawnY(int spawnY) {
-        this.spawnY = spawnY;
-    }
 
     public int getHp() {
         return hp;
@@ -84,5 +85,21 @@ public abstract class AbstractPlayer implements Player {
 
     public void setView(ImageView view) {
         this.view = view;
+    }
+
+    public double getOffsetX() {
+        return offsetX;
+    }
+
+    public void setOffsetX(double offsetX) {
+        this.offsetX = offsetX;
+    }
+
+    public double getOffsetY() {
+        return offsetY;
+    }
+
+    public void setOffsetY(double offsetY) {
+        this.offsetY = offsetY;
     }
 }

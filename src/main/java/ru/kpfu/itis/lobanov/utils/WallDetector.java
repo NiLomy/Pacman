@@ -8,38 +8,10 @@ import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
 import java.util.List;
 
 public class WallDetector {
-//    public static boolean checkForWall(Direction direction, double currentX, double currentY, List<Rectangle> walls, ImageView view) {
-//        for (Rectangle wall : walls) {
-//            double wallX = wall.getX();
-//            double wallY = wall.getY();
-//
-//            if (wall.getBoundsInParent().intersects(view.getBoundsInParent())) return true;
-////            if (direction == Direction.UP && wallY < currentY) {
-////                if ((wallY + GameSettings.CELL_SIZE / 2 >= currentY - GameSettings.PACMAN_SPEED) && checkForNoWallX(currentX, wallX)) {
-////                    return true;
-////                }
-////            }
-////            if (direction == Direction.DOWN && wallY > currentY) {
-////                if ((wallY - GameSettings.CELL_SIZE / 2 <= currentY + GameSettings.PACMAN_SPEED) && checkForNoWallX(currentX, wallX)) {
-////                    return true;
-////                }
-////            }
-////            if (direction == Direction.LEFT && wallX < currentX) {
-////                if ((wallX + GameSettings.CELL_SIZE / 2 >= currentX - GameSettings.PACMAN_SPEED) && checkForNoWallY(currentY, wallY)) {
-////                    return true;
-////                }
-////            }
-////            if (direction == Direction.RIGHT && wallX > currentX) {
-////                if ((wallX - GameSettings.CELL_SIZE / 2 <= currentX + GameSettings.PACMAN_SPEED) && checkForNoWallY(currentY, wallY)) {
-////                    return true;
-////                }
-////            }
-//        }
-//        return false;
-//    }
-
-    public static boolean checkForWall(Direction direction, List<Rectangle> walls, ImageView view) {
-        for (Rectangle wall : walls) {
+    public static boolean checkForWall(Direction direction, List<Rectangle> walls, ImageView view, double offsetX, double offsetY) {
+        for (Rectangle w : walls) {
+            Rectangle wall = new Rectangle(w.getX() + offsetX, w.getY() + offsetY, w.getWidth(), w.getHeight());
+//            Rectangle wall = new Rectangle(w.getX(), w.getY(), w.getWidth(), w.getHeight());
             if (direction != null) switch (direction) {
                 case UP:
                     view.setY(view.getY() - GameSettings.PACMAN_SPEED);
@@ -76,14 +48,6 @@ public class WallDetector {
             }
         }
         return false;
-    }
-
-    private static boolean checkForNoWallX(double currentX, double wallX) {
-        return wallX <= currentX && wallX + GameSettings.CELL_SIZE > currentX;
-    }
-
-    private static boolean checkForNoWallY(double currentY, double wallY) {
-        return wallY <= currentY && wallY + GameSettings.CELL_SIZE > currentY;
     }
 
     private WallDetector() {

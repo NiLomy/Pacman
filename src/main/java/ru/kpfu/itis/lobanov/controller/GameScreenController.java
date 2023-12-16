@@ -7,6 +7,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -14,6 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.apache.commons.lang.SerializationUtils;
 import ru.kpfu.itis.lobanov.PacmanApplication;
@@ -65,7 +68,7 @@ public class GameScreenController implements MessageReceiverController {
         gameScreen.setMaxHeight((GameSettings.MAZE_SIZE + 1) * GameSettings.CELL_SIZE);
         gameScreen.setPrefWidth((GameSettings.MAZE_SIZE) * GameSettings.CELL_SIZE);
         gameScreen.setPrefHeight((GameSettings.MAZE_SIZE + 1) * GameSettings.CELL_SIZE);
-        gameWindow.setStyle("-fx-background-color: lightgrey");
+//        gameWindow.setStyle("-fx-background-color: lightgrey");
         ghosts = new ArrayList<>();
         isRushMode = false;
 
@@ -73,10 +76,10 @@ public class GameScreenController implements MessageReceiverController {
         client.setController(this);
         client.sendMessage(GameMessageProvider.createMessage(MessageType.USER_ID_REQUEST, new byte[0]));
         client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_WALLS_REQUEST, new byte[0]));
-        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_PACMAN_REQUEST, new byte[0]));
-        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_GHOST_REQUEST, new byte[0]));
-        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_BONUSES_REQUEST, new byte[0]));
         client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_PELLETS_REQUEST, new byte[0]));
+        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_BONUSES_REQUEST, new byte[0]));
+        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_GHOST_REQUEST, new byte[0]));
+        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_PACMAN_REQUEST, new byte[0]));
 
         setUpGameInfo();
 
@@ -172,7 +175,7 @@ public class GameScreenController implements MessageReceiverController {
                     buffer = ByteBuffer.wrap(message.getData());
                     List<Rectangle> rectangles = new ArrayList<>();
                     while (buffer.hasRemaining()) {
-                        Rectangle rectangle = new Rectangle(buffer.getInt() * GameSettings.CELL_SIZE, buffer.getInt() * GameSettings.CELL_SIZE, GameSettings.CELL_SIZE, GameSettings.CELL_SIZE);
+                        Rectangle rectangle = new Rectangle(buffer.getInt() * GameSettings.CELL_SIZE + Screen.getPrimary().getVisualBounds().getWidth() / 3, buffer.getInt() * GameSettings.CELL_SIZE + Screen.getPrimary().getVisualBounds().getHeight() / 6, GameSettings.CELL_SIZE, GameSettings.CELL_SIZE);
                         rectangles.add(rectangle);
                     }
                     Platform.runLater(() -> gameWindow.getChildren().addAll(rectangles));
@@ -183,10 +186,12 @@ public class GameScreenController implements MessageReceiverController {
                     double y = buffer.getDouble();
                     Maze m = (Maze) SerializationUtils.deserialize(Arrays.copyOfRange(buffer.array(), GameSettings.DOUBLE_BYTES * 2, buffer.array().length));
                     pacman = new Pacman(m);
-                    pacman.setX(x);
-                    pacman.setSpawnX(x);
-                    pacman.setY(y);
-                    pacman.setSpawnY(y);
+                    pacman.setOffsetX(Screen.getPrimary().getVisualBounds().getWidth() / 3);
+                    pacman.setOffsetY(Screen.getPrimary().getVisualBounds().getHeight() / 6);
+                    pacman.setX(x + Screen.getPrimary().getVisualBounds().getWidth() / 3);
+                    pacman.setSpawnX(x + Screen.getPrimary().getVisualBounds().getWidth() / 3);
+                    pacman.setY(y + Screen.getPrimary().getVisualBounds().getHeight() / 6);
+                    pacman.setSpawnY(y + Screen.getPrimary().getVisualBounds().getHeight() / 6);
                     pacman.show();
                     Platform.runLater(() -> gameWindow.getChildren().addAll(pacman.getView()));
                     break;
@@ -198,10 +203,12 @@ public class GameScreenController implements MessageReceiverController {
                     Maze m2 = (Maze) SerializationUtils.deserialize(Arrays.copyOfRange(buffer.array(), GameSettings.DOUBLE_BYTES * 2 + GameSettings.INTEGER_BYTES, buffer.array().length));
 
                     Ghost g = new Ghost(m2);
-                    g.setX(x2);
-                    g.setSpawnX(x2);
-                    g.setY(y2);
-                    g.setSpawnY(y2);
+                    g.setOffsetX(Screen.getPrimary().getVisualBounds().getWidth() / 3);
+                    g.setOffsetY(Screen.getPrimary().getVisualBounds().getHeight() / 6);
+                    g.setX(x2 + Screen.getPrimary().getVisualBounds().getWidth() / 3);
+                    g.setSpawnX(x2 + Screen.getPrimary().getVisualBounds().getWidth() / 3);
+                    g.setY(y2 + Screen.getPrimary().getVisualBounds().getHeight() / 6);
+                    g.setSpawnY(y2 + Screen.getPrimary().getVisualBounds().getHeight() / 6);
                     switch (id) {
                         case 0:
                             g.setGhostPackageSprite("/red-ghost");
@@ -219,13 +226,15 @@ public class GameScreenController implements MessageReceiverController {
                     break;
                 case MessageType.CREATE_BONUSES_RESPONSE:
                     bonuses = (List<Bonus>) SerializationUtils.deserialize(message.getData());
-                    bonuses.forEach(Bonus::show);
+                    for (Bonus b : bonuses) {
+                        b.show(Screen.getPrimary().getVisualBounds());
+                    }
                     Platform.runLater(() -> gameWindow.getChildren().addAll(bonuses.stream().map(Bonus::getView).collect(Collectors.toList())));
                     break;
                 case MessageType.CREATE_PELLETS_RESPONSE:
                     pellets = (List<Pellet>) SerializationUtils.deserialize(message.getData());
                     for (Pellet p : pellets) {
-                        p.show();
+                        p.show(Screen.getPrimary().getVisualBounds());
                     }
                     Platform.runLater(() -> gameWindow.getChildren().addAll(pellets.stream().map(Pellet::getView).collect(Collectors.toList())));
                     break;
@@ -330,6 +339,9 @@ public class GameScreenController implements MessageReceiverController {
                 case MessageType.RUSH_MODE_RESPONSE:
                     byte[] data = message.getData();
                     isRushMode = data[0] == 1;
+                    for (Ghost ghost : ghosts) {
+                        ghost.setFrightened(isRushMode);
+                    }
                     break;
                 case MessageType.GHOST_SCORES_RESPONSE:
                     if (userId != 0) {
@@ -406,11 +418,11 @@ public class GameScreenController implements MessageReceiverController {
 
     private void goToHomePage() {
         Stage stage = PacmanApplication.getStage();
-        FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource("/start_screen.fxml"));
-        loader.setResources(ResourceBundle.getBundle("game_strings", GameSettings.LOCALE));
+        FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource("/view/start_screen.fxml"));
+        loader.setResources(ResourceBundle.getBundle("property/game_strings", GameSettings.LOCALE));
         try {
             AnchorPane pane = loader.load();
-            Scene scene = new Scene(pane);
+            Scene scene = new Scene(pane, Screen.getPrimary().getVisualBounds().getWidth(), Screen.getPrimary().getVisualBounds().getHeight());
             stage.setScene(scene);
             stage.show();
         } catch (IOException e) {

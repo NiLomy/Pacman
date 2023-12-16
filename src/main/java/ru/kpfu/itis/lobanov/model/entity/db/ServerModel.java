@@ -1,10 +1,13 @@
 package ru.kpfu.itis.lobanov.model.entity.db;
 
+import java.util.Objects;
+
 public class ServerModel {
     private long id;
     private String host;
     private int port;
     private boolean isGameHeld;
+    private String gameMap;
 
     public ServerModel(String host, int port) {
         this.host = host;
@@ -26,6 +29,14 @@ public class ServerModel {
         this.isGameHeld = isGameHeld;
     }
 
+    public ServerModel(long id, String host, int port, boolean isGameHeld, String gameMap) {
+        this.id = id;
+        this.host = host;
+        this.port = port;
+        this.isGameHeld = isGameHeld;
+        this.gameMap = gameMap;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -35,7 +46,9 @@ public class ServerModel {
 
         if (id != that.id) return false;
         if (port != that.port) return false;
-        return host.equals(that.host);
+        if (isGameHeld != that.isGameHeld) return false;
+        if (!host.equals(that.host)) return false;
+        return Objects.equals(gameMap, that.gameMap);
     }
 
     @Override
@@ -43,6 +56,8 @@ public class ServerModel {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + host.hashCode();
         result = 31 * result + port;
+        result = 31 * result + (isGameHeld ? 1 : 0);
+        result = 31 * result + (gameMap != null ? gameMap.hashCode() : 0);
         return result;
     }
 
@@ -76,5 +91,13 @@ public class ServerModel {
 
     public void setGameHeld(boolean gameHeld) {
         isGameHeld = gameHeld;
+    }
+
+    public String getGameMap() {
+        return gameMap;
+    }
+
+    public void setGameMap(String gameMap) {
+        this.gameMap = gameMap;
     }
 }

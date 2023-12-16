@@ -1,5 +1,6 @@
 package ru.kpfu.itis.lobanov.model.entity.environment.pickups;
 
+import javafx.geometry.Rectangle2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
@@ -14,12 +15,12 @@ public class Bonus extends LocatableObject {
         this.score = score;
     }
 
-    public void show() {
+    public void show(Rectangle2D coordinates) {
         view = new Circle();
         view.setRadius(GameSettings.CELL_SIZE / 4);
         view.setFill(Color.BLUE);
-        view.setCenterX(x);
-        view.setCenterY(y);
+        view.setCenterX(x + coordinates.getWidth() / 3);
+        view.setCenterY(y + coordinates.getHeight() / 6);
     }
 
     @Override

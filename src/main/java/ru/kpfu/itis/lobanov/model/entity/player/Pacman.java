@@ -47,7 +47,7 @@ public class Pacman extends AbstractPlayer {
     @Override
     public void go() {
         Direction movingDirection;
-        if (!checkForWall(currentDirection, walls, view)) {
+        if (!checkForWall(currentDirection, walls, view, offsetX, offsetY)) {
             movingDirection = currentDirection;
         } else {
             movingDirection = null;
@@ -87,12 +87,12 @@ public class Pacman extends AbstractPlayer {
         if (movingDirection != null) {
             switch (movingDirection) {
                 case UP:
-                    if (!checkForWall(movingDirection, walls, view)) {
+                    if (!checkForWall(movingDirection, walls, view, offsetX, offsetY)) {
                         setY(y - GameSettings.PACMAN_SPEED);
                     }
-                    if (y + GameSettings.CELL_SIZE / 2 <= 0) {
-                        setY(maze.getLowerExit().getY() * GameSettings.CELL_SIZE + 3);
-                        setX(maze.getLowerExit().getX() * GameSettings.CELL_SIZE + 3);
+                    if (y + GameSettings.CELL_SIZE / 2 <= offsetY + 3 * 2) {
+                        setY(maze.getLowerExit().getY() * GameSettings.CELL_SIZE + offsetY + 3);
+                        setX(maze.getLowerExit().getX() * GameSettings.CELL_SIZE + offsetX + 3);
                     }
                     if (stayCount == 0) {
                         if (lastDirection == Direction.UP) {
@@ -112,12 +112,12 @@ public class Pacman extends AbstractPlayer {
                     }
                     break;
                 case DOWN:
-                    if (!checkForWall(movingDirection, walls, view)) {
+                    if (!checkForWall(movingDirection, walls, view, offsetX, offsetY)) {
                         setY(y + GameSettings.PACMAN_SPEED);
                     }
-                    if (y >= maze.labyrinthLength() * GameSettings.CELL_SIZE - GameSettings.CELL_SIZE / 2) {
-                        setY(GameSettings.CELL_SIZE / 2 + 3);
-                        setX(maze.getUpperExit().getX() * GameSettings.CELL_SIZE + 3);
+                    if (y >= maze.labyrinthLength() * GameSettings.CELL_SIZE + offsetY - GameSettings.CELL_SIZE / 2 - 3) {
+                        setY(GameSettings.CELL_SIZE / 2 + offsetY + 3);
+                        setX(maze.getUpperExit().getX() * GameSettings.CELL_SIZE + offsetX + 3);
                     }
                     if (stayCount == 0) {
                         if (lastDirection == Direction.DOWN) {
@@ -137,12 +137,12 @@ public class Pacman extends AbstractPlayer {
                     }
                     break;
                 case LEFT:
-                    if (!checkForWall(movingDirection, walls, view)) {
+                    if (!checkForWall(movingDirection, walls, view, offsetX, offsetY)) {
                         setX(x - GameSettings.PACMAN_SPEED);
                     }
-                    if (x + GameSettings.CELL_SIZE / 2 <= 0) {
-                        setX(maze.getRightExit().getX() * GameSettings.CELL_SIZE + 3);
-                        setY(maze.getRightExit().getY() * GameSettings.CELL_SIZE + 3);
+                    if (x + GameSettings.CELL_SIZE / 2 <= offsetX + 3 * 2) {
+                        setX(maze.getRightExit().getX() * GameSettings.CELL_SIZE + offsetX + 3);
+                        setY(maze.getRightExit().getY() * GameSettings.CELL_SIZE + offsetY + 3);
                     }
                     if (stayCount == 0) {
                         if (lastDirection == Direction.LEFT) {
@@ -162,12 +162,12 @@ public class Pacman extends AbstractPlayer {
                     }
                     break;
                 case RIGHT:
-                    if (!checkForWall(movingDirection, walls, view)) {
+                    if (!checkForWall(movingDirection, walls, view, offsetX, offsetY)) {
                         setX(x + GameSettings.PACMAN_SPEED);
                     }
-                    if (x >= maze.labyrinthLength() * GameSettings.CELL_SIZE - GameSettings.CELL_SIZE / 2) {
-                        setX(GameSettings.CELL_SIZE / 2 + 3);
-                        setY(maze.getLeftExit().getY() * GameSettings.CELL_SIZE + 3);
+                    if (x >= maze.labyrinthLength() * GameSettings.CELL_SIZE + offsetX - GameSettings.CELL_SIZE / 2 - 3) {
+                        setX(GameSettings.CELL_SIZE / 2 + offsetX + 3);
+                        setY(maze.getLeftExit().getY() * GameSettings.CELL_SIZE + offsetY + 3);
                     }
                     if (stayCount == 0) {
                         if (lastDirection == Direction.RIGHT) {
@@ -205,9 +205,6 @@ public class Pacman extends AbstractPlayer {
             if (view.getBoundsInParent().intersects(pellet.getView().getBoundsInParent())) {
                 return pellets.remove(i);
             }
-//            if (Math.abs(pellet.getX() - x) <= GameSettings.CELL_SIZE / 4 && Math.abs(pellet.getY() - y) <= GameSettings.CELL_SIZE / 4) {
-//                return pellets.remove(i);
-//            }
         }
         return null;
     }
@@ -215,7 +212,7 @@ public class Pacman extends AbstractPlayer {
     public Bonus eatBonus(List<Bonus> bonuses) {
         for (int i = 0; i < bonuses.size(); i++) {
             Bonus bonus = bonuses.get(i);
-            if (Math.abs(bonus.getX() - x) <= GameSettings.CELL_SIZE / 2 && Math.abs(bonus.getY() - y) <= GameSettings.CELL_SIZE / 2) {
+            if (view.getBoundsInParent().intersects(bonus.getView().getBoundsInParent())) {
                 return bonuses.remove(i);
             }
         }
