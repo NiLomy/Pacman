@@ -6,4 +6,6 @@ public class AppConfig {
     public static final int CURRENT_PORT_2 = 6666;
     public static String host;
     public static int port;
+    public static String size;
+    public static String language;
 }

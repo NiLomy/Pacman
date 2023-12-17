@@ -1,13 +1,13 @@
 package ru.kpfu.itis.lobanov;
 
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import ru.kpfu.itis.lobanov.client.PacmanClient;
+import ru.kpfu.itis.lobanov.utils.constants.GameResources;
 import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
 
 import java.util.ResourceBundle;
@@ -24,8 +24,8 @@ public class PacmanApplication extends Application {
     public void start(Stage primaryStage) throws Exception {
         stage = primaryStage;
         primaryStage.setMaximized(true);
-        FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource("/view/start_screen.fxml"));
-        loader.setResources(ResourceBundle.getBundle("property/game_strings", GameSettings.LOCALE));
+        FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource(GameResources.START_SCREEN));
+        loader.setResources(ResourceBundle.getBundle(GameResources.LOCALIZED_TEXTS_RESOURCE_BUNDLE, GameSettings.LOCALE));
 
         AnchorPane pane = loader.load();
         Scene scene = new Scene(pane, Screen.getPrimary().getVisualBounds().getWidth(), Screen.getPrimary().getVisualBounds().getHeight());

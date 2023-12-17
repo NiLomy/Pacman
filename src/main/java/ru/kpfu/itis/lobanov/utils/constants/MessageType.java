@@ -59,5 +59,6 @@ public class MessageType {
         }).collect(Collectors.toList());
     }
 
-    private MessageType() {}
+    private MessageType() {
+    }
 }

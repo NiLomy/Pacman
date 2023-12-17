@@ -1,6 +1,7 @@
 package ru.kpfu.itis.lobanov.utils.animation;
 
 import ru.kpfu.itis.lobanov.exceptions.DecoderException;
+import ru.kpfu.itis.lobanov.utils.constants.LogMessages;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -18,6 +19,7 @@ public class GifDecoder {
     public static final int STATUS_FORMAT_ERROR = 1;
     public static final int STATUS_OPEN_ERROR = 2;
     protected static final int MAX_STACK_SIZE = 4096;
+    public static final String NETSCAPE =  "NETSCAPE2.0";
 
     protected BufferedInputStream in;
     protected int status;
@@ -187,7 +189,7 @@ public class GifDecoder {
         try {
             if (is != null) is.close();
         } catch (IOException e) {
-            throw new DecoderException("Can't decode image.", e);
+            throw new DecoderException(LogMessages.DECODE_IMAGE_EXCEPTION, e);
         }
         return status;
     }
@@ -211,7 +213,7 @@ public class GifDecoder {
         try {
             if (is != null) is.close();
         } catch (IOException e) {
-            throw new DecoderException("Can't decode image.", e);
+            throw new DecoderException(LogMessages.DECODE_IMAGE_EXCEPTION, e);
         }
         return status;
     }
@@ -238,22 +240,22 @@ public class GifDecoder {
         int NullCode = -1;
         int npix = iw * ih;
         int available,
-            clear,
-            code_mask,
-            code_size,
-            end_of_information,
-            in_code,
-            old_code,
-            bits,
-            code,
-            count,
-            i,
-            datum,
-            data_size,
-            first,
-            top,
-            bi,
-            pi;
+                clear,
+                code_mask,
+                code_size,
+                end_of_information,
+                in_code,
+                old_code,
+                bits,
+                code,
+                count,
+                i,
+                datum,
+                data_size,
+                first,
+                top,
+                bi,
+                pi;
 
         if ((pixels == null) || (pixels.length < npix)) {
             pixels = new byte[npix];
@@ -380,7 +382,7 @@ public class GifDecoder {
                     n += count;
                 }
             } catch (IOException e) {
-                throw new DecoderException("Can't decode image.", e);
+                throw new DecoderException(LogMessages.DECODE_IMAGE_EXCEPTION, e);
             }
 
             if (n < blockSize) {
@@ -398,7 +400,7 @@ public class GifDecoder {
         try {
             n = in.read(c);
         } catch (IOException e) {
-            throw new DecoderException("Can't decode image.", e);
+            throw new DecoderException(LogMessages.DECODE_IMAGE_EXCEPTION, e);
         }
         if (n < nbytes) {
             status = STATUS_FORMAT_ERROR;
@@ -436,7 +438,7 @@ public class GifDecoder {
                             for (int i = 0; i < 11; i++) {
                                 app += (char) block[i];
                             }
-                            if (app.equals("NETSCAPE2.0")) {
+                            if (app.equals(NETSCAPE)) {
                                 readNetscapeExt();
                             } else skip();
                             break;

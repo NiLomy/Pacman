@@ -15,7 +15,6 @@ public class GameSettings {
     public static final int CALM_COUNT = 5;
     public static final int MOVING_COUNT = 4;
     public static final int BONUS_DURATION = 5 * 1_000;
-    public static final int PLAYERS_COUNT = 2;
     public static final int GAME_STATUS_UPDATE_FREQUENCY = 60;
     public static final int BONUS_BLINK_UPDATE_FREQUENCY = 120;
     public static final int GHOST_SCORE_INCREASE_UPDATE_FREQUENCY = 2 * 1_000;
@@ -30,5 +29,6 @@ public class GameSettings {
     public static final int DOUBLE_BYTES = 8;
     public static Locale LOCALE = new Locale("en");
 
-    private GameSettings() {}
+    private GameSettings() {
+    }
 }

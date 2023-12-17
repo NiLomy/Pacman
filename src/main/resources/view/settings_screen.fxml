@@ -7,14 +7,18 @@
 <?import javafx.scene.layout.*?>
 
 <?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="ru.kpfu.itis.lobanov.controller.SettingsScreenController">
+            fx:controller="ru.kpfu.itis.lobanov.controller.impl.SettingsScreenController">
 
-    <Button fx:id="back" text="%go_back" AnchorPane.topAnchor="15" AnchorPane.leftAnchor="20"/>
+    <Button fx:id="back" text="%go_back" AnchorPane.topAnchor="32" AnchorPane.leftAnchor="20"
+            style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'"/>
 
-    <VBox spacing="20" AnchorPane.topAnchor="35" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" alignment="CENTER">
-        <ComboBox fx:id="sizeCombo" prefWidth="100.0">
+    <VBox spacing="20" AnchorPane.topAnchor="80" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20"
+          alignment="CENTER">
+        <Label text="%select.size" style="-fx-font-family: 'Comic Sans MS'; -fx-font-size: 40"/>
+        <ComboBox fx:id="sizeCombo" style="-fx-font-family: 'Comic Sans MS'; -fx-font-size: 32" minWidth="220">
             <items>
                 <FXCollections fx:factory="observableArrayList">
                     <String fx:value="Small"/>
@@ -24,7 +28,8 @@
             </items>
         </ComboBox>
 
-        <ComboBox fx:id="languageCombo" prefWidth="100.0">
+        <Label text="%select.language" style="-fx-font-family: 'Comic Sans MS'; -fx-font-size: 40"/>
+        <ComboBox fx:id="languageCombo" style="-fx-font-family: 'Comic Sans MS'; -fx-font-size: 32" minWidth="220">
             <items>
                 <FXCollections fx:factory="observableArrayList">
                     <String fx:value="English"/>
@@ -32,8 +37,13 @@
                 </FXCollections>
             </items>
         </ComboBox>
-
-        <Button fx:id="apply" text="%settings.apply"/>
+        <Button fx:id="apply" text="%settings.apply" style="-fx-font-size: 32; -fx-font-family: 'Comic Sans MS'">
+            <VBox.margin>
+                <Insets>
+                    <top>60</top>
+                </Insets>
+            </VBox.margin>
+        </Button>
     </VBox>
 
 </AnchorPane>

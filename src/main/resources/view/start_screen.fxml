@@ -11,18 +11,20 @@
 <?import javafx.scene.web.WebView?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="ru.kpfu.itis.lobanov.controller.StartScreenController">
+            fx:controller="ru.kpfu.itis.lobanov.controller.impl.StartScreenController">
 
     <children>
-        <VBox fx:id="imageBox" AnchorPane.rightAnchor="20" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20"
-              alignment="CENTER" spacing="30">
-            <Label text="Pacman Game" style="-fx-arc-height: 20;"/>
-        </VBox>
+        <VBox spacing="20" AnchorPane.topAnchor="32" AnchorPane.rightAnchor="5" AnchorPane.leftAnchor="5">
+            <VBox fx:id="imageBox" AnchorPane.rightAnchor="20" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20"
+                  alignment="CENTER" spacing="30">
+                <Label text="Pacman Game" style="-fx-font-size: 72; -fx-font-family: 'Comic Sans MS'"/>
+            </VBox>
 
-        <VBox alignment="CENTER" spacing="10" AnchorPane.topAnchor="290" AnchorPane.rightAnchor="10"
-              AnchorPane.leftAnchor="10">
-            <Button fx:id="startPlay" prefWidth="0" text="%start.play" VBox.vgrow="ALWAYS" minWidth="100.0"/>
-            <Button fx:id="settings" prefWidth="0" text="%settings" VBox.vgrow="ALWAYS" minWidth="100.0"/>
+            <VBox alignment="CENTER" spacing="10" AnchorPane.topAnchor="290" AnchorPane.rightAnchor="10"
+                  AnchorPane.leftAnchor="10">
+                <Button fx:id="startPlay" text="%start.play" style="-fx-font-size: 32; -fx-font-family: 'Comic Sans MS'" minWidth="200"/>
+                <Button fx:id="settings" text="%settings" style="-fx-font-size: 32; -fx-font-family: 'Comic Sans MS'" minWidth="200"/>
+            </VBox>
         </VBox>
     </children>
 

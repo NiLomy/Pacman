@@ -4,5 +4,6 @@ import ru.kpfu.itis.lobanov.server.Server;
 
 public interface ScreenUpdater extends Runnable {
     void init(Server server);
+
     void setGameAlive(boolean gameAlive);
 }

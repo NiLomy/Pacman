@@ -292,7 +292,7 @@ public class Maze implements Serializable {
                 double cellX = x * GameSettings.CELL_SIZE + GameSettings.CELL_SIZE / 2 - 2;
                 double cellY = y * GameSettings.CELL_SIZE + GameSettings.CELL_SIZE / 2 - 2;
                 Bonus tempBonus = new Bonus(cellX, cellY, GameSettings.BONUS_SCORES);
-                if (!data[x][y].isWall() && !bonuses.contains(tempBonus) && (cellX != pacmanX || cellY != pacmanY)) {
+                if (!data[x][y].isWall()) {
                     pellets.add(new Pellet(cellX, cellY, GameSettings.PELLET_SCORES));
                 }
             }

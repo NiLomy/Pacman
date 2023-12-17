@@ -1,15 +1,16 @@
 package ru.kpfu.itis.lobanov.client;
 
-import ru.kpfu.itis.lobanov.controller.Controller;
-import ru.kpfu.itis.lobanov.controller.GameScreenController;
 import ru.kpfu.itis.lobanov.controller.MessageReceiverController;
 import ru.kpfu.itis.lobanov.exceptions.ClientException;
 import ru.kpfu.itis.lobanov.exceptions.MessageReadException;
 import ru.kpfu.itis.lobanov.exceptions.MessageWriteException;
 import ru.kpfu.itis.lobanov.model.entity.net.Message;
 import ru.kpfu.itis.lobanov.protocol.MessageProtocol;
+import ru.kpfu.itis.lobanov.utils.constants.LogMessages;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 
 public class PacmanClient implements Client {
@@ -33,7 +34,7 @@ public class PacmanClient implements Client {
             thread = new ClientThread(input, output, this);
             new Thread(thread).start();
         } catch (IOException e) {
-            throw new ClientException("Can't connect to the server.", e);
+            throw new ClientException(LogMessages.ESTABLISH_CONNECTION_CLIENT_EXCEPTION, e);
         }
     }
 
@@ -42,7 +43,7 @@ public class PacmanClient implements Client {
         try {
             MessageProtocol.writeMessage(thread.getOut(), message);
         } catch (MessageWriteException e) {
-            throw new ClientException("Can't send data to the server.", e);
+            throw new ClientException(LogMessages.WRITE_CLIENT_EXCEPTION, e);
         }
     }
 
@@ -76,10 +77,11 @@ public class PacmanClient implements Client {
             try {
                 while (alive) {
                     Message message = MessageProtocol.readMessage(in);
-                    if (message != null && pacmanClient.controller != null) pacmanClient.controller.receiveMessage(message);
+                    if (message != null && pacmanClient.controller != null)
+                        pacmanClient.controller.receiveMessage(message);
                 }
             } catch (MessageReadException e) {
-                throw new ClientException("Client can't read a message.", e);
+                throw new ClientException(LogMessages.READ_CLIENT_EXCEPTION, e);
             }
         }
 
@@ -98,7 +100,7 @@ public class PacmanClient implements Client {
                 pacmanClient.socket.close();
                 alive = false;
             } catch (IOException e) {
-                throw new ClientException("Connection to the server is lost.", e);
+                throw new ClientException(LogMessages.LOST_CONNECTION_CLIENT_EXCEPTION, e);
             }
         }
     }

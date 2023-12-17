@@ -13,18 +13,19 @@ import ru.kpfu.itis.lobanov.model.entity.environment.Maze;
 import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Bonus;
 import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Pellet;
 import ru.kpfu.itis.lobanov.model.entity.net.Message;
-import ru.kpfu.itis.lobanov.model.entity.player.Ghost;
-import ru.kpfu.itis.lobanov.model.entity.player.Pacman;
+import ru.kpfu.itis.lobanov.model.entity.player.impl.Ghost;
+import ru.kpfu.itis.lobanov.model.entity.player.impl.Pacman;
 import ru.kpfu.itis.lobanov.protocol.MessageProtocol;
 import ru.kpfu.itis.lobanov.updater.ScreenUpdater;
-import ru.kpfu.itis.lobanov.utils.*;
 import ru.kpfu.itis.lobanov.utils.constants.AppConfig;
+import ru.kpfu.itis.lobanov.utils.constants.GameResources;
 import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
+import ru.kpfu.itis.lobanov.utils.constants.LogMessages;
+import ru.kpfu.itis.lobanov.utils.repository.UpdatersRepository;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -33,6 +34,7 @@ import java.util.List;
 
 public class PacmanServer implements Server {
     private final int port;
+    private final int playersCount;
     private ServerSocket serverSocket;
     private final List<Client> clients;
     private final List<EventListener> listeners;
@@ -45,8 +47,9 @@ public class PacmanServer implements Server {
     private ByteBuffer wallsBuffer;
     private final ServerDao serverDao;
 
-    public PacmanServer(int port) {
+    public PacmanServer(int port, int playersCount) {
         this.port = port;
+        this.playersCount = playersCount;
         this.clients = new ArrayList<>();
         this.ghosts = new ArrayList<>();
         this.listeners = new ArrayList<>();
@@ -82,22 +85,6 @@ public class PacmanServer implements Server {
         }
     }
 
-    @Override
-    public void sendBroadCastMessage(Message message, Client client) {
-        for (Client c : clients) {
-            try {
-                byte[] currentData = message.getData();
-                ByteBuffer buffer = ByteBuffer.allocate(currentData.length + GameSettings.INTEGER_BYTES);
-                buffer.putInt(client.id);
-                buffer.put(currentData);
-                message.setData(buffer.array());
-                MessageProtocol.writeMessage(c.getOutput(), message);
-            } catch (MessageWriteException e) {
-                c.stop();
-            }
-        }
-    }
-
     public String generateWalls() {
         StringBuilder sb = new StringBuilder();
         byte[] b = new byte[maze.getWalls().size() * 2 * GameSettings.INTEGER_BYTES];
@@ -112,7 +99,6 @@ public class PacmanServer implements Server {
                 } else sb.append(0);
             }
         }
-        serverDao.updateGameMap(AppConfig.CURRENT_HOST, port, sb.toString());
         return sb.toString();
     }
 
@@ -122,7 +108,7 @@ public class PacmanServer implements Server {
 
     public void createGhosts() {
         for (int i = 0; i < clients.size() - 1; i++) {
-            Ghost ghost = new Ghost(maze);
+            Ghost ghost = new Ghost(maze, GameResources.RED_GHOST_PACKAGE);
             double x = GameSettings.CELL_SIZE + GameSettings.CELL_SIZE * ((GameSettings.MAZE_SIZE - 3) * (i % 2)) + 3;
             double y = GameSettings.CELL_SIZE + GameSettings.CELL_SIZE * ((GameSettings.MAZE_SIZE - 3) * (i / 2)) + 3;
             ghost.setSpawnPoint(x, y);
@@ -187,9 +173,9 @@ public class PacmanServer implements Server {
     @Override
     public void run() {
         try {
+            String gameMap = generateWalls();
             serverSocket = new ServerSocket(port);
-            serverDao.save(new ServerModel(AppConfig.CURRENT_HOST, port));
-            generateWalls();
+            serverDao.save(new ServerModel(AppConfig.CURRENT_HOST, port, false, gameMap, playersCount));
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
@@ -201,7 +187,7 @@ public class PacmanServer implements Server {
 
                 new Thread(client).start();
 
-                if (!isGameStarted && clients.size() == GameSettings.PLAYERS_COUNT) {
+                if (!isGameStarted && clients.size() == playersCount) {
                     createPacman();
                     createGhosts();
                     generateBonuses();
@@ -211,7 +197,7 @@ public class PacmanServer implements Server {
                 }
             }
         } catch (IOException e) {
-            throw new ServerException("Can not establish a connection.", e);
+            throw new ServerException(LogMessages.ESTABLISH_CONNECTION_SERVER_EXCEPTION, e);
         }
     }
 
@@ -259,9 +245,9 @@ public class PacmanServer implements Server {
                     }
                 }
             } catch (MessageReadException e) {
-                throw new ServerException("Server can't read a message.", e);
+                throw new ServerException(LogMessages.READ_SERVER_EXCEPTION, e);
             } catch (EventListenerException e) {
-                throw new ServerException("Server has a not initialized listener.", e);
+                throw new ServerException(LogMessages.LISTENER_SERVER_EXCEPTION, e);
             }
         }
 
@@ -273,7 +259,7 @@ public class PacmanServer implements Server {
                 server.clients.remove(this);
                 alive = false;
             } catch (IOException e) {
-                throw new ServerException("Connection to the client is lost.", e);
+                throw new ServerException(LogMessages.LOST_CONNECTION_SERVER_EXCEPTIONS, e);
             }
         }
 

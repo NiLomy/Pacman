@@ -3,6 +3,7 @@ package ru.kpfu.itis.lobanov.protocol;
 import ru.kpfu.itis.lobanov.exceptions.*;
 import ru.kpfu.itis.lobanov.model.entity.net.Message;
 import ru.kpfu.itis.lobanov.utils.GameMessageProvider;
+import ru.kpfu.itis.lobanov.utils.constants.LogMessages;
 import ru.kpfu.itis.lobanov.utils.constants.MessageType;
 
 import java.io.IOException;
@@ -16,7 +17,6 @@ public class MessageProtocol {
     public static final int MAX_MESSAGE_LENGTH = 100 * 1024;
     private static final int INTEGER_BYTES = 4;
 
-    // replace all byte[] into buffers
     public static Message readMessage(InputStream in) throws MessageReadException {
         byte[] buffer = new byte[VERSION_BYTES.length + INTEGER_BYTES * 2];
         try {
@@ -27,19 +27,19 @@ public class MessageProtocol {
             }
             if (counter == VERSION_BYTES.length) return null;
             if (!Arrays.equals(Arrays.copyOfRange(buffer, 0, VERSION_BYTES.length), VERSION_BYTES)) {
-                throw new InvalidProtocolVersionException("Versions of the protocols don't match. Message first bytes must be: " + Arrays.toString(VERSION_BYTES));
+                throw new InvalidProtocolVersionException(LogMessages.INVALID_PROTOCOL_VERSION_EXCEPTION + Arrays.toString(VERSION_BYTES));
             }
 
             in.read(buffer, 0, INTEGER_BYTES);
             int messageType = ByteBuffer.wrap(buffer, 0, INTEGER_BYTES).getInt();
             if (!MessageType.getAllTypes().contains(messageType)) {
-                throw new InvalidMessageTypeException("Wrong message type: " + messageType + ".");
+                throw new InvalidMessageTypeException(String.format(LogMessages.INVALID_MESSAGE_TYPE_EXCEPTION, messageType));
             }
 
             in.read(buffer, 0, INTEGER_BYTES);
             int messageLength = ByteBuffer.wrap(buffer, 0, INTEGER_BYTES).getInt();
             if (messageLength > MAX_MESSAGE_LENGTH) {
-                throw new InvalidMessageLengthException("Protocol doesn't support this message length: " + messageLength + ". Message length can't be greater than " + MAX_MESSAGE_LENGTH + " bytes length.");
+                throw new InvalidMessageLengthException(String.format(LogMessages.INVALID_MESSAGE_LENGTH_EXCEPTION, messageLength, MAX_MESSAGE_LENGTH));
             }
 
             buffer = new byte[messageLength];
@@ -49,7 +49,7 @@ public class MessageProtocol {
             try {
                 in.close();
             } catch (IOException ex) {
-                throw new MessageReadException("Can't read message.", e);
+                throw new MessageReadException(LogMessages.READ_MESSAGE_EXCEPTION, e);
             }
         }
         return null;
@@ -60,36 +60,27 @@ public class MessageProtocol {
             out.write(MessageProtocol.getBytes(message));
             out.flush();
         } catch (IOException e) {
-            throw new MessageWriteException("Can't write message.", e);
+            throw new MessageWriteException(LogMessages.WRITE_MESSAGE_EXCEPTION, e);
         }
     }
 
     public static byte[] getBytes(Message message) {
-        byte[] bytes = new byte[VERSION_BYTES.length + INTEGER_BYTES * 2 + message.getData().length];
-        int index = 0;
-        for (byte versionByte : VERSION_BYTES) {
-            bytes[index++] = versionByte;
-        }
+        ByteBuffer buffer = ByteBuffer.allocate(VERSION_BYTES.length + INTEGER_BYTES * 2 + message.getData().length);
+        buffer.put(VERSION_BYTES);
+
         int type = message.getType();
         if (!MessageType.getAllTypes().contains(type)) {
-            throw new InvalidMessageTypeException("Wrong message type: " + type + ".");
+            throw new InvalidMessageTypeException(String.format(LogMessages.INVALID_MESSAGE_TYPE_EXCEPTION, type));
         }
-        byte[] messageType = ByteBuffer.allocate(INTEGER_BYTES).putInt(type).array();
-        for (byte typeByte : messageType) {
-            bytes[index++] = typeByte;
-        }
+        buffer.putInt(type);
+
         int length = message.getData().length;
         if (length > MAX_MESSAGE_LENGTH) {
-            throw new InvalidMessageLengthException("Protocol doesn't support this message length: " + length + ". Message length can't be greater than " + MAX_MESSAGE_LENGTH + " bytes length.");
+            throw new InvalidMessageLengthException(String.format(LogMessages.INVALID_MESSAGE_LENGTH_EXCEPTION, length, MAX_MESSAGE_LENGTH));
         }
-        byte[] messageLength = ByteBuffer.allocate(INTEGER_BYTES).putInt(length).array();
-        for (byte lengthByte : messageLength) {
-            bytes[index++] = lengthByte;
-        }
-        byte[] messageData = message.getData();
-        for (byte dataByte : messageData) {
-            bytes[index++] = dataByte;
-        }
-        return bytes;
+        buffer.putInt(length);
+
+        buffer.put(message.getData());
+        return buffer.array();
     }
 }

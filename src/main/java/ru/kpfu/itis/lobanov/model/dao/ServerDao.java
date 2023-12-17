@@ -6,8 +6,10 @@ import java.util.List;
 
 public interface ServerDao extends Dao<ServerModel> {
     ServerModel get(String host, int port);
+
     List<ServerModel> getAllFromServer(String host);
+
     void updateGameStatus(String host, int port, boolean isGameHeld);
-    void updateGameMap(String host, int port, String gameMap);
+
     void remove(String host, int port);
 }

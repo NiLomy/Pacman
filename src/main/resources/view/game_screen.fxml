@@ -8,16 +8,18 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="ru.kpfu.itis.lobanov.controller.GameScreenController"
+            fx:controller="ru.kpfu.itis.lobanov.controller.impl.GameScreenController"
             fx:id="gameScreen">
 
     <Pane fx:id="gameWindow" AnchorPane.topAnchor="20">
 
     </Pane>
 
-    <HBox fx:id="gameInfo" AnchorPane.leftAnchor="5" AnchorPane.rightAnchor="5">
-        <Label fx:id="scoreInfo" prefWidth="130"/>
-        <Label fx:id="timeLabel" prefWidth="150"/>
+    <HBox AnchorPane.leftAnchor="80" AnchorPane.topAnchor="20">
+        <Label fx:id="scoreInfo" style="-fx-font-size: 24"/>
+    </HBox>
+    <HBox AnchorPane.rightAnchor="80" AnchorPane.topAnchor="20">
+        <Label fx:id="timeLabel" style="-fx-font-size: 24"/>
     </HBox>
 
 </AnchorPane>

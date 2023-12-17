@@ -5,14 +5,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
 
-public class Bonus extends LocatableObject {
-    private int score;
+import java.util.Objects;
+
+public class Bonus extends ScoreLocatableObject {
     private Circle view;
 
     public Bonus(double x, double y, int score) {
-        this.x = x;
-        this.y = y;
-        this.score = score;
+        super(x, y, score);
     }
 
     public void show(Rectangle2D coordinates) {
@@ -27,26 +26,18 @@ public class Bonus extends LocatableObject {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         Bonus bonus = (Bonus) o;
 
-        if (x != bonus.getX() || y != bonus.getY()) return false;
-        return score == bonus.score;
+        return Objects.equals(view, bonus.view);
     }
 
     @Override
     public int hashCode() {
-        int result = score;
-        result = 31 * result + view.hashCode();
+        int result = super.hashCode();
+        result = 31 * result + (view != null ? view.hashCode() : 0);
         return result;
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
     }
 
     public Circle getView() {

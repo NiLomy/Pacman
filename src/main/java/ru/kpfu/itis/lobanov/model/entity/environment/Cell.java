@@ -11,9 +11,6 @@ public class Cell implements Serializable {
     private boolean isSideWall;
     private boolean isChecked;
 
-    public Cell() {
-    }
-
     public Cell(int x, int y) {
         this.x = x;
         this.y = y;

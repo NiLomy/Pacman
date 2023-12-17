@@ -1,34 +1,31 @@
 package ru.kpfu.itis.lobanov.server;
 
+import ru.kpfu.itis.lobanov.PacmanApplication;
 import ru.kpfu.itis.lobanov.listener.*;
-import ru.kpfu.itis.lobanov.utils.constants.AppConfig;
-import ru.kpfu.itis.lobanov.utils.ListenersRepository;
+import ru.kpfu.itis.lobanov.utils.repository.ListenersRepository;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ApplicationServer {
     private static final List<PacmanServer> servers = new ArrayList<>();
     public static void main(String[] args) {
 //        System.out.println(InetAddress.getLocalHost().getHostAddress());
-        //TODO make a window before launching server to write host and port
-//        startServer(AppConfig.CURRENT_PORT_1);
-//        startServer(AppConfig.CURRENT_PORT_2);
-        startServer(7899);
+        startServer(createServer(7899, 2));
         System.out.println("EEE");
     }
 
-    public static PacmanServer startServer(int port) {
-        PacmanServer pacmanServer = new PacmanServer(port);
+    public static PacmanServer createServer(int port, int playersCount) {
+        PacmanServer pacmanServer = new PacmanServer(port, playersCount);
         for (EventListener listener : ListenersRepository.getEventListeners()) {
             pacmanServer.registerListener(listener);
         }
         servers.add(pacmanServer);
-        new Thread(pacmanServer).start();
         return pacmanServer;
+    }
+
+    public static void startServer(PacmanServer pacmanServer) {
+        new Thread(pacmanServer).start();
     }
 
     public static void closeServer(int port) {
