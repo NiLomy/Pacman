@@ -5,8 +5,6 @@ import ru.kpfu.itis.lobanov.exceptions.MessageReadException;
 import ru.kpfu.itis.lobanov.exceptions.MessageWriteException;
 import ru.kpfu.itis.lobanov.exceptions.ServerException;
 import ru.kpfu.itis.lobanov.listener.EventListener;
-import ru.kpfu.itis.lobanov.model.dao.ServerDao;
-import ru.kpfu.itis.lobanov.model.dao.impl.ServerDaoImpl;
 import ru.kpfu.itis.lobanov.model.entity.db.ServerModel;
 import ru.kpfu.itis.lobanov.model.entity.environment.Cell;
 import ru.kpfu.itis.lobanov.model.entity.environment.Maze;
@@ -21,18 +19,21 @@ import ru.kpfu.itis.lobanov.utils.constants.AppConfig;
 import ru.kpfu.itis.lobanov.utils.constants.GameResources;
 import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
 import ru.kpfu.itis.lobanov.utils.constants.LogMessages;
+import ru.kpfu.itis.lobanov.utils.db.ServerRepository;
 import ru.kpfu.itis.lobanov.utils.repository.UpdatersRepository;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PacmanServer implements Server {
+public class PacmanServer implements GameServer {
     private final int port;
     private final int playersCount;
     private ServerSocket serverSocket;
@@ -45,7 +46,6 @@ public class PacmanServer implements Server {
     private List<Pellet> pellets;
     private List<Bonus> bonuses;
     private ByteBuffer wallsBuffer;
-    private final ServerDao serverDao;
 
     public PacmanServer(int port, int playersCount) {
         this.port = port;
@@ -54,7 +54,7 @@ public class PacmanServer implements Server {
         this.ghosts = new ArrayList<>();
         this.listeners = new ArrayList<>();
         this.isGameStarted = false;
-        this.serverDao = new ServerDaoImpl();
+
         Runtime.getRuntime().addShutdownHook(new Thread(this::closeServer));
     }
 
@@ -76,12 +76,16 @@ public class PacmanServer implements Server {
 
     @Override
     public void sendBroadCastMessage(Message message) {
-        for (Client c : clients) {
-            try {
-                MessageProtocol.writeMessage(c.getOutput(), message);
-            } catch (MessageWriteException e) {
-                c.stop();
+        try {
+            for (Client c : clients) {
+                try {
+                    MessageProtocol.writeMessage(c.getOutput(), message);
+                } catch (MessageWriteException e) {
+                    c.stop();
+                }
             }
+        } catch (Throwable t) {
+            System.out.println("YAAA2");
         }
     }
 
@@ -95,8 +99,8 @@ public class PacmanServer implements Server {
                 if (cells[i][j].isWall()) {
                     wallsBuffer.putInt(i);
                     wallsBuffer.putInt(j);
-                    sb.append(1);
-                } else sb.append(0);
+                    sb.append(GameSettings.WALL_DECODER_CHAR);
+                } else sb.append(GameSettings.SPACE_DECODER_CHAR);
             }
         }
         return sb.toString();
@@ -109,8 +113,12 @@ public class PacmanServer implements Server {
     public void createGhosts() {
         for (int i = 0; i < clients.size() - 1; i++) {
             Ghost ghost = new Ghost(maze, GameResources.RED_GHOST_PACKAGE);
-            double x = GameSettings.CELL_SIZE + GameSettings.CELL_SIZE * ((GameSettings.MAZE_SIZE - 3) * (i % 2)) + 3;
-            double y = GameSettings.CELL_SIZE + GameSettings.CELL_SIZE * ((GameSettings.MAZE_SIZE - 3) * (i / 2)) + 3;
+            double x = GameSettings.CELL_SIZE
+                    + GameSettings.CELL_SIZE * ((GameSettings.MAZE_SIZE - GameSettings.PLAYER_SET_UP_COORDINATE_BIAS) * (i % 2))
+                    + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS;
+            double y = GameSettings.CELL_SIZE
+                    + GameSettings.CELL_SIZE * ((GameSettings.MAZE_SIZE - GameSettings.PLAYER_SET_UP_COORDINATE_BIAS) * (i / 2))
+                    + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS;
             ghost.setSpawnPoint(x, y);
             ghosts.add(ghost);
         }
@@ -120,12 +128,14 @@ public class PacmanServer implements Server {
         return port;
     }
 
-    public void generateBonuses() {
+    public List<Bonus> generateBonuses() {
         bonuses = maze.generateBonuses(pacman.getX(), pacman.getY());
+        return bonuses;
     }
 
-    public void generatePellets() {
+    public List<Pellet> generatePellets() {
         pellets = maze.generatePellets(pacman.getX(), pacman.getY(), bonuses);
+        return pellets;
     }
 
     public ServerSocket getServerSocket() {
@@ -141,28 +151,37 @@ public class PacmanServer implements Server {
         this.maze = maze;
     }
 
+    @Override
     public ByteBuffer getWallsBuffer() {
         return wallsBuffer;
     }
 
+    @Override
     public Pacman getPacman() {
         return pacman;
     }
 
+    @Override
     public List<Ghost> getGhosts() {
         return ghosts;
     }
 
+    @Override
     public List<Pellet> getPellets() {
         return pellets;
     }
 
     @Override
     public void closeServer() {
-        serverDao.remove(AppConfig.CURRENT_HOST, port);
-        List<ServerModel> servers = serverDao.getAllFromServer(AppConfig.CURRENT_HOST);
-        if (servers.isEmpty()) {
-            System.exit(0);
+        try {
+            String host = InetAddress.getLocalHost().getHostAddress();
+            ServerRepository.remove(host, port);
+            List<ServerModel> servers = ServerRepository.getAllFromServer(host);
+            if (servers.isEmpty()) {
+                System.exit(0);
+            }
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -175,7 +194,8 @@ public class PacmanServer implements Server {
         try {
             String gameMap = generateWalls();
             serverSocket = new ServerSocket(port);
-            serverDao.save(new ServerModel(AppConfig.CURRENT_HOST, port, false, gameMap, playersCount));
+            String host = InetAddress.getLocalHost().getHostAddress();
+            ServerRepository.save(new ServerModel(host, port, false, gameMap, playersCount));
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
@@ -196,6 +216,8 @@ public class PacmanServer implements Server {
                     isGameStarted = true;
                 }
             }
+        } catch (UnknownHostException e) {
+
         } catch (IOException e) {
             throw new ServerException(LogMessages.ESTABLISH_CONNECTION_SERVER_EXCEPTION, e);
         }

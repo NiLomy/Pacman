@@ -35,20 +35,7 @@ public class ServerDaoImpl implements ServerDao {
             PreparedStatement preparedStatement = connection.prepareStatement(GET_SINGLE_BY_ID_QUERY);
             preparedStatement.setInt(1, id);
 
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet != null) {
-                if (resultSet.next()) {
-                    return new ServerModel(
-                            resultSet.getLong(ID_COLUMN),
-                            resultSet.getString(HOST_COLUMN),
-                            resultSet.getInt(PORT_COLUMN),
-                            resultSet.getBoolean(IS_GAME_HELD_COLUMN),
-                            resultSet.getString(GAME_MAP_COLUMN),
-                            resultSet.getInt(PLAYERS_COUNT_COLUMN)
-                    );
-                }
-            }
-            return null;
+            return getServerModelByStatement(preparedStatement);
         } catch (SQLException e) {
             throw new DbException(LogMessages.GET_SINGLE_SERVER_DB_EXCEPTION, e);
         }
@@ -121,20 +108,7 @@ public class ServerDaoImpl implements ServerDao {
             preparedStatement.setString(position++, host);
             preparedStatement.setInt(position++, port);
 
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet != null) {
-                if (resultSet.next()) {
-                    return new ServerModel(
-                            resultSet.getLong(ID_COLUMN),
-                            resultSet.getString(HOST_COLUMN),
-                            resultSet.getInt(PORT_COLUMN),
-                            resultSet.getBoolean(IS_GAME_HELD_COLUMN),
-                            resultSet.getString(GAME_MAP_COLUMN),
-                            resultSet.getInt(PLAYERS_COUNT_COLUMN)
-                    );
-                }
-            }
-            return null;
+            return getServerModelByStatement(preparedStatement);
         } catch (SQLException e) {
             throw new DbException(LogMessages.GET_SINGLE_SERVER_DB_EXCEPTION, e);
         }
@@ -200,5 +174,22 @@ public class ServerDaoImpl implements ServerDao {
         } catch (SQLException e) {
             throw new DbException(LogMessages.REMOVE_DB_EXCEPTION, e);
         }
+    }
+
+    private ServerModel getServerModelByStatement(PreparedStatement preparedStatement) throws SQLException {
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet != null) {
+            if (resultSet.next()) {
+                return new ServerModel(
+                        resultSet.getLong(ID_COLUMN),
+                        resultSet.getString(HOST_COLUMN),
+                        resultSet.getInt(PORT_COLUMN),
+                        resultSet.getBoolean(IS_GAME_HELD_COLUMN),
+                        resultSet.getString(GAME_MAP_COLUMN),
+                        resultSet.getInt(PLAYERS_COUNT_COLUMN)
+                );
+            }
+        }
+        return null;
     }
 }

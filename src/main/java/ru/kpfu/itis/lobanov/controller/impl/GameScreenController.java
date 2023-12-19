@@ -2,7 +2,6 @@ package ru.kpfu.itis.lobanov.controller.impl;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -26,19 +25,18 @@ import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Pellet;
 import ru.kpfu.itis.lobanov.model.entity.net.Message;
 import ru.kpfu.itis.lobanov.model.entity.player.impl.Ghost;
 import ru.kpfu.itis.lobanov.model.entity.player.impl.Pacman;
+import ru.kpfu.itis.lobanov.utils.AppScreenVisualizer;
 import ru.kpfu.itis.lobanov.utils.GameMessageProvider;
-import ru.kpfu.itis.lobanov.utils.constants.Direction;
-import ru.kpfu.itis.lobanov.utils.constants.GameResources;
-import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
-import ru.kpfu.itis.lobanov.utils.constants.MessageType;
+import ru.kpfu.itis.lobanov.utils.constants.*;
 
-import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class GameScreenController implements MessageReceiverController {
+    private static final String PASSED_TIME = "%s:%s:%s";
+    private static final String SPACE_DIVIDER = "%s %s";
     @FXML
     private Pane gameWindow;
     @FXML
@@ -47,7 +45,6 @@ public class GameScreenController implements MessageReceiverController {
     private Label scoreInfo;
     @FXML
     private Label timeLabel;
-    public static final String PASSED_TIME = "%s %s:%s:%s";
     private int scores;
     private Pacman pacman;
     private List<Ghost> ghosts;
@@ -59,10 +56,12 @@ public class GameScreenController implements MessageReceiverController {
     private boolean isRushMode;
     private String passedTime;
     private ResourceBundle resources;
+    private AppScreenVisualizer visualizer;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
+        this.visualizer = new AppScreenVisualizer();
         gameScreen.setMaxWidth((GameSettings.MAZE_SIZE) * GameSettings.CELL_SIZE);
         gameScreen.setMaxHeight((GameSettings.MAZE_SIZE + 1) * GameSettings.CELL_SIZE);
         gameScreen.setPrefWidth((GameSettings.MAZE_SIZE) * GameSettings.CELL_SIZE);
@@ -75,10 +74,10 @@ public class GameScreenController implements MessageReceiverController {
         client.setController(this);
         client.sendMessage(GameMessageProvider.createMessage(MessageType.USER_ID_REQUEST, new byte[0]));
         client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_WALLS_REQUEST, new byte[0]));
-        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_PELLETS_REQUEST, new byte[0]));
-        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_BONUSES_REQUEST, new byte[0]));
-        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_GHOST_REQUEST, new byte[0]));
         client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_PACMAN_REQUEST, new byte[0]));
+        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_BONUSES_REQUEST, new byte[0]));
+        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_PELLETS_REQUEST, new byte[0]));
+        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_GHOST_REQUEST, new byte[0]));
 
         setUpGameInfo();
 
@@ -130,6 +129,9 @@ public class GameScreenController implements MessageReceiverController {
     public void receiveMessage(Message message) {
         if (message != null) {
             ByteBuffer buffer;
+            double offsetX = Screen.getPrimary().getVisualBounds().getWidth() / GameSettings.SCREEN_WIDTH_DIVIDER;
+            double offsetY = Screen.getPrimary().getVisualBounds().getHeight() / GameSettings.SCREEN_HEIGHT_DIVIDER;
+
             switch (message.getType()) {
                 case MessageType.MOVEMENT_RESPONSE:
                     buffer = ByteBuffer.wrap(message.getData());
@@ -184,13 +186,14 @@ public class GameScreenController implements MessageReceiverController {
                     double x = buffer.getDouble();
                     double y = buffer.getDouble();
                     Maze m = (Maze) SerializationUtils.deserialize(Arrays.copyOfRange(buffer.array(), GameSettings.DOUBLE_BYTES * 2, buffer.array().length));
+
                     pacman = new Pacman(m);
-                    pacman.setOffsetX(Screen.getPrimary().getVisualBounds().getWidth() / 3);
-                    pacman.setOffsetY(Screen.getPrimary().getVisualBounds().getHeight() / 6);
-                    pacman.setX(x + Screen.getPrimary().getVisualBounds().getWidth() / 3);
-                    pacman.setSpawnX(x + Screen.getPrimary().getVisualBounds().getWidth() / 3);
-                    pacman.setY(y + Screen.getPrimary().getVisualBounds().getHeight() / 6);
-                    pacman.setSpawnY(y + Screen.getPrimary().getVisualBounds().getHeight() / 6);
+                    pacman.setOffsetX(offsetX);
+                    pacman.setOffsetY(offsetY);
+                    pacman.setX(x + offsetX);
+                    pacman.setSpawnX(x + offsetX);
+                    pacman.setY(y + offsetY);
+                    pacman.setSpawnY(y + offsetY);
                     pacman.show();
                     Platform.runLater(() -> gameWindow.getChildren().addAll(pacman.getView()));
                     break;
@@ -205,23 +208,20 @@ public class GameScreenController implements MessageReceiverController {
                     switch (id) {
                         case 0:
                             g = new Ghost(m2, GameResources.RED_GHOST_PACKAGE);
-//                            g.setGhostPackageSprite(GameResources.RED_GHOST_PACKAGE);
                             break;
                         case 1:
                             g = new Ghost(m2, GameResources.BLUE_GHOST_PACKAGE);
-//                            g.setGhostPackageSprite(GameResources.BLUE_GHOST_PACKAGE);
                             break;
                         default:
                             g = new Ghost(m2, GameResources.GREEN_GHOST_PACKAGE);
-//                            g.setGhostPackageSprite(GameResources.GREEN_GHOST_PACKAGE);
                             break;
                     }
-                    g.setOffsetX(Screen.getPrimary().getVisualBounds().getWidth() / 3);
-                    g.setOffsetY(Screen.getPrimary().getVisualBounds().getHeight() / 6);
-                    g.setX(x2 + Screen.getPrimary().getVisualBounds().getWidth() / 3);
-                    g.setSpawnX(x2 + Screen.getPrimary().getVisualBounds().getWidth() / 3);
-                    g.setY(y2 + Screen.getPrimary().getVisualBounds().getHeight() / 6);
-                    g.setSpawnY(y2 + Screen.getPrimary().getVisualBounds().getHeight() / 6);
+                    g.setOffsetX(offsetX);
+                    g.setX(x2 + offsetX);
+                    g.setSpawnX(x2 +offsetX);
+                    g.setOffsetY(offsetY);
+                    g.setY(y2 + offsetY);
+                    g.setSpawnY(y2 + offsetY);
                     g.show();
                     ghosts.add(g);
                     Platform.runLater(() -> gameWindow.getChildren().addAll(g.getView()));
@@ -267,7 +267,7 @@ public class GameScreenController implements MessageReceiverController {
                             }
                         };
                         Timer timer = new Timer();
-                        timer.schedule(task, 3 * 1_000);
+                        timer.schedule(task, GameSettings.GHOST_RESPAWN_DELAY);
                         if (userId == 0) scores += GameSettings.PACMAN_EAT_GHOST_BONUS;
                     } else {
                         Platform.runLater(() -> {
@@ -373,71 +373,34 @@ public class GameScreenController implements MessageReceiverController {
                     int time = buffer.getInt();
                     Platform.runLater(() -> {
                         String seconds = String.valueOf(time % GameSettings.SECONDS_IN_MINUTE);
+
                         if (seconds.length() == 1) seconds = '0' + seconds;
                         String minutes = String.valueOf((time / GameSettings.SECONDS_IN_MINUTE) % GameSettings.MINUTES_IN_HOUR);
                         if (minutes.length() == 1) minutes = '0' + minutes;
                         String hours = String.valueOf((time / GameSettings.SECONDS_IN_MINUTE) / GameSettings.MINUTES_IN_HOUR);
                         if (hours.length() == 1) hours = '0' + hours;
-                        passedTime = String.format(PASSED_TIME, resources.getString(GameResources.TIME_PASSED), hours, minutes, seconds);
-                        timeLabel.setText(passedTime);
+
+                        passedTime = String.format(PASSED_TIME, hours, minutes, seconds);
+                        timeLabel.setText(String.format(SPACE_DIVIDER, resources.getString(GameResources.TIME_PASSED), passedTime));
                     });
                     break;
             }
         }
     }
 
-    // rework for current version
     private void gameOver(String message) {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
                 Platform.runLater(() -> {
-                    Stage stage = PacmanApplication.getStage();
-                    AnchorPane pane = new AnchorPane();
-                    pane.setPrefWidth(600);
-                    pane.setMaxHeight(400);
-                    Label gameResultInfo = new Label(message);
-                    gameResultInfo.setStyle("-fx-font-family: sans-serif; -fx-font-weight: bold; -fx-font-size: 26px");
-                    Label stats = new Label(resources.getString(GameResources.GAME_STATS));
-                    stats.setStyle("-fx-font-size: 20 px");
-                    Label playerScores = new Label(resources.getString(GameResources.GAME_SCORES) + " " + scores);
-                    playerScores.setStyle("-fx-font-family: sans-serif");
-                    Label playerTime = new Label(resources.getString(GameResources.GAME_PLAYED_TIME) + " " + passedTime);
-                    playerTime.setStyle("-fx-font-family: sans-serif");
-                    HBox hBox = new HBox();
-                    hBox.setAlignment(Pos.CENTER);
-                    hBox.setSpacing(40);
-                    hBox.getChildren().addAll(playerScores, playerTime);
-                    Button button = new Button(resources.getString(GameResources.GO_BACK));
-                    button.setOnAction(event -> goToHomePage());
-                    button.setStyle("-fx-border-radius: 5px; -fx-padding: 8px 16px; -fx-cursor: pointer; -fx-font-family: sans-serif");
-                    VBox vBox = new VBox();
-                    vBox.setPrefSize(600, 400);
-                    vBox.setAlignment(Pos.CENTER);
-                    vBox.setSpacing(20);
-                    vBox.getChildren().addAll(gameResultInfo, stats, hBox, button);
-                    pane.getChildren().addAll(vBox);
-                    Scene scene = new Scene(pane);
-                    stage.setScene(scene);
-                    stage.show();
+                    AppConfig.gameOverMessage = message;
+                    AppConfig.playerScores = scores;
+                    AppConfig.timePassed = passedTime;
+                    visualizer.show(GameResources.GAME_OVER_SCREEN);
                 });
             }
         };
         Timer timer = new Timer();
         timer.schedule(task, 400);
-    }
-
-    private void goToHomePage() {
-        Stage stage = PacmanApplication.getStage();
-        FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource(GameResources.START_SCREEN));
-        loader.setResources(ResourceBundle.getBundle(GameResources.LOCALIZED_TEXTS_RESOURCE_BUNDLE, GameSettings.LOCALE));
-        try {
-            AnchorPane pane = loader.load();
-            Scene scene = new Scene(pane, Screen.getPrimary().getVisualBounds().getWidth(), Screen.getPrimary().getVisualBounds().getHeight());
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

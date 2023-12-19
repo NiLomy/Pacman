@@ -18,10 +18,12 @@ public class CreatePacmanEventListener extends AbstractEventListener {
             throw new EventListenerException(String.format(LogMessages.INITIALIZE_LISTENER_EXCEPTION, CreatePacmanEventListener.class.getSimpleName()));
 
         byte[] maze = SerializationUtils.serialize(server.getMaze());
+
         ByteBuffer buffer = ByteBuffer.allocate(maze.length + GameSettings.DOUBLE_BYTES * 2);
         buffer.putDouble(server.getPacman().getSpawnX());
         buffer.putDouble(server.getPacman().getSpawnY());
         buffer.put(maze);
+
         Message response = GameMessageProvider.createMessage(MessageType.CREATE_PACMAN_RESPONSE, buffer.array());
         server.sendMessage(connectionId, response);
     }

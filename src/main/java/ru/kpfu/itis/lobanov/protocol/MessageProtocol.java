@@ -3,6 +3,7 @@ package ru.kpfu.itis.lobanov.protocol;
 import ru.kpfu.itis.lobanov.exceptions.*;
 import ru.kpfu.itis.lobanov.model.entity.net.Message;
 import ru.kpfu.itis.lobanov.utils.GameMessageProvider;
+import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
 import ru.kpfu.itis.lobanov.utils.constants.LogMessages;
 import ru.kpfu.itis.lobanov.utils.constants.MessageType;
 
@@ -15,10 +16,9 @@ import java.util.Arrays;
 public class MessageProtocol {
     public static final byte[] VERSION_BYTES = {0x0, 0x1};
     public static final int MAX_MESSAGE_LENGTH = 100 * 1024;
-    private static final int INTEGER_BYTES = 4;
 
     public static Message readMessage(InputStream in) throws MessageReadException {
-        byte[] buffer = new byte[VERSION_BYTES.length + INTEGER_BYTES * 2];
+        byte[] buffer = new byte[VERSION_BYTES.length + GameSettings.INTEGER_BYTES * 2];
         try {
             in.read(buffer, 0, VERSION_BYTES.length);
             int counter = 0;
@@ -30,14 +30,14 @@ public class MessageProtocol {
                 throw new InvalidProtocolVersionException(LogMessages.INVALID_PROTOCOL_VERSION_EXCEPTION + Arrays.toString(VERSION_BYTES));
             }
 
-            in.read(buffer, 0, INTEGER_BYTES);
-            int messageType = ByteBuffer.wrap(buffer, 0, INTEGER_BYTES).getInt();
+            in.read(buffer, 0, GameSettings.INTEGER_BYTES);
+            int messageType = ByteBuffer.wrap(buffer, 0, GameSettings.INTEGER_BYTES).getInt();
             if (!MessageType.getAllTypes().contains(messageType)) {
                 throw new InvalidMessageTypeException(String.format(LogMessages.INVALID_MESSAGE_TYPE_EXCEPTION, messageType));
             }
 
-            in.read(buffer, 0, INTEGER_BYTES);
-            int messageLength = ByteBuffer.wrap(buffer, 0, INTEGER_BYTES).getInt();
+            in.read(buffer, 0, GameSettings.INTEGER_BYTES);
+            int messageLength = ByteBuffer.wrap(buffer, 0, GameSettings.INTEGER_BYTES).getInt();
             if (messageLength > MAX_MESSAGE_LENGTH) {
                 throw new InvalidMessageLengthException(String.format(LogMessages.INVALID_MESSAGE_LENGTH_EXCEPTION, messageLength, MAX_MESSAGE_LENGTH));
             }
@@ -65,7 +65,7 @@ public class MessageProtocol {
     }
 
     public static byte[] getBytes(Message message) {
-        ByteBuffer buffer = ByteBuffer.allocate(VERSION_BYTES.length + INTEGER_BYTES * 2 + message.getData().length);
+        ByteBuffer buffer = ByteBuffer.allocate(VERSION_BYTES.length + GameSettings.INTEGER_BYTES * 2 + message.getData().length);
         buffer.put(VERSION_BYTES);
 
         int type = message.getType();

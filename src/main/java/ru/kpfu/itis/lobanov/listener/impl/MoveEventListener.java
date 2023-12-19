@@ -17,9 +17,11 @@ public class MoveEventListener extends AbstractEventListener {
             throw new EventListenerException(String.format(LogMessages.INITIALIZE_LISTENER_EXCEPTION, MoveEventListener.class.getSimpleName()));
 
         byte[] currentData = message.getData();
+
         ByteBuffer buffer = ByteBuffer.allocate(currentData.length + GameSettings.INTEGER_BYTES);
         buffer.putInt(connectionId);
         buffer.put(currentData);
+
         server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.MOVEMENT_RESPONSE, buffer.array()));
     }
 

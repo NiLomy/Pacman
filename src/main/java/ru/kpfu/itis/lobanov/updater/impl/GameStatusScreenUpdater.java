@@ -7,6 +7,8 @@ import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
 import ru.kpfu.itis.lobanov.utils.constants.LogMessages;
 import ru.kpfu.itis.lobanov.utils.constants.MessageType;
 
+import java.util.ConcurrentModificationException;
+
 public class GameStatusScreenUpdater extends AbstractScreenUpdater {
 
     @Override
@@ -19,11 +21,15 @@ public class GameStatusScreenUpdater extends AbstractScreenUpdater {
             throw new RuntimeException(e);
         }
         while (isGameAlive) {
-            server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.PLAYERS_MOVE_RESPONSE, new byte[0]));
-            server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.PACMAN_EAT_PELLET_RESPONSE, new byte[0]));
-            server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.PACMAN_EAT_BONUS_RESPONSE, new byte[0]));
-            server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.CHANGE_SCORES_RESPONSE, new byte[0]));
-            server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.GAME_WIN_RESPONSE, new byte[0]));
+            try {
+                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.PLAYERS_MOVE_RESPONSE, new byte[0]));
+                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.PACMAN_EAT_PELLET_RESPONSE, new byte[0]));
+                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.PACMAN_EAT_BONUS_RESPONSE, new byte[0]));
+                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.CHANGE_SCORES_RESPONSE, new byte[0]));
+                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.GAME_WIN_RESPONSE, new byte[0]));
+            } catch (ConcurrentModificationException e) {
+                System.out.println("YAAAA");
+            }
             try {
                 Thread.sleep(GameSettings.GAME_STATUS_UPDATE_FREQUENCY);
             } catch (InterruptedException e) {

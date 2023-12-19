@@ -10,6 +10,7 @@ import ru.kpfu.itis.lobanov.utils.constants.LogMessages;
 import ru.kpfu.itis.lobanov.utils.constants.MessageType;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class CreateBonusesEventListener extends AbstractEventListener {
     @Override

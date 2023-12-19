@@ -8,6 +8,7 @@ import ru.kpfu.itis.lobanov.utils.constants.LogMessages;
 import ru.kpfu.itis.lobanov.utils.constants.MessageType;
 
 import java.nio.ByteBuffer;
+import java.util.ConcurrentModificationException;
 
 public class TimeScreenUpdater extends AbstractScreenUpdater {
     @Override
@@ -21,8 +22,12 @@ public class TimeScreenUpdater extends AbstractScreenUpdater {
         }
         int time = 0;
         while (isGameAlive) {
-            time++;
-            server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.TIME_RESPONSE, ByteBuffer.allocate(4).putInt(time).array()));
+            try {
+                time++;
+                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.TIME_RESPONSE, ByteBuffer.allocate(4).putInt(time).array()));
+            } catch (ConcurrentModificationException e) {
+                System.out.println("YAAAA");
+            }
             try {
                 Thread.sleep(GameSettings.TIME_UPDATE_FREQUENCY);
             } catch (InterruptedException e) {

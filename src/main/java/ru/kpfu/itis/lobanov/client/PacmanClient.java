@@ -64,12 +64,13 @@ public class PacmanClient implements Client {
         private final InputStream in;
         private final OutputStream out;
         private final PacmanClient pacmanClient;
-        private boolean alive = true;
+        private boolean alive;
 
         public ClientThread(InputStream in, OutputStream out, PacmanClient pacmanClient) {
             this.in = in;
             this.out = out;
             this.pacmanClient = pacmanClient;
+            this.alive = true;
         }
 
         @Override
@@ -92,6 +93,8 @@ public class PacmanClient implements Client {
         public OutputStream getOut() {
             return out;
         }
+
+        
 
         public void stop() {
             try {

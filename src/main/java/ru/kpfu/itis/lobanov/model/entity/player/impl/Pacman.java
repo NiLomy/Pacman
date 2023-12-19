@@ -17,31 +17,23 @@ import java.util.Random;
 import static ru.kpfu.itis.lobanov.utils.WallDetector.checkForWall;
 
 public class Pacman extends AbstractPlayer {
+    private int moveCount;
     private int stayCount;
     private Direction lastDirection;
-    private int moveCount;
-    private final Image calmPacmanImage;
-    private final Image upOpenPacmanImage;
-    private final Image downOpenPacmanImage;
-    private final Image leftOpenPacmanImage;
-    private final Image rightOpenPacmanImage;
-    private final Image upWideOpenPacmanImage;
-    private final Image downWideOpenPacmanImage;
-    private final Image leftWideOpenPacmanImage;
-    private final Image rightWideOpenPacmanImage;
+    private Image calmPacmanImage;
+    private Image upOpenPacmanImage;
+    private Image downOpenPacmanImage;
+    private Image leftOpenPacmanImage;
+    private Image rightOpenPacmanImage;
+    private Image upWideOpenPacmanImage;
+    private Image downWideOpenPacmanImage;
+    private Image leftWideOpenPacmanImage;
+    private Image rightWideOpenPacmanImage;
 
     public Pacman(Maze maze) {
         super(maze);
         this.stayCount = 0;
-        this.calmPacmanImage = new Image(GameResources.PACMAN_CALM_IMAGE);
-        this.upOpenPacmanImage = new Image(GameResources.UP_OPEN_PACMAN_IMAGE);
-        this.downOpenPacmanImage = new Image(GameResources.DOWN_OPEN_PACMAN_IMAGE);
-        this.leftOpenPacmanImage = new Image(GameResources.LEFT_OPEN_PACMAN_IMAGE);
-        this.rightOpenPacmanImage = new Image(GameResources.RIGHT_OPEN_PACMAN_IMAGE);
-        this.upWideOpenPacmanImage = new Image(GameResources.UP_WIDE_OPEN_PACMAN_IMAGE);
-        this.downWideOpenPacmanImage = new Image(GameResources.DOWN_WIDE_OPEN_PACMAN_IMAGE);
-        this.leftWideOpenPacmanImage = new Image(GameResources.LEFT_WIDE_OPEN_PACMAN_IMAGE);
-        this.rightWideOpenPacmanImage = new Image(GameResources.RIGHT_WIDE_OPEN_PACMAN_IMAGE);
+
         setSpawnPoint();
         setHp(GameSettings.PACMAN_HP);
     }
@@ -54,8 +46,8 @@ public class Pacman extends AbstractPlayer {
             int index = random.nextInt(cellsForPlacement.length);
             Cell cell = cellsForPlacement[index];
             if (!cell.isWall()) {
-                x = spawnX = cell.getX() * GameSettings.CELL_SIZE + 3;
-                y = spawnY = cell.getY() * GameSettings.CELL_SIZE + 3;
+                x = spawnX = cell.getX() * GameSettings.CELL_SIZE + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS;
+                y = spawnY = cell.getY() * GameSettings.CELL_SIZE + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS;
                 break;
             }
         }
@@ -107,9 +99,9 @@ public class Pacman extends AbstractPlayer {
                     if (!checkForWall(movingDirection, walls, view, offsetX, offsetY)) {
                         setY(y - GameSettings.PACMAN_SPEED);
                     }
-                    if (y + GameSettings.CELL_SIZE / 2 <= offsetY + 3 * 2) {
-                        setY(maze.getLowerExit().getY() * GameSettings.CELL_SIZE + offsetY + 3);
-                        setX(maze.getLowerExit().getX() * GameSettings.CELL_SIZE + offsetX + 3);
+                    if (y + GameSettings.CELL_SIZE / 2 <= offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS * 2) {
+                        setY(maze.getLowerExit().getY() * GameSettings.CELL_SIZE + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                        setX(maze.getLowerExit().getX() * GameSettings.CELL_SIZE + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
                     }
                     if (stayCount == 0) {
                         if (lastDirection == Direction.UP) {
@@ -132,9 +124,9 @@ public class Pacman extends AbstractPlayer {
                     if (!checkForWall(movingDirection, walls, view, offsetX, offsetY)) {
                         setY(y + GameSettings.PACMAN_SPEED);
                     }
-                    if (y >= maze.labyrinthLength() * GameSettings.CELL_SIZE + offsetY - GameSettings.CELL_SIZE / 2 - 3) {
-                        setY(GameSettings.CELL_SIZE / 2 + offsetY + 3);
-                        setX(maze.getUpperExit().getX() * GameSettings.CELL_SIZE + offsetX + 3);
+                    if (y >= maze.labyrinthLength() * GameSettings.CELL_SIZE + offsetY - GameSettings.CELL_SIZE / 2 - GameSettings.PLAYER_SET_UP_COORDINATE_BIAS) {
+                        setY(GameSettings.CELL_SIZE / 2 + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                        setX(maze.getUpperExit().getX() * GameSettings.CELL_SIZE + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
                     }
                     if (stayCount == 0) {
                         if (lastDirection == Direction.DOWN) {
@@ -157,9 +149,9 @@ public class Pacman extends AbstractPlayer {
                     if (!checkForWall(movingDirection, walls, view, offsetX, offsetY)) {
                         setX(x - GameSettings.PACMAN_SPEED);
                     }
-                    if (x + GameSettings.CELL_SIZE / 2 <= offsetX + 3 * 2) {
-                        setX(maze.getRightExit().getX() * GameSettings.CELL_SIZE + offsetX + 3);
-                        setY(maze.getRightExit().getY() * GameSettings.CELL_SIZE + offsetY + 3);
+                    if (x + GameSettings.CELL_SIZE / 2 <= offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS * 2) {
+                        setX(maze.getRightExit().getX() * GameSettings.CELL_SIZE + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                        setY(maze.getRightExit().getY() * GameSettings.CELL_SIZE + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
                     }
                     if (stayCount == 0) {
                         if (lastDirection == Direction.LEFT) {
@@ -182,9 +174,9 @@ public class Pacman extends AbstractPlayer {
                     if (!checkForWall(movingDirection, walls, view, offsetX, offsetY)) {
                         setX(x + GameSettings.PACMAN_SPEED);
                     }
-                    if (x >= maze.labyrinthLength() * GameSettings.CELL_SIZE + offsetX - GameSettings.CELL_SIZE / 2 - 3) {
-                        setX(GameSettings.CELL_SIZE / 2 + offsetX + 3);
-                        setY(maze.getLeftExit().getY() * GameSettings.CELL_SIZE + offsetY + 3);
+                    if (x >= maze.labyrinthLength() * GameSettings.CELL_SIZE + offsetX - GameSettings.CELL_SIZE / 2 - GameSettings.PLAYER_SET_UP_COORDINATE_BIAS) {
+                        setX(GameSettings.CELL_SIZE / 2 + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                        setY(maze.getLeftExit().getY() * GameSettings.CELL_SIZE + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
                     }
                     if (stayCount == 0) {
                         if (lastDirection == Direction.RIGHT) {
@@ -209,9 +201,19 @@ public class Pacman extends AbstractPlayer {
     }
 
     public void show() {
+        this.calmPacmanImage = new Image(GameResources.PACMAN_CALM_IMAGE);
+        this.upOpenPacmanImage = new Image(GameResources.UP_OPEN_PACMAN_IMAGE);
+        this.downOpenPacmanImage = new Image(GameResources.DOWN_OPEN_PACMAN_IMAGE);
+        this.leftOpenPacmanImage = new Image(GameResources.LEFT_OPEN_PACMAN_IMAGE);
+        this.rightOpenPacmanImage = new Image(GameResources.RIGHT_OPEN_PACMAN_IMAGE);
+        this.upWideOpenPacmanImage = new Image(GameResources.UP_WIDE_OPEN_PACMAN_IMAGE);
+        this.downWideOpenPacmanImage = new Image(GameResources.DOWN_WIDE_OPEN_PACMAN_IMAGE);
+        this.leftWideOpenPacmanImage = new Image(GameResources.LEFT_WIDE_OPEN_PACMAN_IMAGE);
+        this.rightWideOpenPacmanImage = new Image(GameResources.RIGHT_WIDE_OPEN_PACMAN_IMAGE);
+
         view.setImage(calmPacmanImage);
-        view.setFitWidth(GameSettings.CELL_SIZE - 4);
-        view.setFitHeight(GameSettings.CELL_SIZE - 4);
+        view.setFitWidth(GameSettings.CELL_SIZE - GameSettings.PLAYER_SET_UP_VIEW_SIZE_BIAS);
+        view.setFitHeight(GameSettings.CELL_SIZE - GameSettings.PLAYER_SET_UP_VIEW_SIZE_BIAS);
         view.setX(spawnX);
         view.setY(spawnY);
     }
@@ -230,6 +232,7 @@ public class Pacman extends AbstractPlayer {
     public Bonus eatBonus(List<Bonus> bonuses) {
         for (int i = 0; i < bonuses.size(); i++) {
             Bonus bonus = bonuses.get(i);
+
             if (view.getBoundsInParent().intersects(bonus.getView().getBoundsInParent())) {
                 return bonuses.remove(i);
             }

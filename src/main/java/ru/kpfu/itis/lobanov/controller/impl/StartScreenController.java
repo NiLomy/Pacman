@@ -1,21 +1,15 @@
 package ru.kpfu.itis.lobanov.controller.impl;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
-import ru.kpfu.itis.lobanov.PacmanApplication;
 import ru.kpfu.itis.lobanov.controller.Controller;
+import ru.kpfu.itis.lobanov.utils.AppScreenVisualizer;
 import ru.kpfu.itis.lobanov.utils.animation.GifAnimator;
 import ru.kpfu.itis.lobanov.utils.animation.ImageAnimator;
 import ru.kpfu.itis.lobanov.utils.constants.GameResources;
 import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -30,33 +24,16 @@ public class StartScreenController implements Controller {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        ImageAnimator animator = new GifAnimator(Objects.requireNonNull(getClass().getResource(GameResources.PACMAN_GIF)).toExternalForm(), 4000);
-        animator.setCycleCount(-1);
-        animator.play();
-        animator.getView().setFitWidth(550);
-        animator.getView().setFitHeight(300);
-        imageBox.getChildren().addAll(animator.getView());
-        startPlay.setOnAction(event -> {
-            showScreen(GameResources.ROOMS_SCREEN);
-        });
-        settings.setOnAction(event -> {
-            showScreen(GameResources.SETTINGS_SCREEN);
-        });
-    }
+        AppScreenVisualizer visualizer = new AppScreenVisualizer();
 
-    private void showScreen(String fxmlName) {
-        Stage stage = PacmanApplication.getStage();
-        FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource(fxmlName));
-        loader.setResources(ResourceBundle.getBundle(GameResources.LOCALIZED_TEXTS_RESOURCE_BUNDLE, GameSettings.LOCALE));
-        try {
-            AnchorPane pane = loader.load();
-            Scene scene = new Scene(pane, Screen.getPrimary().getVisualBounds().getWidth(), Screen.getPrimary().getVisualBounds().getHeight());
-            stage.setScene(scene);
-            stage.setMaximized(true);
-            stage.show();
-            stage.setMaximized(true);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        ImageAnimator animator = new GifAnimator(Objects.requireNonNull(getClass().getResource(GameResources.PACMAN_GIF)).toExternalForm(), GameSettings.PACMAN_GIF_DURATION_MILLIS);
+        animator.getView().setFitWidth(GameSettings.PACMAN_GIF_WIDTH);
+        animator.getView().setFitHeight(GameSettings.PACMAN_GIF_HEIGHT);
+        animator.setCycleCount(GameSettings.PACMAN_GIF_CYCLE_TIME_INDEFINITE);
+        animator.play();
+        imageBox.getChildren().addAll(animator.getView());
+
+        startPlay.setOnAction(event -> visualizer.show(GameResources.ROOMS_SCREEN));
+        settings.setOnAction(event -> visualizer.show(GameResources.SETTINGS_SCREEN));
     }
 }

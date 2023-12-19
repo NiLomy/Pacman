@@ -17,6 +17,7 @@ public class SendIdEventListener extends AbstractEventListener {
             throw new EventListenerException(String.format(LogMessages.INITIALIZE_LISTENER_EXCEPTION, SendIdEventListener.class.getSimpleName()));
 
         ByteBuffer buffer = ByteBuffer.allocate(GameSettings.INTEGER_BYTES).putInt(connectionId);
+
         Message response = GameMessageProvider.createMessage(MessageType.USER_ID_RESPONSE, buffer.array());
         server.sendMessage(connectionId, response);
     }

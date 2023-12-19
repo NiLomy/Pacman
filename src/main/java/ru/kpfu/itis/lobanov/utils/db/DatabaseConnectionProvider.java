@@ -11,7 +11,6 @@ import java.sql.SQLException;
 
 public class DatabaseConnectionProvider {
     public static final String DRIVER = "org.postgresql.Driver";
-
     private static Connection connection;
 
     public static Connection getConnection() throws DbException {

@@ -10,9 +10,7 @@ import java.util.List;
 public class ApplicationServer {
     private static final List<PacmanServer> servers = new ArrayList<>();
     public static void main(String[] args) {
-//        System.out.println(InetAddress.getLocalHost().getHostAddress());
         startServer(createServer(7899, 2));
-        System.out.println("EEE");
     }
 
     public static PacmanServer createServer(int port, int playersCount) {

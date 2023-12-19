@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
-<?import javafx.geometry.Insets?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="ru.kpfu.itis.lobanov.controller.impl.CreateRoomScreenController"
@@ -14,26 +10,30 @@
 
     <children>
         <VBox AnchorPane.topAnchor="32.0" AnchorPane.leftAnchor="20">
-            <Button fx:id="backBtn" text="%go_back" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'"/>
+            <Button fx:id="backBtn" text="%go_back_rooms" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'"/>
         </VBox>
         <VBox alignment="CENTER" spacing="20" AnchorPane.topAnchor="88" AnchorPane.rightAnchor="10"
               AnchorPane.leftAnchor="10">
             <HBox spacing="100" alignment="CENTER">
                 <VBox spacing="20" alignment="CENTER">
-                    <Label text="%input.port" styleClass="label-small" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'"/>
-                    <TextField fx:id="setPort" maxWidth="112" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'; -fx-text-alignment: center; -fx-alignment: center"/>
-                    <Label fx:id="emptyPort" visible="false" textFill="red" text="%input.port.empty" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'; -fx-text-alignment: center; -fx-alignment: center"/>
-                    <Label text="%input.players_count" styleClass="label-small" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'">
+                    <Label text="%input.port" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'"/>
+                    <TextField fx:id="setPort" maxWidth="112"
+                               style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'; -fx-text-alignment: center; -fx-alignment: center"/>
+                    <Label fx:id="emptyPort" visible="false" textFill="red" text="%input.port.empty"
+                           style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'; -fx-text-alignment: center; -fx-alignment: center"/>
+                    <Label text="%input.players_count" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'">
                         <VBox.margin>
                             <Insets>
                                 <top>40</top>
                             </Insets>
                         </VBox.margin>
                     </Label>
-                    <Slider fx:id="setPlayerCount" value="2" showTickLabels="true" min="2" max="4" maxWidth="140" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'; -fx-text-alignment: center; -fx-alignment: center"/>
+                    <Slider fx:id="setPlayerCount" value="2" showTickLabels="true" min="2" max="4" maxWidth="140"
+                            style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'; -fx-text-alignment: center; -fx-alignment: center"/>
                 </VBox>
                 <VBox fx:id="panel" spacing="20" alignment="CENTER">
-                    <Button fx:id="changeBtn" text="%map.change" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'">
+                    <Button fx:id="changeBtn" text="%map.change"
+                            style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'">
                         <VBox.margin>
                             <Insets>
                                 <top>20</top>

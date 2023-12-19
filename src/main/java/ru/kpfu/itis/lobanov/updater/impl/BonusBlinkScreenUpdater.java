@@ -7,6 +7,8 @@ import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
 import ru.kpfu.itis.lobanov.utils.constants.LogMessages;
 import ru.kpfu.itis.lobanov.utils.constants.MessageType;
 
+import java.util.ConcurrentModificationException;
+
 public class BonusBlinkScreenUpdater extends AbstractScreenUpdater {
 
     @Override
@@ -19,7 +21,11 @@ public class BonusBlinkScreenUpdater extends AbstractScreenUpdater {
             throw new RuntimeException(e);
         }
         while (isGameAlive) {
-            server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.BLINK_BONUSES_RESPONSE, new byte[0]));
+            try {
+                server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.BLINK_BONUSES_RESPONSE, new byte[0]));
+            } catch (ConcurrentModificationException e) {
+                System.out.println("YAAAA");
+            }
             try {
                 Thread.sleep(GameSettings.BONUS_BLINK_UPDATE_FREQUENCY);
             } catch (InterruptedException e) {

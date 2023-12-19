@@ -3,6 +3,7 @@ package ru.kpfu.itis.lobanov.listener.impl;
 import org.apache.commons.lang.SerializationUtils;
 import ru.kpfu.itis.lobanov.exceptions.EventListenerException;
 import ru.kpfu.itis.lobanov.listener.AbstractEventListener;
+import ru.kpfu.itis.lobanov.model.entity.environment.Maze;
 import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Pellet;
 import ru.kpfu.itis.lobanov.model.entity.net.Message;
 import ru.kpfu.itis.lobanov.utils.GameMessageProvider;
@@ -18,7 +19,6 @@ public class CreatePelletsEventListener extends AbstractEventListener {
         if (!isInit)
             throw new EventListenerException(String.format(LogMessages.INITIALIZE_LISTENER_EXCEPTION, CreatePelletsEventListener.class.getSimpleName()));
 
-        List<Pellet> d = server.getPellets();
         Message response = GameMessageProvider.createMessage(MessageType.CREATE_PELLETS_RESPONSE, SerializationUtils.serialize((ArrayList<Pellet>) server.getPellets()));
         server.sendMessage(connectionId, response);
     }

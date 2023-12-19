@@ -17,6 +17,7 @@ public class SendClientsCountEventListener extends AbstractEventListener {
             throw new EventListenerException(String.format(LogMessages.INITIALIZE_LISTENER_EXCEPTION, SendClientsCountEventListener.class.getSimpleName()));
 
         ByteBuffer buffer = ByteBuffer.allocate(GameSettings.INTEGER_BYTES).putInt(clientsCount);
+
         Message response = GameMessageProvider.createMessage(MessageType.USER_COUNT_INFO_RESPONSE, buffer.array());
         server.sendBroadCastMessage(response);
     }
