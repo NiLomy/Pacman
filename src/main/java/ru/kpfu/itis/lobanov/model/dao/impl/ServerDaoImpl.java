@@ -25,7 +25,6 @@ public class ServerDaoImpl implements ServerDao {
     public static final String INSERT_QUERY = "insert into servers (host, port, is_game_held, game_map, players_count) values (?, ?, ?, ?, ?);";
     public static final String UPDATE_QUERY = "update servers set host=?, port=?, is_game_held=?, game_map=?, players_count=? where id=?;";
     public static final String UPDATE_IS_GAME_HELD_QUERY = "update servers set is_game_held=? where host=? AND port=?;";
-    ;
     public static final String DELETE_BY_ID_QUERY = "delete from servers where id=?;";
     public static final String DELETE_BY_HOST_AND_PORT_QUERY = "delete from servers where host=? and port=?;";
 

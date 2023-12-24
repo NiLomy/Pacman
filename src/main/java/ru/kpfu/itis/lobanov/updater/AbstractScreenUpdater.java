@@ -13,9 +13,4 @@ public abstract class AbstractScreenUpdater implements ScreenUpdater {
         this.isGameAlive = true;
         this.isInit = true;
     }
-
-    @Override
-    public void setGameAlive(boolean gameAlive) {
-        isGameAlive = gameAlive;
-    }
 }

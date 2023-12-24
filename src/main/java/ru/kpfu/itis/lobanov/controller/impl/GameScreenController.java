@@ -2,23 +2,19 @@ package ru.kpfu.itis.lobanov.controller.impl;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
-import javafx.stage.Stage;
 import org.apache.commons.lang.SerializationUtils;
 import ru.kpfu.itis.lobanov.PacmanApplication;
 import ru.kpfu.itis.lobanov.client.PacmanClient;
 import ru.kpfu.itis.lobanov.controller.MessageReceiverController;
+import ru.kpfu.itis.lobanov.exceptions.ClientException;
+import ru.kpfu.itis.lobanov.model.entity.environment.Cell;
 import ru.kpfu.itis.lobanov.model.entity.environment.Maze;
 import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Bonus;
 import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Pellet;
@@ -37,6 +33,7 @@ import java.util.stream.Collectors;
 public class GameScreenController implements MessageReceiverController {
     private static final String PASSED_TIME = "%s:%s:%s";
     private static final String SPACE_DIVIDER = "%s %s";
+    public static final int GAME_OVER_TIMER = 200;
     @FXML
     private Pane gameWindow;
     @FXML
@@ -45,16 +42,19 @@ public class GameScreenController implements MessageReceiverController {
     private Label scoreInfo;
     @FXML
     private Label timeLabel;
-    private int scores;
+    private PacmanClient client;
     private Pacman pacman;
     private List<Ghost> ghosts;
-    private Direction currentDirection;
     private List<Pellet> pellets;
     private List<Bonus> bonuses;
-    private PacmanClient client;
-    private int userId;
-    private boolean isRushMode;
+    private Maze maze;
+
+    private int scores;
     private String passedTime;
+    private Direction currentDirection;
+    private boolean isRushMode;
+
+    private int userId;
     private ResourceBundle resources;
     private AppScreenVisualizer visualizer;
 
@@ -62,27 +62,36 @@ public class GameScreenController implements MessageReceiverController {
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
         this.visualizer = new AppScreenVisualizer();
-        gameScreen.setMaxWidth((GameSettings.MAZE_SIZE) * GameSettings.CELL_SIZE);
-        gameScreen.setMaxHeight((GameSettings.MAZE_SIZE + 1) * GameSettings.CELL_SIZE);
-        gameScreen.setPrefWidth((GameSettings.MAZE_SIZE) * GameSettings.CELL_SIZE);
-        gameScreen.setPrefHeight((GameSettings.MAZE_SIZE + 1) * GameSettings.CELL_SIZE);
-//        gameWindow.setStyle("-fx-background-color: lightgrey");
+
+        if (AppConfig.lightMode) {
+            setLightTheme();
+        } else {
+            setDarkTheme();
+        }
+        gameScreen.setMaxWidth((GameSettings.MAZE_SIZE) * AppConfig.CELL_SIZE);
+        gameScreen.setMaxHeight((GameSettings.MAZE_SIZE + 1) * AppConfig.CELL_SIZE);
+        gameScreen.setPrefWidth((GameSettings.MAZE_SIZE) * AppConfig.CELL_SIZE);
+        gameScreen.setPrefHeight((GameSettings.MAZE_SIZE + 1) * AppConfig.CELL_SIZE);
         ghosts = new ArrayList<>();
         isRushMode = false;
 
         client = PacmanApplication.getClient();
         client.setController(this);
-        client.sendMessage(GameMessageProvider.createMessage(MessageType.USER_ID_REQUEST, new byte[0]));
-        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_WALLS_REQUEST, new byte[0]));
-        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_PACMAN_REQUEST, new byte[0]));
-        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_BONUSES_REQUEST, new byte[0]));
-        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_PELLETS_REQUEST, new byte[0]));
-        client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_GHOST_REQUEST, new byte[0]));
+        try {
+            client.sendMessage(GameMessageProvider.createMessage(MessageType.USER_ID_REQUEST, new byte[0]));
+            client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_WALLS_REQUEST, new byte[0]));
+            client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_PACMAN_REQUEST, new byte[0]));
+            client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_BONUSES_REQUEST, new byte[0]));
+            client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_PELLETS_REQUEST, new byte[0]));
+            client.sendMessage(GameMessageProvider.createMessage(MessageType.CREATE_GHOST_REQUEST, new byte[0]));
+        } catch (ClientException e) {
+            visualizer.show(GameResources.NET_ERROR_SCREEN);
+        }
 
         setUpGameInfo();
 
-        gameWindow.setOnKeyPressed(event1 -> {
-            switch (event1.getCode()) {
+        gameWindow.setOnKeyPressed(event -> {
+            switch (event.getCode()) {
                 case UP:
                 case W:
                     currentDirection = Direction.UP;
@@ -102,27 +111,14 @@ public class GameScreenController implements MessageReceiverController {
             }
             if (currentDirection != null) {
                 Message message = GameMessageProvider.createMessage(MessageType.MOVEMENT_REQUEST, new byte[]{currentDirection.getPositionByte()});
-                client.sendMessage(message);
-            }
-        });
-        Platform.runLater(() -> gameWindow.requestFocus());
-    }
-
-    private void setUpGameInfo() {
-        Platform.runLater(() -> scoreInfo.setText(resources.getString(GameResources.GAME_SCORES) + " " + scores));
-    }
-
-    private void blinkBonuses() {
-        Platform.runLater(() -> {
-            for (Bonus bonus : bonuses) {
-                Circle bonusView = bonus.getView();
-                if (bonusView.getFill() == Color.BLUE) {
-                    bonusView.setFill(Color.CYAN);
-                } else {
-                    bonusView.setFill(Color.BLUE);
+                try {
+                    client.sendMessage(message);
+                } catch (ClientException e) {
+                    visualizer.show(GameResources.NET_ERROR_SCREEN);
                 }
             }
         });
+        Platform.runLater(() -> gameWindow.requestFocus());
     }
 
     @Override
@@ -133,6 +129,95 @@ public class GameScreenController implements MessageReceiverController {
             double offsetY = Screen.getPrimary().getVisualBounds().getHeight() / GameSettings.SCREEN_HEIGHT_DIVIDER;
 
             switch (message.getType()) {
+                case MessageType.USER_ID_RESPONSE:
+                    buffer = ByteBuffer.wrap(message.getData());
+                    userId = buffer.getInt();
+                    break;
+
+                case MessageType.CREATE_WALLS_RESPONSE:
+                    System.out.println(Arrays.toString(message.getData()));
+                    maze = (Maze) SerializationUtils.deserialize(message.getData());
+                    List<Rectangle> rectangles = new ArrayList<>();
+                    Cell[][] cells = maze.getData();
+                    for (int i = 0; i < cells.length; i++) {
+                        for (int j = 0; j < cells.length; j++) {
+                            if (cells[i][j].isWall()) {
+                                Rectangle rectangle = new Rectangle(i * AppConfig.CELL_SIZE + offsetX, j * AppConfig.CELL_SIZE + offsetY, AppConfig.CELL_SIZE, AppConfig.CELL_SIZE);
+                                if (!AppConfig.lightMode) {
+                                    rectangle.setFill(Color.BLUE);
+                                }
+                                rectangles.add(rectangle);
+                            }
+                        }
+                    }
+                    Platform.runLater(() -> gameWindow.getChildren().addAll(rectangles));
+                    break;
+
+                case MessageType.CREATE_PACMAN_RESPONSE:
+                    buffer = ByteBuffer.wrap(message.getData());
+                    double x = buffer.getDouble();
+                    double y = buffer.getDouble();
+
+                    pacman = new Pacman(maze);
+                    pacman.setOffsetX(offsetX);
+                    pacman.setOffsetY(offsetY);
+                    pacman.setX(x + offsetX);
+                    pacman.setSpawnX(x + offsetX);
+                    pacman.setY(y + offsetY);
+                    pacman.setSpawnY(y + offsetY);
+                    pacman.show();
+                    Platform.runLater(() -> gameWindow.getChildren().addAll(pacman.getView()));
+                    break;
+
+                case MessageType.CREATE_BONUSES_RESPONSE:
+                    bonuses = (List<Bonus>) SerializationUtils.deserialize(message.getData());
+                    if (bonuses != null) {
+                        for (Bonus b : bonuses) {
+                            Platform.runLater(() -> b.show(Screen.getPrimary().getVisualBounds()));
+                        }
+                        Platform.runLater(() -> gameWindow.getChildren().addAll(bonuses.stream().map(Bonus::getView).collect(Collectors.toList())));
+                    }
+                    break;
+
+                case MessageType.CREATE_PELLETS_RESPONSE:
+                    pellets = (List<Pellet>) SerializationUtils.deserialize(message.getData());
+                    if (pellets != null) {
+                        for (Pellet p : pellets) {
+                            Platform.runLater(() -> p.show(Screen.getPrimary().getVisualBounds()));
+                        }
+                        Platform.runLater(() -> gameWindow.getChildren().addAll(pellets.stream().map(Pellet::getView).collect(Collectors.toList())));
+                    }
+                    break;
+
+                case MessageType.CREATE_GHOST_RESPONSE:
+                    buffer = ByteBuffer.wrap(message.getData());
+                    int id = buffer.getInt();
+                    double x2 = buffer.getDouble();
+                    double y2 = buffer.getDouble();
+
+                    Ghost g;
+                    switch (id) {
+                        case 0:
+                            g = new Ghost(maze, GameResources.RED_GHOST_PACKAGE);
+                            break;
+                        case 1:
+                            g = new Ghost(maze, GameResources.BLUE_GHOST_PACKAGE);
+                            break;
+                        default:
+                            g = new Ghost(maze, GameResources.GREEN_GHOST_PACKAGE);
+                            break;
+                    }
+                    g.setOffsetX(offsetX);
+                    g.setX(x2 + offsetX);
+                    g.setSpawnX(x2 + offsetX);
+                    g.setOffsetY(offsetY);
+                    g.setY(y2 + offsetY);
+                    g.setSpawnY(y2 + offsetY);
+                    g.show();
+                    ghosts.add(g);
+                    Platform.runLater(() -> gameWindow.getChildren().addAll(g.getView()));
+                    break;
+
                 case MessageType.MOVEMENT_RESPONSE:
                     buffer = ByteBuffer.wrap(message.getData());
                     int playerId = buffer.getInt();
@@ -168,82 +253,34 @@ public class GameScreenController implements MessageReceiverController {
                         }
                     }
                     break;
-                case MessageType.USER_ID_RESPONSE:
-                    buffer = ByteBuffer.wrap(message.getData());
-                    userId = buffer.getInt();
-                    break;
-                case MessageType.CREATE_WALLS_RESPONSE:
-                    buffer = ByteBuffer.wrap(message.getData());
-                    List<Rectangle> rectangles = new ArrayList<>();
-                    while (buffer.hasRemaining()) {
-                        Rectangle rectangle = new Rectangle(buffer.getInt() * GameSettings.CELL_SIZE + Screen.getPrimary().getVisualBounds().getWidth() / 3, buffer.getInt() * GameSettings.CELL_SIZE + Screen.getPrimary().getVisualBounds().getHeight() / 6, GameSettings.CELL_SIZE, GameSettings.CELL_SIZE);
-                        rectangles.add(rectangle);
-                    }
-                    Platform.runLater(() -> gameWindow.getChildren().addAll(rectangles));
-                    break;
-                case MessageType.CREATE_PACMAN_RESPONSE:
-                    buffer = ByteBuffer.wrap(message.getData());
-                    double x = buffer.getDouble();
-                    double y = buffer.getDouble();
-                    Maze m = (Maze) SerializationUtils.deserialize(Arrays.copyOfRange(buffer.array(), GameSettings.DOUBLE_BYTES * 2, buffer.array().length));
 
-                    pacman = new Pacman(m);
-                    pacman.setOffsetX(offsetX);
-                    pacman.setOffsetY(offsetY);
-                    pacman.setX(x + offsetX);
-                    pacman.setSpawnX(x + offsetX);
-                    pacman.setY(y + offsetY);
-                    pacman.setSpawnY(y + offsetY);
-                    pacman.show();
-                    Platform.runLater(() -> gameWindow.getChildren().addAll(pacman.getView()));
+                case MessageType.PLAYERS_MOVE_RESPONSE:
+                    Platform.runLater(pacman::go);
+                    for (int i = 0; i < ghosts.size(); i++) {
+                        Ghost ghos = ghosts.get(i);
+                        Platform.runLater(ghos::go);
+                        if (pacman.getView().getBoundsInParent().intersects(ghos.getView().getBoundsInParent())) {
+                            buffer = ByteBuffer.allocate(GameSettings.DOUBLE_BYTES * 2 + GameSettings.INTEGER_BYTES * 2);
+                            if (userId != 0) {
+                                if (isRushMode) {
+                                    buffer.putInt(0);
+                                    buffer.putInt(i + 1);
+                                } else {
+                                    buffer.putInt(i + 1);
+                                    buffer.putInt(0);
+                                }
+                                buffer.putDouble(pacman.getX());
+                                buffer.putDouble(pacman.getY());
+                                try {
+                                    client.sendMessage(GameMessageProvider.createMessage(MessageType.EAT_PLAYER_REQUEST, buffer.array()));
+                                } catch (ClientException e) {
+                                    visualizer.show(GameResources.NET_ERROR_SCREEN);
+                                }
+                            }
+                        }
+                    }
                     break;
-                case MessageType.CREATE_GHOST_RESPONSE:
-                    buffer = ByteBuffer.wrap(message.getData());
-                    int id = buffer.getInt();
-                    double x2 = buffer.getDouble();
-                    double y2 = buffer.getDouble();
-                    Maze m2 = (Maze) SerializationUtils.deserialize(Arrays.copyOfRange(buffer.array(), GameSettings.DOUBLE_BYTES * 2 + GameSettings.INTEGER_BYTES, buffer.array().length));
 
-                    Ghost g;
-                    switch (id) {
-                        case 0:
-                            g = new Ghost(m2, GameResources.RED_GHOST_PACKAGE);
-                            break;
-                        case 1:
-                            g = new Ghost(m2, GameResources.BLUE_GHOST_PACKAGE);
-                            break;
-                        default:
-                            g = new Ghost(m2, GameResources.GREEN_GHOST_PACKAGE);
-                            break;
-                    }
-                    g.setOffsetX(offsetX);
-                    g.setX(x2 + offsetX);
-                    g.setSpawnX(x2 +offsetX);
-                    g.setOffsetY(offsetY);
-                    g.setY(y2 + offsetY);
-                    g.setSpawnY(y2 + offsetY);
-                    g.show();
-                    ghosts.add(g);
-                    Platform.runLater(() -> gameWindow.getChildren().addAll(g.getView()));
-                    break;
-                case MessageType.CREATE_BONUSES_RESPONSE:
-                    bonuses = (List<Bonus>) SerializationUtils.deserialize(message.getData());
-                    if (bonuses != null) {
-                        for (Bonus b : bonuses) {
-                            Platform.runLater(() -> b.show(Screen.getPrimary().getVisualBounds()));
-                        }
-                        Platform.runLater(() -> gameWindow.getChildren().addAll(bonuses.stream().map(Bonus::getView).collect(Collectors.toList())));
-                    }
-                    break;
-                case MessageType.CREATE_PELLETS_RESPONSE:
-                    pellets = (List<Pellet>) SerializationUtils.deserialize(message.getData());
-                    if (pellets != null) {
-                        for (Pellet p : pellets) {
-                            Platform.runLater(() -> p.show(Screen.getPrimary().getVisualBounds()));
-                        }
-                        Platform.runLater(() -> gameWindow.getChildren().addAll(pellets.stream().map(Pellet::getView).collect(Collectors.toList())));
-                    }
-                    break;
                 case MessageType.EAT_PLAYER_RESPONSE:
                     buffer = ByteBuffer.wrap(message.getData());
                     int eaterId = buffer.getInt();
@@ -288,13 +325,18 @@ public class GameScreenController implements MessageReceiverController {
                         if (userId == eaterId) scores += GameSettings.GHOST_EAT_PACMAN_BONUS;
                         pacman.setHp(pacman.getHp() - 1);
                         if (pacman.getHp() == 0) {
-                            client.sendMessage(GameMessageProvider.createMessage(MessageType.GAME_END_REQUEST, new byte[]{1}));
+                            try {
+                                client.sendMessage(GameMessageProvider.createMessage(MessageType.GAME_END_REQUEST, new byte[]{1}));
+                            } catch (ClientException e) {
+                                visualizer.show(GameResources.NET_ERROR_SCREEN);
+                            }
                         }
                     }
                     break;
                 case MessageType.BLINK_BONUSES_RESPONSE:
                     blinkBonuses();
                     break;
+
                 case MessageType.PACMAN_EAT_PELLET_RESPONSE:
                     Platform.runLater(() -> {
                         Pellet pellet = pacman.eatPellet(pellets);
@@ -306,46 +348,32 @@ public class GameScreenController implements MessageReceiverController {
                         }
                     });
                     break;
+
                 case MessageType.PACMAN_EAT_BONUS_RESPONSE:
                     Platform.runLater(() -> {
                         Bonus bonus = pacman.eatBonus(bonuses);
                         if (bonus != null) {
-                            client.sendMessage(GameMessageProvider.createMessage(MessageType.RUSH_MODE_REQUEST, new byte[]{1}));
+                            try {
+                                client.sendMessage(GameMessageProvider.createMessage(MessageType.RUSH_MODE_REQUEST, new byte[]{1}));
+                            } catch (ClientException e) {
+                                visualizer.show(GameResources.NET_ERROR_SCREEN);
+                            }
                             if (userId == 0) scores += bonus.getScore();
                             Platform.runLater(() -> gameWindow.getChildren().remove(bonus.getView()));
                         }
                     });
                     break;
+
                 case MessageType.CHANGE_SCORES_RESPONSE:
                     setUpGameInfo();
                     break;
-                case MessageType.GAME_WIN_RESPONSE:
-                    if (pellets.isEmpty() && bonuses.isEmpty()) {
-                        client.sendMessage(GameMessageProvider.createMessage(MessageType.GAME_END_REQUEST, new byte[]{0}));
+
+                case MessageType.GHOST_SCORES_RESPONSE:
+                    if (userId != 0) {
+                        scores += GameSettings.GHOST_SCORES_DEFAULT;
                     }
                     break;
-                case MessageType.PLAYERS_MOVE_RESPONSE:
-                    Platform.runLater(pacman::go);
-                    for (int i = 0; i < ghosts.size(); i++) {
-                        Ghost ghos = ghosts.get(i);
-                        Platform.runLater(ghos::go);
-                        if (pacman.getView().getBoundsInParent().intersects(ghos.getView().getBoundsInParent())) {
-                            buffer = ByteBuffer.allocate(GameSettings.DOUBLE_BYTES * 2 + GameSettings.INTEGER_BYTES * 2);
-                            if (userId != 0) {
-                                if (isRushMode) {
-                                    buffer.putInt(0);
-                                    buffer.putInt(i + 1);
-                                } else {
-                                    buffer.putInt(i + 1);
-                                    buffer.putInt(0);
-                                }
-                                buffer.putDouble(pacman.getX());
-                                buffer.putDouble(pacman.getY());
-                                client.sendMessage(GameMessageProvider.createMessage(MessageType.EAT_PLAYER_REQUEST, buffer.array()));
-                            }
-                        }
-                    }
-                    break;
+
                 case MessageType.RUSH_MODE_RESPONSE:
                     byte[] data = message.getData();
                     isRushMode = data[0] == 1;
@@ -353,21 +381,7 @@ public class GameScreenController implements MessageReceiverController {
                         ghost.setFrightened(isRushMode);
                     }
                     break;
-                case MessageType.GHOST_SCORES_RESPONSE:
-                    if (userId != 0) {
-                        scores += GameSettings.GHOST_SCORES_DEFAULT;
-                    }
-                    break;
-                case MessageType.GAME_END_RESPONSE:
-                    buffer = ByteBuffer.wrap(message.getData());
-                    if (buffer.get() == 0) {
-                        if (userId == 0) gameOver(resources.getString(GameResources.GAME_WIN));
-                        else gameOver(resources.getString(GameResources.GAME_LOSE));
-                    } else {
-                        if (userId == 0) gameOver(resources.getString(GameResources.GAME_LOSE));
-                        else gameOver(resources.getString(GameResources.GAME_WIN));
-                    }
-                    break;
+
                 case MessageType.TIME_RESPONSE:
                     buffer = ByteBuffer.wrap(message.getData());
                     int time = buffer.getInt();
@@ -384,8 +398,46 @@ public class GameScreenController implements MessageReceiverController {
                         timeLabel.setText(String.format(SPACE_DIVIDER, resources.getString(GameResources.TIME_PASSED), passedTime));
                     });
                     break;
+
+                case MessageType.GAME_WIN_RESPONSE:
+                    if (pellets.isEmpty() && bonuses.isEmpty()) {
+                        try {
+                            client.sendMessage(GameMessageProvider.createMessage(MessageType.GAME_END_REQUEST, new byte[]{0}));
+                        } catch (ClientException e) {
+                            visualizer.show(GameResources.NET_ERROR_SCREEN);
+                        }
+                    }
+                    break;
+
+                case MessageType.GAME_END_RESPONSE:
+                    buffer = ByteBuffer.wrap(message.getData());
+                    if (buffer.get() == 0) {
+                        if (userId == 0) gameOver(resources.getString(GameResources.GAME_WIN));
+                        else gameOver(resources.getString(GameResources.GAME_LOSE));
+                    } else {
+                        if (userId == 0) gameOver(resources.getString(GameResources.GAME_LOSE));
+                        else gameOver(resources.getString(GameResources.GAME_WIN));
+                    }
+                    break;
             }
         }
+    }
+
+    private void setUpGameInfo() {
+        Platform.runLater(() -> scoreInfo.setText(String.format(SPACE_DIVIDER, resources.getString(GameResources.GAME_SCORES), scores)));
+    }
+
+    private void blinkBonuses() {
+        Platform.runLater(() -> {
+            for (Bonus bonus : bonuses) {
+                Circle bonusView = bonus.getView();
+                if (bonusView.getFill() == Color.BLUE) {
+                    bonusView.setFill(Color.CYAN);
+                } else {
+                    bonusView.setFill(Color.BLUE);
+                }
+            }
+        });
     }
 
     private void gameOver(String message) {
@@ -401,6 +453,18 @@ public class GameScreenController implements MessageReceiverController {
             }
         };
         Timer timer = new Timer();
-        timer.schedule(task, 400);
+        timer.schedule(task, GAME_OVER_TIMER);
+    }
+
+    private void setLightTheme() {
+        gameScreen.setStyle("-fx-background-color: white");
+        scoreInfo.setTextFill(Color.BLACK);
+        timeLabel.setTextFill(Color.BLACK);
+    }
+
+    private void setDarkTheme() {
+        gameScreen.setStyle("-fx-background-color: black");
+        scoreInfo.setTextFill(Color.BLUE);
+        timeLabel.setTextFill(Color.BLUE);
     }
 }

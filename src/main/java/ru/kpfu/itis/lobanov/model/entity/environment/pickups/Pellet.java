@@ -3,6 +3,7 @@ package ru.kpfu.itis.lobanov.model.entity.environment.pickups;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import ru.kpfu.itis.lobanov.utils.constants.AppConfig;
 import ru.kpfu.itis.lobanov.utils.constants.GameResources;
 import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
 
@@ -19,8 +20,8 @@ public class Pellet extends ScoreLocatableObject {
         view = new ImageView();
         view.toBack();
         view.setImage(new Image(GameResources.PELLET_IMAGE));
-        view.setFitHeight(GameSettings.CELL_SIZE / 5);
-        view.setFitWidth(GameSettings.CELL_SIZE / 5);
+        view.setFitHeight(AppConfig.CELL_SIZE / 5);
+        view.setFitWidth(AppConfig.CELL_SIZE / 5);
         view.setX(x + coordinates.getWidth() / 3);
         view.setY(y + coordinates.getHeight() / 6);
     }

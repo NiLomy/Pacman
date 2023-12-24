@@ -1,20 +1,16 @@
 package ru.kpfu.itis.lobanov.server;
 
-import ru.kpfu.itis.lobanov.PacmanApplication;
 import ru.kpfu.itis.lobanov.listener.*;
 import ru.kpfu.itis.lobanov.utils.repository.ListenersRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ApplicationServer {
+public class ApplicationServerProvider {
     private static final List<PacmanServer> servers = new ArrayList<>();
-    public static void main(String[] args) {
-        startServer(createServer(7899, 2));
-    }
 
     public static PacmanServer createServer(int port, int playersCount) {
-        PacmanServer pacmanServer = new PacmanServer(port, playersCount);
+        PacmanServer pacmanServer = new PacmanServerImpl(port, playersCount);
         for (EventListener listener : ListenersRepository.getEventListeners()) {
             pacmanServer.registerListener(listener);
         }
@@ -35,9 +31,9 @@ public class ApplicationServer {
                 break;
             }
         }
-        /*
-        * socket.isConnected in thread or catch IOE or ping-pong in 1 sec and make timer if not received - disconnect
-        *
-        * */
     }
+    /*
+     * socket.isConnected in thread or catch IOE or ping-pong in 1 sec and make timer if not received - disconnect
+     *
+     * */
 }

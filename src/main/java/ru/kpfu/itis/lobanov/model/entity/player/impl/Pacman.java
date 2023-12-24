@@ -6,10 +6,7 @@ import ru.kpfu.itis.lobanov.model.entity.environment.Maze;
 import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Bonus;
 import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Pellet;
 import ru.kpfu.itis.lobanov.model.entity.player.AbstractPlayer;
-import ru.kpfu.itis.lobanov.utils.constants.Direction;
-import ru.kpfu.itis.lobanov.utils.constants.GameResources;
-import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
-import ru.kpfu.itis.lobanov.utils.constants.Placement;
+import ru.kpfu.itis.lobanov.utils.constants.*;
 
 import java.util.List;
 import java.util.Random;
@@ -46,8 +43,8 @@ public class Pacman extends AbstractPlayer {
             int index = random.nextInt(cellsForPlacement.length);
             Cell cell = cellsForPlacement[index];
             if (!cell.isWall()) {
-                x = spawnX = cell.getX() * GameSettings.CELL_SIZE + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS;
-                y = spawnY = cell.getY() * GameSettings.CELL_SIZE + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS;
+                x = spawnX = cell.getX() * AppConfig.CELL_SIZE + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS;
+                y = spawnY = cell.getY() * AppConfig.CELL_SIZE + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS;
                 break;
             }
         }
@@ -99,9 +96,9 @@ public class Pacman extends AbstractPlayer {
                     if (!checkForWall(movingDirection, walls, view, offsetX, offsetY)) {
                         setY(y - GameSettings.PACMAN_SPEED);
                     }
-                    if (y + GameSettings.CELL_SIZE / 2 <= offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS * 2) {
-                        setY(maze.getLowerExit().getY() * GameSettings.CELL_SIZE + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
-                        setX(maze.getLowerExit().getX() * GameSettings.CELL_SIZE + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                    if (y + AppConfig.CELL_SIZE / 2 <= offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS * 2) {
+                        setY(maze.getLowerExit().getY() * AppConfig.CELL_SIZE + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                        setX(maze.getLowerExit().getX() * AppConfig.CELL_SIZE + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
                     }
                     if (stayCount == 0) {
                         if (lastDirection == Direction.UP) {
@@ -124,9 +121,9 @@ public class Pacman extends AbstractPlayer {
                     if (!checkForWall(movingDirection, walls, view, offsetX, offsetY)) {
                         setY(y + GameSettings.PACMAN_SPEED);
                     }
-                    if (y >= maze.labyrinthLength() * GameSettings.CELL_SIZE + offsetY - GameSettings.CELL_SIZE / 2 - GameSettings.PLAYER_SET_UP_COORDINATE_BIAS) {
-                        setY(GameSettings.CELL_SIZE / 2 + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
-                        setX(maze.getUpperExit().getX() * GameSettings.CELL_SIZE + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                    if (y >= maze.labyrinthLength() * AppConfig.CELL_SIZE + offsetY - AppConfig.CELL_SIZE / 2 - GameSettings.PLAYER_SET_UP_COORDINATE_BIAS) {
+                        setY(AppConfig.CELL_SIZE / 2 + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                        setX(maze.getUpperExit().getX() * AppConfig.CELL_SIZE + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
                     }
                     if (stayCount == 0) {
                         if (lastDirection == Direction.DOWN) {
@@ -149,9 +146,9 @@ public class Pacman extends AbstractPlayer {
                     if (!checkForWall(movingDirection, walls, view, offsetX, offsetY)) {
                         setX(x - GameSettings.PACMAN_SPEED);
                     }
-                    if (x + GameSettings.CELL_SIZE / 2 <= offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS * 2) {
-                        setX(maze.getRightExit().getX() * GameSettings.CELL_SIZE + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
-                        setY(maze.getRightExit().getY() * GameSettings.CELL_SIZE + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                    if (x + AppConfig.CELL_SIZE / 2 <= offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS * 2) {
+                        setX(maze.getRightExit().getX() * AppConfig.CELL_SIZE + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                        setY(maze.getRightExit().getY() * AppConfig.CELL_SIZE + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
                     }
                     if (stayCount == 0) {
                         if (lastDirection == Direction.LEFT) {
@@ -174,9 +171,9 @@ public class Pacman extends AbstractPlayer {
                     if (!checkForWall(movingDirection, walls, view, offsetX, offsetY)) {
                         setX(x + GameSettings.PACMAN_SPEED);
                     }
-                    if (x >= maze.labyrinthLength() * GameSettings.CELL_SIZE + offsetX - GameSettings.CELL_SIZE / 2 - GameSettings.PLAYER_SET_UP_COORDINATE_BIAS) {
-                        setX(GameSettings.CELL_SIZE / 2 + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
-                        setY(maze.getLeftExit().getY() * GameSettings.CELL_SIZE + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                    if (x >= maze.labyrinthLength() * AppConfig.CELL_SIZE + offsetX - AppConfig.CELL_SIZE / 2 - GameSettings.PLAYER_SET_UP_COORDINATE_BIAS) {
+                        setX(AppConfig.CELL_SIZE / 2 + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                        setY(maze.getLeftExit().getY() * AppConfig.CELL_SIZE + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
                     }
                     if (stayCount == 0) {
                         if (lastDirection == Direction.RIGHT) {
@@ -212,8 +209,8 @@ public class Pacman extends AbstractPlayer {
         this.rightWideOpenPacmanImage = new Image(GameResources.RIGHT_WIDE_OPEN_PACMAN_IMAGE);
 
         view.setImage(calmPacmanImage);
-        view.setFitWidth(GameSettings.CELL_SIZE - GameSettings.PLAYER_SET_UP_VIEW_SIZE_BIAS);
-        view.setFitHeight(GameSettings.CELL_SIZE - GameSettings.PLAYER_SET_UP_VIEW_SIZE_BIAS);
+        view.setFitWidth(AppConfig.CELL_SIZE - GameSettings.PLAYER_SET_UP_VIEW_SIZE_BIAS);
+        view.setFitHeight(AppConfig.CELL_SIZE - GameSettings.PLAYER_SET_UP_VIEW_SIZE_BIAS);
         view.setX(spawnX);
         view.setY(spawnY);
     }

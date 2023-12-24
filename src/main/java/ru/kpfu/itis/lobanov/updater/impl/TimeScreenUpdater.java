@@ -18,20 +18,19 @@ public class TimeScreenUpdater extends AbstractScreenUpdater {
         try {
             Thread.sleep(GameSettings.GAME_DOWNLOADING_TIME);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            isGameAlive = false;
         }
         int time = 0;
         while (isGameAlive) {
             try {
                 time++;
                 server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.TIME_RESPONSE, ByteBuffer.allocate(4).putInt(time).array()));
-            } catch (ConcurrentModificationException e) {
-                System.out.println("YAAAA");
+            } catch (ConcurrentModificationException ignored) {
             }
             try {
                 Thread.sleep(GameSettings.TIME_UPDATE_FREQUENCY);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                isGameAlive = false;
             }
         }
     }

@@ -1,0 +1,37 @@
+.button-light {
+    -fx-font-size: 32;
+    -fx-font-family: 'Comic Sans MS';
+    -fx-background-color: #e6e8e8;
+    -fx-border-color: black;
+    -fx-border-width: 4px;
+    -fx-border-radius: 4px;
+}
+
+.button-light:hover {
+    -fx-font-size: 32;
+    -fx-font-family: 'Comic Sans MS';
+    -fx-background-color: #f3f5f5;
+    -fx-border-color: black;
+    -fx-border-width: 4px;
+    -fx-cursor: hand;
+    -fx-border-radius: 4px;
+}
+
+.button-dark {
+    -fx-font-size: 32;
+    -fx-font-family: 'Comic Sans MS';
+    -fx-background-color: #010618;
+    -fx-border-color: blue;
+    -fx-border-width: 4px;
+    -fx-border-radius: 4px;
+}
+
+.button-dark:hover {
+    -fx-font-size: 32;
+    -fx-font-family: 'Comic Sans MS';
+    -fx-background-color: #020a2a;
+    -fx-border-color: blue;
+    -fx-border-width: 4px;
+    -fx-border-radius: 4px;
+    -fx-cursor: hand;
+}

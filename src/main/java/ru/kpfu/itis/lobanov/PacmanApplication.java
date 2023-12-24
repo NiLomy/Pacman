@@ -7,12 +7,15 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import ru.kpfu.itis.lobanov.client.PacmanClient;
+import ru.kpfu.itis.lobanov.utils.constants.AppConfig;
 import ru.kpfu.itis.lobanov.utils.constants.GameResources;
-import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
+import ru.kpfu.itis.lobanov.utils.db.ServerRepository;
 
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class PacmanApplication extends Application {
+    public static final String GAME_NAME = "Pacman";
     private static Stage stage;
     private static PacmanClient client;
 
@@ -22,15 +25,19 @@ public class PacmanApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        // establish connection with serverless db
+        Class.forName(ServerRepository.class.getName());
+        // build gui
         stage = primaryStage;
         primaryStage.setMaximized(true);
         FXMLLoader loader = new FXMLLoader(PacmanApplication.class.getResource(GameResources.START_SCREEN));
-        loader.setResources(ResourceBundle.getBundle(GameResources.LOCALIZED_TEXTS_RESOURCE_BUNDLE, GameSettings.LOCALE));
+        loader.setResources(ResourceBundle.getBundle(GameResources.LOCALIZED_TEXTS_RESOURCE_BUNDLE, AppConfig.LOCALE));
 
         AnchorPane pane = loader.load();
         Scene scene = new Scene(pane, Screen.getPrimary().getVisualBounds().getWidth(), Screen.getPrimary().getVisualBounds().getHeight());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/buttons.css")).toExternalForm());
 
-        primaryStage.setTitle("Pacman");
+        primaryStage.setTitle(GAME_NAME);
         primaryStage.setOnCloseRequest(e -> {
             if (client != null && client.getThread() != null) {
 //                client.sendMessage(GameMessageProvider.createMessage(MessageType.USER_COUNT_INFO_REQUEST, new byte[0]));

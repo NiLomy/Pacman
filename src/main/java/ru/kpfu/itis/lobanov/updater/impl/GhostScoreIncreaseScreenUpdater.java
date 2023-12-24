@@ -16,14 +16,14 @@ public class GhostScoreIncreaseScreenUpdater extends AbstractScreenUpdater {
         try {
             Thread.sleep(GameSettings.GAME_DOWNLOADING_TIME);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            isGameAlive = false;
         }
         while (isGameAlive) {
             server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.GHOST_SCORES_RESPONSE, new byte[0]));
             try {
                 Thread.sleep(GameSettings.GHOST_SCORE_INCREASE_UPDATE_FREQUENCY);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                isGameAlive = false;
             }
         }
     }

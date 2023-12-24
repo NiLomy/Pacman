@@ -5,13 +5,14 @@
 <?import javafx.scene.layout.*?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
+            fx:id="screen"
             fx:controller="ru.kpfu.itis.lobanov.controller.impl.StartScreenController">
 
     <children>
-        <VBox spacing="20" AnchorPane.topAnchor="32" AnchorPane.rightAnchor="5" AnchorPane.leftAnchor="5">
+        <VBox spacing="20" AnchorPane.topAnchor="28" AnchorPane.rightAnchor="5" AnchorPane.leftAnchor="5">
             <VBox fx:id="imageBox" AnchorPane.rightAnchor="20" AnchorPane.leftAnchor="20" AnchorPane.topAnchor="20"
-                  alignment="CENTER" spacing="30">
-                <Label text="Pacman Game" style="-fx-font-size: 72; -fx-font-family: 'Comic Sans MS'"/>
+                  alignment="CENTER" spacing="20">
+                <Label fx:id="gameName" text="Pacman Game" style="-fx-font-size: 72; -fx-font-family: 'Comic Sans MS'"/>
             </VBox>
 
             <VBox alignment="CENTER" spacing="10" AnchorPane.topAnchor="290" AnchorPane.rightAnchor="10"

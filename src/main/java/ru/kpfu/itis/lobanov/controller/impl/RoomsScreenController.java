@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -25,6 +26,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class RoomsScreenController implements Controller {
+    @FXML
+    private AnchorPane screen;
     @FXML
     private VBox panel;
     @FXML
@@ -52,11 +55,24 @@ public class RoomsScreenController implements Controller {
         if (servers.isEmpty()) {
             Label noRooms = new Label(resources.getString(GameResources.NO_ROOMS));
             noRooms.setStyle(GameResources.BIG_CENTER_TEXT);
+            if (AppConfig.lightMode) {
+                noRooms.setTextFill(Color.BLACK);
+            } else {
+                noRooms.setTextFill(Color.BLUE);
+            }
 
             Button createRoomBtn = new Button(resources.getString(GameResources.ROOM_CREATE));
             createRoomBtn.setStyle(GameResources.MEDIUM_TEXT);
+            if (AppConfig.lightMode) {
+                createRoomBtn.getStyleClass().add("button-light");
+                createRoomBtn.setTextFill(Color.BLACK);
+            } else {
+                createRoomBtn.getStyleClass().add("button-dark");
+                createRoomBtn.setTextFill(Color.BLUE);
+            }
             createRoomBtn.setOnAction(event -> visualizer.show(GameResources.CREATE_ROOM_SCREEN));
 
+            scrollPane.setVisible(false);
             panel.getChildren().addAll(noRooms, createRoomBtn);
         } else {
             serverBox = new VBox(GameSettings.SERVER_BOX_SPACING);
@@ -71,11 +87,27 @@ public class RoomsScreenController implements Controller {
             scrollPane.setFitToWidth(true);
             scrollPane.setMaxHeight(GameSettings.SERVERS_SCROLL_PANE_MAX_HEIGHT);
             scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+            if (!AppConfig.lightMode) {
+                scrollPane.setStyle("-fx-background-color: black");
+            }
+        }
+
+        if (AppConfig.lightMode) {
+            setLightTheme();
+        } else {
+            setDarkTheme();
         }
     }
 
     private void createRoom(String host, int port, int position) {
         Button room = new Button(resources.getString(GameResources.ROOM_ENTER) + position);
+        if (AppConfig.lightMode) {
+            room.getStyleClass().add("button-light");
+            room.setTextFill(Color.BLACK);
+        } else {
+            room.getStyleClass().add("button-dark");
+            room.setTextFill(Color.BLUE);
+        }
         room.setStyle(GameResources.MEDIUM_TEXT);
         room.setOnAction(event -> {
             if (ServerRepository.get(host, port).isGameHeld()) {
@@ -102,14 +134,14 @@ public class RoomsScreenController implements Controller {
     private void showMap(String host, int port) {
         String gameMap = ServerRepository.get(host, port).getGameMap();
         if (gameMap != null) {
-            VBox vBox = new VBox();
-            vBox.setAlignment(Pos.CENTER);
+            HBox hbox = new HBox();
+            hbox.setAlignment(Pos.CENTER);
 
             int index = 0;
             double mapLength = Math.sqrt(gameMap.length());
             for (int x = 0; x < mapLength; x++) {
-                HBox line = new HBox();
-                line.setAlignment(Pos.CENTER);
+                VBox column = new VBox();
+                column.setAlignment(Pos.CENTER);
 
                 for (int y = 0; y < mapLength; y++) {
                     Rectangle rectangle = new Rectangle(
@@ -118,15 +150,45 @@ public class RoomsScreenController implements Controller {
                             GameSettings.MAZE_SIZE_FOR_ROOMS_PREVIEW,
                             GameSettings.MAZE_SIZE_FOR_ROOMS_PREVIEW
                     );
-                    if (gameMap.charAt(index) == GameSettings.SPACE_DECODER_CHAR) {
-                        rectangle.setFill(Color.LIGHTGREY);
+                    if (AppConfig.lightMode) {
+                        if (gameMap.charAt(index) == GameSettings.SPACE_DECODER_CHAR) {
+                            rectangle.setFill(Color.LIGHTGREY);
+                        }
+                    } else {
+                        if (gameMap.charAt(index) == GameSettings.WALL_DECODER_CHAR) {
+                            rectangle.setFill(Color.BLUE);
+                        }
                     }
-                    line.getChildren().addAll(rectangle);
+                    column.getChildren().addAll(rectangle);
                     index++;
                 }
-                vBox.getChildren().addAll(line);
+                hbox.getChildren().addAll(column);
             }
-            serverBox.getChildren().addAll(vBox);
+            serverBox.getChildren().addAll(hbox);
         }
+    }
+
+    private void setLightTheme() {
+        screen.setStyle("-fx-background-color: white");
+        scrollPane.setStyle("-fx-background-color: white");
+        backBtn.getStyleClass().add("button-light");
+        backBtn.setTextFill(Color.BLACK);
+        createRoom.getStyleClass().add("button-light");
+        createRoom.setTextFill(Color.BLACK);
+        refreshBtn.getStyleClass().add("button-light");
+        refreshBtn.setTextFill(Color.BLACK);
+        if (serverBox != null) serverBox.setStyle("-fx-background-color: white");
+    }
+
+    private void setDarkTheme() {
+        screen.setStyle("-fx-background-color: black");
+        scrollPane.setStyle("-fx-background-color: black");
+        backBtn.getStyleClass().add("button-dark");
+        backBtn.setTextFill(Color.BLUE);
+        createRoom.getStyleClass().add("button-dark");
+        createRoom.setTextFill(Color.BLUE);
+        refreshBtn.getStyleClass().add("button-dark");
+        refreshBtn.setTextFill(Color.BLUE);
+        if (serverBox != null) serverBox.setStyle("-fx-background-color: black");
     }
 }

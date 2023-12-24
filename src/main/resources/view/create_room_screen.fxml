@@ -5,23 +5,23 @@
 <?import javafx.scene.layout.*?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="ru.kpfu.itis.lobanov.controller.impl.CreateRoomScreenController"
-            prefHeight="400.0" prefWidth="600.0">
+            fx:id="screen"
+            fx:controller="ru.kpfu.itis.lobanov.controller.impl.CreateRoomScreenController">
 
     <children>
         <VBox AnchorPane.topAnchor="32.0" AnchorPane.leftAnchor="20">
             <Button fx:id="backBtn" text="%go_back_rooms" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'"/>
         </VBox>
-        <VBox alignment="CENTER" spacing="20" AnchorPane.topAnchor="88" AnchorPane.rightAnchor="10"
+        <VBox alignment="CENTER" spacing="20" AnchorPane.topAnchor="90" AnchorPane.rightAnchor="10"
               AnchorPane.leftAnchor="10">
             <HBox spacing="100" alignment="CENTER">
                 <VBox spacing="20" alignment="CENTER">
-                    <Label text="%input.port" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'"/>
+                    <Label fx:id="portInput" text="%input.port" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'"/>
                     <TextField fx:id="setPort" maxWidth="112"
                                style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'; -fx-text-alignment: center; -fx-alignment: center"/>
                     <Label fx:id="emptyPort" visible="false" textFill="red" text="%input.port.empty"
                            style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'; -fx-text-alignment: center; -fx-alignment: center"/>
-                    <Label text="%input.players_count" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'">
+                    <Label fx:id="playersCount" text="%input.players_count" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'">
                         <VBox.margin>
                             <Insets>
                                 <top>40</top>
@@ -43,7 +43,7 @@
                 </VBox>
             </HBox>
         </VBox>
-        <VBox AnchorPane.bottomAnchor="76" AnchorPane.rightAnchor="20" AnchorPane.leftAnchor="20" alignment="CENTER">
+        <VBox AnchorPane.bottomAnchor="70" AnchorPane.rightAnchor="20" AnchorPane.leftAnchor="20" alignment="CENTER">
             <Button fx:id="submit" text="%server.start" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'"/>
         </VBox>
     </children>

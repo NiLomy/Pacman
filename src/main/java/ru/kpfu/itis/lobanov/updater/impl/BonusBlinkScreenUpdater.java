@@ -18,18 +18,17 @@ public class BonusBlinkScreenUpdater extends AbstractScreenUpdater {
         try {
             Thread.sleep(GameSettings.GAME_DOWNLOADING_TIME);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            isGameAlive = false;
         }
         while (isGameAlive) {
             try {
                 server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.BLINK_BONUSES_RESPONSE, new byte[0]));
-            } catch (ConcurrentModificationException e) {
-                System.out.println("YAAAA");
+            } catch (ConcurrentModificationException ignored) {
             }
             try {
                 Thread.sleep(GameSettings.BONUS_BLINK_UPDATE_FREQUENCY);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                isGameAlive = false;
             }
         }
     }

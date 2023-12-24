@@ -5,6 +5,7 @@
 <?import javafx.scene.layout.*?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
+            fx:id="screen"
             fx:controller="ru.kpfu.itis.lobanov.controller.impl.FullRoomController"
             prefHeight="400.0" prefWidth="600.0">
 
@@ -13,7 +14,7 @@
 
     <VBox alignment="CENTER" spacing="20" AnchorPane.topAnchor="200" AnchorPane.leftAnchor="20"
           AnchorPane.rightAnchor="20">
-        <Label text="%room.full"
+        <Label fx:id="fullRoomText" text="%room.full"
                style="-fx-font-size: 40; -fx-alignment: center; -fx-text-alignment: center; -fx-font-weight: bold; -fx-font-family: 'Comic Sans MS'"/>
     </VBox>
 

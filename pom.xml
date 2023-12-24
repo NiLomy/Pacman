@@ -24,7 +24,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>ru.kpfu.itis.lobanov.server.ApplicationServer</mainClass>
+                                    <mainClass>ru.kpfu.itis.lobanov.server.ApplicationServerProvider</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>

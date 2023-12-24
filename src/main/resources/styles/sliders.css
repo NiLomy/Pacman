@@ -1,0 +1,33 @@
+.slider-light {
+    -fx-control-inner-background: white;
+}
+
+.slider-light .thumb {
+    -fx-background-color: white;
+    -fx-background-radius: 20px;
+    -fx-border-color: #000000;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-padding: 10px;
+}
+
+.slider-light .axis {
+    -fx-tick-label-fill: black;
+}
+
+.slider-dark {
+    -fx-control-inner-background: #78cef3;
+}
+
+.slider-dark .thumb {
+    -fx-background-color: #0341b2;
+    -fx-background-radius: 20px;
+    -fx-border-color: #000000;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-padding: 10px;
+}
+
+.slider-dark .axis {
+    -fx-tick-label-fill: blue;
+}

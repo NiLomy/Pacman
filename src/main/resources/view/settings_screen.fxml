@@ -5,16 +5,32 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="ru.kpfu.itis.lobanov.controller.impl.SettingsScreenController">
+            fx:id="screen"
+            fx:controller="ru.kpfu.itis.lobanov.controller.impl.SettingsScreenController"
+            style="-fx-background-color: white">
 
     <Button fx:id="back" text="%go_back" AnchorPane.topAnchor="32" AnchorPane.leftAnchor="20"
             style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'"/>
+    <VBox spacing="10" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="32" alignment="CENTER">
+        <Label fx:id="changeThemeText" text="%game.mode.light" style="-fx-font-family: 'Comic Sans MS'; -fx-font-size: 40"/>
+        <Button fx:id="changeTheme" AnchorPane.topAnchor="32" AnchorPane.rightAnchor="20" mnemonicParsing="false">
+            <graphic>
+                <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="/images/themes/light-mode.png" />
+                    </image>
+                </ImageView>
+            </graphic>
+        </Button>
+    </VBox>
 
-    <VBox spacing="20" AnchorPane.topAnchor="80" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20"
+    <VBox spacing="20" AnchorPane.topAnchor="80" AnchorPane.leftAnchor="180" AnchorPane.rightAnchor="180"
           alignment="CENTER">
-        <Label text="%select.size" style="-fx-font-family: 'Comic Sans MS'; -fx-font-size: 40"/>
+        <Label fx:id="changeSizeText" text="%select.size" style="-fx-font-family: 'Comic Sans MS'; -fx-font-size: 40"/>
         <ComboBox fx:id="sizeCombo" style="-fx-font-family: 'Comic Sans MS'; -fx-font-size: 32" minWidth="220">
             <items>
                 <FXCollections fx:factory="observableArrayList">
@@ -25,7 +41,7 @@
             </items>
         </ComboBox>
 
-        <Label text="%select.language" style="-fx-font-family: 'Comic Sans MS'; -fx-font-size: 40"/>
+        <Label fx:id="changeLanguageText" text="%select.language" style="-fx-font-family: 'Comic Sans MS'; -fx-font-size: 40"/>
         <ComboBox fx:id="languageCombo" style="-fx-font-family: 'Comic Sans MS'; -fx-font-size: 32" minWidth="220">
             <items>
                 <FXCollections fx:factory="observableArrayList">
@@ -34,6 +50,7 @@
                 </FXCollections>
             </items>
         </ComboBox>
+
         <Button fx:id="apply" text="%settings.apply" style="-fx-font-size: 32; -fx-font-family: 'Comic Sans MS'">
             <VBox.margin>
                 <Insets>

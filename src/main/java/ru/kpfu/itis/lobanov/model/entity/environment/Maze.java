@@ -3,6 +3,7 @@ package ru.kpfu.itis.lobanov.model.entity.environment;
 import javafx.scene.shape.Rectangle;
 import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Bonus;
 import ru.kpfu.itis.lobanov.model.entity.environment.pickups.Pellet;
+import ru.kpfu.itis.lobanov.utils.constants.AppConfig;
 import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
 import ru.kpfu.itis.lobanov.utils.constants.Placement;
 
@@ -274,8 +275,8 @@ public class Maze implements Serializable {
         while (true) {
             int index = random.nextInt(cellsForPlacement.length);
             Cell cell = cellsForPlacement[index];
-            double cellX = cell.getX() * GameSettings.CELL_SIZE + GameSettings.CELL_SIZE / 2;
-            double cellY = cell.getY() * GameSettings.CELL_SIZE + GameSettings.CELL_SIZE / 2;
+            double cellX = cell.getX() * AppConfig.CELL_SIZE + AppConfig.CELL_SIZE / 2;
+            double cellY = cell.getY() * AppConfig.CELL_SIZE + AppConfig.CELL_SIZE / 2;
 
             if (!cell.isWall() && (cellX != pacmanX || cellY != pacmanY)) {
                 return new Bonus(cellX, cellY, GameSettings.BONUS_SCORES);
@@ -289,10 +290,14 @@ public class Maze implements Serializable {
 
         for (int x = beginIndex; x < GameSettings.MAZE_SIZE - 1; x++) {
             for (int y = beginIndex; y < GameSettings.MAZE_SIZE - 1; y++) {
-                double cellX = x * GameSettings.CELL_SIZE + GameSettings.CELL_SIZE / 2 - 2;
-                double cellY = y * GameSettings.CELL_SIZE + GameSettings.CELL_SIZE / 2 - 2;
-                Bonus tempBonus = new Bonus(cellX, cellY, GameSettings.BONUS_SCORES);
-                if (!data[x][y].isWall()) {
+                double cellX = x * AppConfig.CELL_SIZE + AppConfig.CELL_SIZE / 2 - GameSettings.PELLET_SET_UP_COORDINATES_BIAS;
+                double cellY = y * AppConfig.CELL_SIZE + AppConfig.CELL_SIZE / 2 - GameSettings.PELLET_SET_UP_COORDINATES_BIAS;
+                Bonus tempBonus = new Bonus(cellX + GameSettings.PELLET_SET_UP_COORDINATES_BIAS, cellY + GameSettings.PELLET_SET_UP_COORDINATES_BIAS, GameSettings.BONUS_SCORES);
+                if (
+                    !data[x][y].isWall() &&
+                    (Double.compare(x * AppConfig.CELL_SIZE + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS, pacmanX) != 0 || Double.compare(y * AppConfig.CELL_SIZE + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS, pacmanY) != 0) &&
+                    !bonuses.contains(tempBonus)
+                ) {
                     pellets.add(new Pellet(cellX, cellY, GameSettings.PELLET_SCORES));
                 }
             }
@@ -305,7 +310,7 @@ public class Maze implements Serializable {
         for (int x = 0; x < GameSettings.MAZE_SIZE; x++) {
             for (int y = 0; y < GameSettings.MAZE_SIZE; y++) {
                 if (data[x][y].isWall()) {
-                    Rectangle rectangle = new Rectangle(x * GameSettings.CELL_SIZE, y * GameSettings.CELL_SIZE, GameSettings.CELL_SIZE, GameSettings.CELL_SIZE);
+                    Rectangle rectangle = new Rectangle(x * AppConfig.CELL_SIZE, y * AppConfig.CELL_SIZE, AppConfig.CELL_SIZE, AppConfig.CELL_SIZE);
                     walls.add(rectangle);
                 }
             }

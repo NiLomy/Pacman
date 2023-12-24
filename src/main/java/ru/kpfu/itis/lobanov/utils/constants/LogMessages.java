@@ -18,6 +18,11 @@ public class LogMessages {
     public static final String SAVE_DB_EXCEPTION =  "Can't save server model into DB.";
     public static final String UPDATE_DB_EXCEPTION = "Can't update server model into DB.";
     public static final String REMOVE_DB_EXCEPTION = "Can't remove server model from DB.";
+    public static final String WRITE_DB_CONFIG_EXCEPTION = "Can not write data into the property file.";
+    public static final String READ_DB_CONFIG_EXCEPTION = "Can not read data from the property file.";
+    public static final String NOT_FOUND_DB_CONFIG_EXCEPTION = "Unable to find: %s.";
+    public static final String ESTABLISH_CONNECTION_DB_EXCEPTION = "Can not connect to DB.";
+    public static final String GET_CONFIGURATION_DB_EXCEPTION = "Can not get configurations for current DB.";
     public static final String INVALID_PROTOCOL_VERSION_EXCEPTION = "Versions of the protocols don't match. Message first bytes must be: ";
     public static final String INVALID_MESSAGE_TYPE_EXCEPTION = "Wrong message type: %d.";
     public static final String INVALID_MESSAGE_LENGTH_EXCEPTION = "Protocol doesn't support this message length: %d. Message length can't be greater than %d bytes length.";
@@ -25,11 +30,7 @@ public class LogMessages {
     public static final String WRITE_MESSAGE_EXCEPTION = "Can't write message.";
     public static final String INITIALIZE_UPDATER_EXCEPTION = "Screen updater: %s hasn't been initialized yet.";
     public static final String DECODE_IMAGE_EXCEPTION = "Can't decode image.";
-    public static final String WRITE_DB_CONFIG_EXCEPTION = "Can not write data into the property file.";
-    public static final String READ_DB_CONFIG_EXCEPTION = "Can not read data from the property file.";
-    public static final String NOT_FOUND_DB_CONFIG_EXCEPTION = "Unable to find: %s.";
-    public static final String ESTABLISH_CONNECTION_DB_EXCEPTION = "Can not connect to DB.";
-    public static final String GET_CONFIGURATION_DB_EXCEPTION = "Can not get configurations for current DB.";
+    public static final String LOCAL_HOST_EXCEPTION = "Local host name cannot be resolved into an address.";
 
     private LogMessages() {}
 }

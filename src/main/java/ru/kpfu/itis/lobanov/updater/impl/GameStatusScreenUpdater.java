@@ -18,7 +18,7 @@ public class GameStatusScreenUpdater extends AbstractScreenUpdater {
         try {
             Thread.sleep(GameSettings.GAME_DOWNLOADING_TIME);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            isGameAlive = false;
         }
         while (isGameAlive) {
             try {
@@ -27,13 +27,12 @@ public class GameStatusScreenUpdater extends AbstractScreenUpdater {
                 server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.PACMAN_EAT_BONUS_RESPONSE, new byte[0]));
                 server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.CHANGE_SCORES_RESPONSE, new byte[0]));
                 server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.GAME_WIN_RESPONSE, new byte[0]));
-            } catch (ConcurrentModificationException e) {
-                System.out.println("YAAAA");
+            } catch (ConcurrentModificationException ignored) {
             }
             try {
                 Thread.sleep(GameSettings.GAME_STATUS_UPDATE_FREQUENCY);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                isGameAlive = false;
             }
         }
     }

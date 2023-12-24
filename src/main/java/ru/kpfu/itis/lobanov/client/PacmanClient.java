@@ -43,6 +43,7 @@ public class PacmanClient implements Client {
         try {
             MessageProtocol.writeMessage(thread.getOut(), message);
         } catch (MessageWriteException e) {
+            thread.stop();
             throw new ClientException(LogMessages.WRITE_CLIENT_EXCEPTION, e);
         }
     }
@@ -93,8 +94,6 @@ public class PacmanClient implements Client {
         public OutputStream getOut() {
             return out;
         }
-
-        
 
         public void stop() {
             try {

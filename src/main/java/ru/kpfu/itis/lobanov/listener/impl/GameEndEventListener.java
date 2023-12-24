@@ -14,7 +14,6 @@ public class GameEndEventListener extends AbstractEventListener {
             throw new EventListenerException(String.format(LogMessages.INITIALIZE_LISTENER_EXCEPTION, GameEndEventListener.class.getSimpleName()));
 
         server.sendBroadCastMessage(GameMessageProvider.createMessage(MessageType.GAME_END_RESPONSE, message.getData()));
-        server.endGame();
         server.closeServer();
     }
 

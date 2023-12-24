@@ -3,6 +3,7 @@ package ru.kpfu.itis.lobanov.model.entity.player.impl;
 import javafx.scene.image.Image;
 import ru.kpfu.itis.lobanov.model.entity.environment.Maze;
 import ru.kpfu.itis.lobanov.model.entity.player.AbstractPlayer;
+import ru.kpfu.itis.lobanov.utils.constants.AppConfig;
 import ru.kpfu.itis.lobanov.utils.constants.Direction;
 import ru.kpfu.itis.lobanov.utils.constants.GameResources;
 import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
@@ -23,7 +24,7 @@ public class Ghost extends AbstractPlayer {
         super(maze);
         this.ghostPackageSprite = ghostPackageSprite;
 
-        setSpawnPoint(GameSettings.CELL_SIZE + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS, GameSettings.CELL_SIZE + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+        setSpawnPoint(AppConfig.CELL_SIZE + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS, AppConfig.CELL_SIZE + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
         setHp(GameSettings.GHOST_HP);
     }
 
@@ -73,9 +74,9 @@ public class Ghost extends AbstractPlayer {
                     if (!checkForWall(movingDirection, walls, view, offsetX, offsetY)) {
                         setY(y - GameSettings.GHOST_SPEED);
                     }
-                    if (y + GameSettings.CELL_SIZE / 2 <= offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS * 2) {
-                        setY(maze.getLowerExit().getY() * GameSettings.CELL_SIZE + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
-                        setX(maze.getLowerExit().getX() * GameSettings.CELL_SIZE + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                    if (y + AppConfig.CELL_SIZE / 2 <= offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS * 2) {
+                        setY(maze.getLowerExit().getY() * AppConfig.CELL_SIZE + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                        setX(maze.getLowerExit().getX() * AppConfig.CELL_SIZE + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
                     }
                     break;
                 case DOWN:
@@ -87,9 +88,9 @@ public class Ghost extends AbstractPlayer {
                     if (!checkForWall(movingDirection, walls, view, offsetX, offsetY)) {
                         setY(y + GameSettings.GHOST_SPEED);
                     }
-                    if (y >= maze.labyrinthLength() * GameSettings.CELL_SIZE + offsetY - GameSettings.CELL_SIZE / 2 - GameSettings.PLAYER_SET_UP_COORDINATE_BIAS) {
-                        setY(GameSettings.CELL_SIZE / 2 + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
-                        setX(maze.getUpperExit().getX() * GameSettings.CELL_SIZE + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                    if (y >= maze.labyrinthLength() * AppConfig.CELL_SIZE + offsetY - AppConfig.CELL_SIZE / 2 - GameSettings.PLAYER_SET_UP_COORDINATE_BIAS) {
+                        setY(AppConfig.CELL_SIZE / 2 + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                        setX(maze.getUpperExit().getX() * AppConfig.CELL_SIZE + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
                     }
                     break;
                 case LEFT:
@@ -101,9 +102,9 @@ public class Ghost extends AbstractPlayer {
                     if (!checkForWall(movingDirection, walls, view, offsetX, offsetY)) {
                         setX(x - GameSettings.GHOST_SPEED);
                     }
-                    if (x + GameSettings.CELL_SIZE / 2 <= offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS * 2) {
-                        setX(maze.getRightExit().getX() * GameSettings.CELL_SIZE + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
-                        setY(maze.getRightExit().getY() * GameSettings.CELL_SIZE + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                    if (x + AppConfig.CELL_SIZE / 2 <= offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS * 2) {
+                        setX(maze.getRightExit().getX() * AppConfig.CELL_SIZE + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                        setY(maze.getRightExit().getY() * AppConfig.CELL_SIZE + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
                     }
                     break;
                 case RIGHT:
@@ -115,9 +116,9 @@ public class Ghost extends AbstractPlayer {
                     if (!checkForWall(movingDirection, walls, view, offsetX, offsetY)) {
                         setX(x + GameSettings.GHOST_SPEED);
                     }
-                    if (x >= maze.labyrinthLength() * GameSettings.CELL_SIZE + offsetX - GameSettings.CELL_SIZE / 2 - GameSettings.PLAYER_SET_UP_COORDINATE_BIAS) {
-                        setX(GameSettings.CELL_SIZE / 2 + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
-                        setY(maze.getLeftExit().getY() * GameSettings.CELL_SIZE + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                    if (x >= maze.labyrinthLength() * AppConfig.CELL_SIZE + offsetX - AppConfig.CELL_SIZE / 2 - GameSettings.PLAYER_SET_UP_COORDINATE_BIAS) {
+                        setX(AppConfig.CELL_SIZE / 2 + offsetX + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
+                        setY(maze.getLeftExit().getY() * AppConfig.CELL_SIZE + offsetY + GameSettings.PLAYER_SET_UP_COORDINATE_BIAS);
                     }
             }
         }
@@ -131,8 +132,8 @@ public class Ghost extends AbstractPlayer {
         this.rightGhostImage = new Image(GameResources.GHOST_PACKAGE_PREFIX + ghostPackageSprite + GameResources.RIGHT_IMAGE);
 
         view.setImage(rightGhostImage);
-        view.setFitWidth(GameSettings.CELL_SIZE - GameSettings.PLAYER_SET_UP_VIEW_SIZE_BIAS);
-        view.setFitHeight(GameSettings.CELL_SIZE - GameSettings.PLAYER_SET_UP_VIEW_SIZE_BIAS);
+        view.setFitWidth(AppConfig.CELL_SIZE - GameSettings.PLAYER_SET_UP_VIEW_SIZE_BIAS);
+        view.setFitHeight(AppConfig.CELL_SIZE - GameSettings.PLAYER_SET_UP_VIEW_SIZE_BIAS);
         view.setX(spawnX);
         view.setY(spawnY);
     }

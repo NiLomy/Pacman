@@ -18,15 +18,13 @@ public class CreateGhostEventListener extends AbstractEventListener {
         if (!isInit)
             throw new EventListenerException(String.format(LogMessages.INITIALIZE_LISTENER_EXCEPTION, CreateGhostEventListener.class.getSimpleName()));
 
-        byte[] maze = SerializationUtils.serialize(server.getMaze());
         for (int i = 0; i < server.getGhosts().size(); i++) {
             Ghost ghost = server.getGhosts().get(i);
 
-            ByteBuffer buffer = ByteBuffer.allocate(maze.length + GameSettings.DOUBLE_BYTES * 2 + GameSettings.INTEGER_BYTES);
+            ByteBuffer buffer = ByteBuffer.allocate(GameSettings.DOUBLE_BYTES * 2 + GameSettings.INTEGER_BYTES);
             buffer.putInt(i);
             buffer.putDouble(ghost.getSpawnX());
             buffer.putDouble(ghost.getSpawnY());
-            buffer.put(maze);
 
             Message response = GameMessageProvider.createMessage(MessageType.CREATE_GHOST_RESPONSE, buffer.array());
             server.sendMessage(connectionId, response);

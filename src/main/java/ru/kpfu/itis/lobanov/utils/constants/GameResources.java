@@ -15,6 +15,7 @@ public class GameResources {
     public static final String CREATE_ROOM_SCREEN = "/view/create_room_screen.fxml";
     public static final String GAME_SCREEN = "/view/game_screen.fxml";
     public static final String GAME_OVER_SCREEN = "/view/game_over_screen.fxml";
+    public static final String NET_ERROR_SCREEN = "/view/net_error_screen.fxml";
     // text resources
     public static final String GAME_STATS = "game.stats";
     public static final String GAME_SCORES = "game.scores";

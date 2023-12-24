@@ -1,0 +1,43 @@
+.text-field-light {
+    -fx-font-size: 24;
+    -fx-font-family: 'Comic Sans MS';
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+    -fx-text-fill: black;
+    -fx-background-color: #e6e8e8;
+    -fx-border-color: black;
+    -fx-border-width: 4px;
+    -fx-border-radius: 4px;
+}
+
+.text-field-light:hover {
+    -fx-font-size: 24;
+    -fx-font-family: 'Comic Sans MS';
+    -fx-background-color: #f3f5f5;
+    -fx-border-color: black;
+    -fx-border-width: 4px;
+    -fx-cursor: hand;
+    -fx-border-radius: 4px;
+}
+
+.text-field-dark {
+    -fx-font-size: 24;
+    -fx-font-family: 'Comic Sans MS';
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+    -fx-text-fill: blue;
+    -fx-background-color: #010618;
+    -fx-border-color: blue;
+    -fx-border-width: 4px;
+    -fx-border-radius: 4px;
+}
+
+.text-field-dark:hover {
+    -fx-font-size: 24;
+    -fx-font-family: 'Comic Sans MS';
+    -fx-background-color: #020a2a;
+    -fx-border-color: blue;
+    -fx-border-width: 4px;
+    -fx-cursor: hand;
+    -fx-border-radius: 4px;
+}

@@ -3,6 +3,7 @@ package ru.kpfu.itis.lobanov.model.entity.environment.pickups;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import ru.kpfu.itis.lobanov.utils.constants.AppConfig;
 import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
 
 import java.util.Objects;
@@ -16,7 +17,7 @@ public class Bonus extends ScoreLocatableObject {
 
     public void show(Rectangle2D coordinates) {
         view = new Circle();
-        view.setRadius(GameSettings.CELL_SIZE / 4);
+        view.setRadius(AppConfig.CELL_SIZE / 4);
         view.setFill(Color.BLUE);
         view.setCenterX(x + coordinates.getWidth() / 3);
         view.setCenterY(y + coordinates.getHeight() / 6);

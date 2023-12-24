@@ -3,6 +3,8 @@ package ru.kpfu.itis.lobanov.controller.impl;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import ru.kpfu.itis.lobanov.PacmanApplication;
 import ru.kpfu.itis.lobanov.client.PacmanClient;
 import ru.kpfu.itis.lobanov.controller.MessageReceiverController;
@@ -21,6 +23,10 @@ import java.util.ResourceBundle;
 public class WaitingRoomController implements MessageReceiverController {
     public static final String PLAYERS_COUNT = "Players: %d/%d";
     @FXML
+    private AnchorPane screen;
+    @FXML
+    private Label playersWaitingLabel;
+    @FXML
     private Label playersCountLabel;
     private int maxPlayersCount;
     private int userCount;
@@ -30,6 +36,11 @@ public class WaitingRoomController implements MessageReceiverController {
     public void initialize(URL location, ResourceBundle resources) {
         visualizer = new AppScreenVisualizer();
 
+        if (AppConfig.lightMode) {
+            setLightTheme();
+        } else {
+            setDarkTheme();
+        }
         PacmanClient client = PacmanApplication.getClient();
         client.setController(this);
         maxPlayersCount = ServerRepository.get(AppConfig.host, AppConfig.port).getPlayersCount();
@@ -49,5 +60,17 @@ public class WaitingRoomController implements MessageReceiverController {
                 Platform.runLater(() -> visualizer.show(GameResources.GAME_SCREEN));
             }
         }
+    }
+
+    private void setLightTheme() {
+        screen.setStyle("-fx-background-color: white");
+        playersWaitingLabel.setTextFill(Color.BLACK);
+        playersCountLabel.setTextFill(Color.BLACK);
+    }
+
+    private void setDarkTheme() {
+        screen.setStyle("-fx-background-color: black");
+        playersWaitingLabel.setTextFill(Color.BLUE);
+        playersCountLabel.setTextFill(Color.BLUE);
     }
 }

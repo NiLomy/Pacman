@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -14,15 +15,16 @@ import javafx.scene.shape.Rectangle;
 import ru.kpfu.itis.lobanov.PacmanApplication;
 import ru.kpfu.itis.lobanov.client.PacmanClient;
 import ru.kpfu.itis.lobanov.controller.Controller;
+import ru.kpfu.itis.lobanov.exceptions.LocalHostException;
 import ru.kpfu.itis.lobanov.model.entity.environment.Cell;
 import ru.kpfu.itis.lobanov.model.entity.environment.Maze;
-import ru.kpfu.itis.lobanov.server.ApplicationServer;
+import ru.kpfu.itis.lobanov.server.ApplicationServerProvider;
 import ru.kpfu.itis.lobanov.server.PacmanServer;
 import ru.kpfu.itis.lobanov.utils.AppScreenVisualizer;
 import ru.kpfu.itis.lobanov.utils.constants.AppConfig;
 import ru.kpfu.itis.lobanov.utils.constants.GameResources;
 import ru.kpfu.itis.lobanov.utils.constants.GameSettings;
-import ru.kpfu.itis.lobanov.utils.constants.Placement;
+import ru.kpfu.itis.lobanov.utils.constants.LogMessages;
 
 import java.net.InetAddress;
 import java.net.URL;
@@ -31,7 +33,8 @@ import java.util.ResourceBundle;
 
 public class CreateRoomScreenController implements Controller {
     public static final String ANY_NON_DIGIT = "\\D*";
-
+    @FXML
+    private AnchorPane screen;
     @FXML
     private Button backBtn;
     @FXML
@@ -45,9 +48,13 @@ public class CreateRoomScreenController implements Controller {
     @FXML
     private Slider setPlayerCount;
     @FXML
+    private Label portInput;
+    @FXML
     private Label emptyPort;
+    @FXML
+    private Label playersCount;
     private VBox map;
-    private VBox lastMap;
+    private HBox lastMap;
     private Maze maze;
     private AppScreenVisualizer visualizer;
 
@@ -56,6 +63,11 @@ public class CreateRoomScreenController implements Controller {
         maze = new Maze();
         visualizer = new AppScreenVisualizer();
 
+        if (AppConfig.lightMode) {
+            setLightTheme();
+        } else {
+            setDarkTheme();
+        }
         setPlayerCount.setBlockIncrement(1);
         setPlayerCount.setMajorTickUnit(1);
         setPlayerCount.valueProperty().addListener((observable, oldValue, newValue) ->
@@ -95,14 +107,14 @@ public class CreateRoomScreenController implements Controller {
 
     private void showMap(String gameMap) {
         if (gameMap != null) {
-            VBox vBox = new VBox();
-            vBox.setAlignment(Pos.CENTER);
+            HBox hBox = new HBox();
+            hBox.setAlignment(Pos.CENTER);
 
             int index = 0;
             double mapLength = Math.sqrt(gameMap.length());
             for (int x = 0; x < mapLength; x++) {
-                HBox line = new HBox();
-                line.setAlignment(Pos.CENTER);
+                VBox column = new VBox();
+                column.setAlignment(Pos.CENTER);
 
                 for (int y = 0; y < mapLength; y++) {
                     Rectangle rectangle = new Rectangle(
@@ -110,16 +122,24 @@ public class CreateRoomScreenController implements Controller {
                             y * GameSettings.MAZE_SIZE_FOR_CREATION_PREVIEW,
                             GameSettings.MAZE_SIZE_FOR_CREATION_PREVIEW,
                             GameSettings.MAZE_SIZE_FOR_CREATION_PREVIEW);
-                    if (gameMap.charAt(index) == '0') {
-                        rectangle.setFill(Color.LIGHTGREY);
+                    if (AppConfig.lightMode) {
+                        if (gameMap.charAt(index) == GameSettings.SPACE_DECODER_CHAR) {
+                            rectangle.setFill(Color.LIGHTGREY);
+                        }
+                    } else {
+                        if (gameMap.charAt(index) == GameSettings.SPACE_DECODER_CHAR) {
+                            rectangle.setFill(Color.BLACK);
+                        } else {
+                            rectangle.setFill(Color.BLUE);
+                        }
                     }
-                    line.getChildren().addAll(rectangle);
+                    column.getChildren().addAll(rectangle);
                     index++;
                 }
-                vBox.getChildren().addAll(line);
+                hBox.getChildren().addAll(column);
             }
-            lastMap = vBox;
-            map.getChildren().addAll(vBox);
+            lastMap = hBox;
+            map.getChildren().addAll(hBox);
         }
     }
 
@@ -129,12 +149,11 @@ public class CreateRoomScreenController implements Controller {
             emptyPort.setVisible(true);
         } else {
             emptyPort.setVisible(false);
+            submit.setDisable(true);
 
-//            new Thread(() -> {
-//            }).start();
-            PacmanServer server = ApplicationServer.createServer(Integer.parseInt(port), (int) setPlayerCount.getValue());
+            PacmanServer server = ApplicationServerProvider.createServer(Integer.parseInt(port), (int) setPlayerCount.getValue());
             server.setMaze(maze);
-            ApplicationServer.startServer(server);
+            ApplicationServerProvider.startServer(server);
             Platform.runLater(() -> showWaitingRoomScreen(Integer.parseInt(port)));
         }
     }
@@ -151,7 +170,37 @@ public class CreateRoomScreenController implements Controller {
 
             visualizer.show(GameResources.WAITING_ROOM_SCREEN);
         } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
+            throw new LocalHostException(LogMessages.LOCAL_HOST_EXCEPTION, e);
         }
+    }
+
+    private void setLightTheme() {
+        screen.getStyleClass().add("screen-light");
+        backBtn.getStyleClass().add("button-light");
+        backBtn.setTextFill(Color.BLACK);
+        changeBtn.getStyleClass().add("button-light");
+        changeBtn.setTextFill(Color.BLACK);
+        submit.getStyleClass().add("button-light");
+        submit.setTextFill(Color.BLACK);
+        portInput.setTextFill(Color.BLACK);
+        emptyPort.setTextFill(Color.BLACK);
+        playersCount.setTextFill(Color.BLACK);
+        setPort.getStyleClass().add("text-field-light");
+        setPlayerCount.getStyleClass().add("slider-light");
+    }
+
+    private void setDarkTheme() {
+        screen.setStyle("-fx-background-color: black");
+        backBtn.getStyleClass().add("button-dark");
+        backBtn.setTextFill(Color.BLUE);
+        changeBtn.getStyleClass().add("button-dark");
+        changeBtn.setTextFill(Color.BLUE);
+        submit.getStyleClass().add("button-dark");
+        submit.setTextFill(Color.BLUE);
+        portInput.setTextFill(Color.BLUE);
+        emptyPort.setTextFill(Color.BLUE);
+        playersCount.setTextFill(Color.BLUE);
+        setPort.getStyleClass().add("text-field-dark");
+        setPlayerCount.getStyleClass().add("slider-dark");
     }
 }

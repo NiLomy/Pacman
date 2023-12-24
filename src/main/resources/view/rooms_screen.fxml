@@ -6,11 +6,12 @@
 <?import javafx.scene.layout.*?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
+            fx:id="screen"
             fx:controller="ru.kpfu.itis.lobanov.controller.impl.RoomsScreenController">
 
     <children>
         <VBox AnchorPane.topAnchor="32.0" AnchorPane.leftAnchor="20">
-            <Button fx:id="backBtn" text="%go_back" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'; -fx-cursor: pointer"/>
+            <Button fx:id="backBtn" text="%go_back" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'"/>
         </VBox>
         <VBox AnchorPane.topAnchor="32.0" AnchorPane.rightAnchor="20">
             <Button fx:id="createRoom" text="%room.create" style="-fx-font-size: 24; -fx-font-family: 'Comic Sans MS'"/>
